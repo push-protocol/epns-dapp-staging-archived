@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "https://staging-app.epns.io/static/css/main.fca38781.chunk.css",
+    "main.js": "https://staging-app.epns.io/static/js/main.5e9dae95.chunk.js",
+    "main.js.map": "https://staging-app.epns.io/static/js/main.5e9dae95.chunk.js.map",
+    "runtime-main.js": "https://staging-app.epns.io/static/js/runtime-main.3f1dbb42.js",
+    "runtime-main.js.map": "https://staging-app.epns.io/static/js/runtime-main.3f1dbb42.js.map",
+    "static/css/2.f9890651.chunk.css": "https://staging-app.epns.io/static/css/2.f9890651.chunk.css",
+    "static/js/2.4a01eb24.chunk.js": "https://staging-app.epns.io/static/js/2.4a01eb24.chunk.js",
+    "static/js/2.4a01eb24.chunk.js.map": "https://staging-app.epns.io/static/js/2.4a01eb24.chunk.js.map",
+    "static/js/3.2bd2a143.chunk.js": "https://staging-app.epns.io/static/js/3.2bd2a143.chunk.js",
+    "static/js/3.2bd2a143.chunk.js.map": "https://staging-app.epns.io/static/js/3.2bd2a143.chunk.js.map",
+    "index.html": "https://staging-app.epns.io/index.html",
+    "precache-manifest.0da27e730bd3c404492bfc7a661ec327.js": "https://staging-app.epns.io/precache-manifest.0da27e730bd3c404492bfc7a661ec327.js",
+    "service-worker.js": "https://staging-app.epns.io/service-worker.js",
+    "static/css/2.f9890651.chunk.css.map": "https://staging-app.epns.io/static/css/2.f9890651.chunk.css.map",
+    "static/css/main.fca38781.chunk.css.map": "https://staging-app.epns.io/static/css/main.fca38781.chunk.css.map",
+    "static/js/2.4a01eb24.chunk.js.LICENSE.txt": "https://staging-app.epns.io/static/js/2.4a01eb24.chunk.js.LICENSE.txt",
+    "static/js/3.2bd2a143.chunk.js.LICENSE.txt": "https://staging-app.epns.io/static/js/3.2bd2a143.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.3f1dbb42.js",
+    "static/css/2.f9890651.chunk.css",
+    "static/js/2.4a01eb24.chunk.js",
+    "static/css/main.fca38781.chunk.css",
+    "static/js/main.5e9dae95.chunk.js"
+  ]
+}
