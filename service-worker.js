@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "https://staging-app.epns.io/precache-manifest.8e262d40c231c1105ce79d594cb73f82.js"
+  "https://staging-app.epns.io/precache-manifest.4cac4919033c7b7bda9c6aba280a5d90.js"
 );
 
 self.addEventListener('message', (event) => {
