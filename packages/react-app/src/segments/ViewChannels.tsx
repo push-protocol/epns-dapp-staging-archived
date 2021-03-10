@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { css } from 'styled-components';
 import Loader from 'react-loader-spinner'
+import { Waypoint } from "react-waypoint";
 
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
@@ -21,39 +22,29 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
   const [controlAt, setControlAt] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [channels, setChannels] = React.useState([]);
+  const [paginatedChannels, setPaginatedChannels] = React.useState([]);
   const [user, setUser] = React.useState(null);
   const [owner, setOwner] = React.useState(null);
+
+  const [page, setPage] = React.useState(0);
+  const channelsPerPage = 2;
+  const channelsVisited = page * channelsPerPage;
 
   React.useEffect(() => {
     fetchChannels();
   }, [account]);
 
+  //update paginatedChannels array when scrolled till the end
+  React.useEffect(() => {
+    if(channels){
+      setPaginatedChannels(prev => [...prev, ...channels.slice(channelsVisited, channelsVisited + channelsPerPage)])
+    }
+  }, [channels, page]);
+
   // handle user action at control center
   const userClickedAt = (controlIndex) => {
     setControlAt(controlIndex);
   }
-
-  //ROPSTEN ETHER FAUCET API IMPLEMENTATION
-  //not feasible at the moment
-
-  // const requestEther = () => {
-
-  //   fetch('https://faucet.ropsten.be/donate/0x276B820E8382f17ECB9FA77B0952ca4E67287601')
-  //   .then(async response => {
-  //     const data = await response.json();
-  //     console.log("🚀 ~ file: ViewChannels.tsx ~ line 40 ~ requestEther ~ data", data)
-
-  //     // check for error response
-  //     if (!response.ok) {
-  //         // get error message from body or default to response statusText
-  //         const error = (data && data.message) || response.statusText;
-  //         console.log(error);
-  //     }
-  // })
-  // .catch(error => {
-  //     console.error('There was an error!', error);
-  // });
-  // }
 
   // to fetch channels
   const fetchChannels = async () => {
@@ -79,6 +70,8 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
     setChannels(channelsMeta);
     setLoading(false);
   }
+
+  
 
   return (
     <>
@@ -107,36 +100,46 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
         <Items id="scrollstyle-secondary">
           <Faucets/>
 
-          {Object.keys(channels).map(index => {
+          {Object.keys(paginatedChannels).map(index => {
             const isOwner = (
-              channels[index].addr === account ||
-              (account === owner && channels[index].addr === "0x0000000000000000000000000000000000000000")
+              paginatedChannels[index].addr === account ||
+              (account === owner && paginatedChannels[index].addr === "0x0000000000000000000000000000000000000000")
             );
 
-            if (channels[index].addr !== "0x0000000000000000000000000000000000000000") {
+            if (paginatedChannels[index].addr !== "0x0000000000000000000000000000000000000000") {
               return (
+                <>
+                {Number(index) === paginatedChannels.length -1 && (<Waypoint onEnter = { () => setPage(prev => prev + 1)}/>)}
                 <ViewChannelItem
-                  key={channels[index].addr}
-                  channelObject={channels[index]}
+                  key={paginatedChannels[index].addr}
+                  channelObject={paginatedChannels[index]}
                   isOwner={isOwner}
                   epnsReadProvider={epnsReadProvider}
                   epnsWriteProvide={epnsWriteProvide}
                 />
+                </>
               );
             }
-            else if (channels[index].addr === "0x0000000000000000000000000000000000000000" && user.channellized) {
+            else if (paginatedChannels[index].addr === "0x0000000000000000000000000000000000000000" && user.channellized) {
               return (
+                <>
+                {Number(index) === paginatedChannels.length -1 && (<Waypoint onEnter = { () => setPage(prev => prev + 1)}/>)}
                 <ViewChannelItem
-                  key={channels[index].addr}
-                  channelObject={channels[index]}
+                  key={paginatedChannels[index].addr}
+                  channelObject={paginatedChannels[index]}
                   isOwner={isOwner}
                   epnsReadProvider={epnsReadProvider}
                   epnsWriteProvide={epnsWriteProvide}
                 />
+                </>
               );
             }
             else {
-              return null;
+              return(
+                <>
+                {Number(index) === paginatedChannels.length -1 && (<Waypoint onEnter = { () => setPage(prev => prev + 1)}/>)}
+                </>
+              )
             }
           })}
         </Items>
