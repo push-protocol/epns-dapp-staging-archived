@@ -76,7 +76,7 @@ function Feedbox({ epnsReadProvider }) {
 
   //function to query more notifications
   const handlePagination = async() => {
-    await setNotificationsVisited(data.notifications.length);
+    await setNotificationsVisited(prev => prev + notificationsPerPage);
     await fetchMore({
       variables: {
         first: notificationsPerPage,
