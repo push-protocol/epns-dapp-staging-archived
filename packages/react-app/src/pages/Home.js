@@ -16,6 +16,7 @@ import ViewChannels from 'segments/ViewChannels';
 import Info from "segments/Info";
 import ChannelOwnerDashboard from 'segments/ChannelOwnerDashboard';
 import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
+import NFT from 'segments/NFT';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
@@ -168,6 +169,14 @@ function Home({ setBadgeCount, bellPressed }) {
           <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
           <ControlText active={controlAt == 3 ? 1 : 0}>Receive Notifs</ControlText>
         </ControlButton>
+        <ControlButton index={4} active={controlAt == 4 ? 1 : 0} border="#e20880"
+          onClick={() => {
+            userClickedAt(4)
+          }}
+        >
+          <ControlImage src="./svg/share.svg" active={controlAt == 4 ? 1 : 0} />
+          <ControlText active={controlAt == 4 ? 1 : 0}>NFT</ControlText>
+        </ControlButton>
       </Controls>
       <Interface>
         {controlAt == 0 &&
@@ -189,6 +198,12 @@ function Home({ setBadgeCount, bellPressed }) {
         }
         {controlAt == 3 &&
           <Info/>
+        }
+        {controlAt == 4 &&
+          <NFT
+          epnsReadProvider={epnsReadProvider}
+          epnsWriteProvide={epnsWriteProvider}
+          />
         }
       </Interface>
     </Container>
@@ -213,9 +228,9 @@ const Controls = styled.div`
 `
 
 const ControlButton = styled.div`
-  flex: 1 1 21%;
+  flex: 1 1 15%;
   height: 120px;
-  min-width: 200px;
+  min-width: 150px;
   background: #fff;
 
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
@@ -252,7 +267,7 @@ const ControlImage = styled.img`
 
   transition: transform .2s ease-out;
   ${ props => props.active && css`
-    transform: scale(3.5) translate(-20px, 0px);
+    transform: scale(2) translate(-20px, 0px);
     opacity: 0.4;
   `};
 `
