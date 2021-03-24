@@ -16,6 +16,7 @@ import ViewChannels from 'segments/ViewChannels';
 import Info from "segments/Info";
 import ChannelOwnerDashboard from 'segments/ChannelOwnerDashboard';
 import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
+import YieldFarming from 'segments/YieldFarming';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
@@ -53,7 +54,7 @@ function Home({ setBadgeCount, bellPressed }) {
     // Reset when account refreshes
     setChannelAdmin(false);
     setAdminStatusLoaded(false);
-    userClickedAt(1);
+    userClickedAt(4);
     setChannelJson([]);
 
     // EPNS Read Provider Set
@@ -70,7 +71,7 @@ function Home({ setBadgeCount, bellPressed }) {
 
   // Revert to Feedbox on bell pressed
   React.useEffect(() => {
-    setControlAt(0);
+    setControlAt(4);
   }, [bellPressed]);
 
   // handle user action at control center
@@ -168,6 +169,14 @@ function Home({ setBadgeCount, bellPressed }) {
           <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
           <ControlText active={controlAt == 3 ? 1 : 0}>Receive Notifs</ControlText>
         </ControlButton>
+        <ControlButton index={4} active={controlAt == 4 ? 1 : 0} border="#e20880"
+          onClick={() => {
+            userClickedAt(4)
+          }}
+        >
+          <ControlImage src="./svg/share.svg" active={controlAt == 4 ? 1 : 0} />
+          <ControlText active={controlAt == 4 ? 1 : 0}>Yield Farming</ControlText>
+        </ControlButton>
       </Controls>
       <Interface>
         {controlAt == 0 &&
@@ -189,6 +198,9 @@ function Home({ setBadgeCount, bellPressed }) {
         }
         {controlAt == 3 &&
           <Info/>
+        }
+        {controlAt == 4 &&
+          <YieldFarming />
         }
       </Interface>
     </Container>
