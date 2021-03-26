@@ -8,7 +8,7 @@ const addresses = {
   rockstar: "0xCD1B6C8DDB9A735AA5961Ab4aa5B513fba23A3a3", //ropsten address
   batchMintNFT: "0x9A20272669BBAa6254358ba4BB0520fFc813691C", //ropsten address
   NFTRewards: "0x1f4CA0b2B0541b942A440A3f6673883eEacb2cb3", //ropsten address
-  distributor: "0xb4f0a5848F7DFfD2b373E477B30f21028508394b", //ropsten address
+  distributor: "0x4Cd9Fe2E0acb9BC28fA51106b99825bd7a02309e", //ropsten address
 
 };
 
