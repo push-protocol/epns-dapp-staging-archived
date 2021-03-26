@@ -20,6 +20,7 @@ import NFT from 'segments/NFT';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
+import Airdrop from "segments/Airdrop";
 
 
 // Create Header
@@ -169,6 +170,7 @@ function Home({ setBadgeCount, bellPressed }) {
           <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
           <ControlText active={controlAt == 3 ? 1 : 0}>Receive Notifs</ControlText>
         </ControlButton>
+
         <ControlButton index={4} active={controlAt == 4 ? 1 : 0} border="#e20880"
           onClick={() => {
             userClickedAt(4)
@@ -176,6 +178,15 @@ function Home({ setBadgeCount, bellPressed }) {
         >
           <ControlImage src="./svg/share.svg" active={controlAt == 4 ? 1 : 0} />
           <ControlText active={controlAt == 4 ? 1 : 0}>NFT</ControlText>
+        </ControlButton>
+
+        <ControlButton index={5} active={controlAt == 5 ? 1 : 0} border="#e20880"
+          onClick={() => {
+            userClickedAt(5)
+          }}
+        >
+          <ControlImage src="./svg/share.svg" active={controlAt == 5 ? 1 : 0} />
+          <ControlText active={controlAt == 5 ? 1 : 0}>Airdrop</ControlText>
         </ControlButton>
       </Controls>
       <Interface>
@@ -205,6 +216,10 @@ function Home({ setBadgeCount, bellPressed }) {
           epnsWriteProvide={epnsWriteProvider}
           />
         }
+        {controlAt == 5 &&
+          <Airdrop
+          />
+        }
       </Interface>
     </Container>
   );
@@ -228,9 +243,9 @@ const Controls = styled.div`
 `
 
 const ControlButton = styled.div`
-  flex: 1 1 15%;
+  flex: 1 1 10%;
   height: 120px;
-  min-width: 150px;
+  min-width: 100px;
   background: #fff;
 
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
