@@ -5,7 +5,7 @@ import { ethers, utils, BigNumber} from "ethers";
 import { parseEther, bigNumber } from 'ethers/utils'
 const claims = require("config/claims.json")
 
-// FeedDB Helper Function
+// Airdrop Helper Functions
 const AirdropHelper = {
     combinedHash : (first, second) => {
         if (!first) {
@@ -79,7 +79,6 @@ const AirdropHelper = {
         const enableLogs = 1;
         const merkleRootHex = claims.merkleRoot
         const merkleRoot = Buffer.from(merkleRootHex.slice(2), 'hex')
-        console.log("🚀 ~ file: AirdropHelper.js ~ line 82 ~ verifyAddress: ~ merkleRoot", merkleRoot)
         if(claims.claims[user]){
             const claim = claims.claims[user]
         const proof = claim.proof.map((p) => Buffer.from(p.slice(2), 'hex'))
@@ -88,13 +87,8 @@ const AirdropHelper = {
         const isClaimed = await txPromise
         const claimable = !isClaimed
         const BNamount = BigNumber.from(claim.amount)
-        console.log("🚀 ~ file: AirdropHelper.js ~ line 91 ~ verifyAddress: ~ BNamount", BNamount)
-        // const amount = BNamount.toString()
-        const num = BNamount.toString()
         const amount = BNamount.toNumber()
         // const amount = ethers.utils.parseEther(num)
-        console.log("🚀 ~ file: AirdropHelper.js ~ line 95 ~ verifyAddress: ~ amount", amount)
-        console.log("🚀 ~ file: AirdropHelper.js ~ line 88 ~ verifyAddress: ~ claimable", claimable)
         return({ index: claim.index, account: user, amount, proof, merkleRoot, verified, claimable})
         }
         else

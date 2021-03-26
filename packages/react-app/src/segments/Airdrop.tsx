@@ -43,14 +43,10 @@ function Airdrop() {
 
   // to check wh
   const checkClaim = async () => {
-    console.log("🚀 ~ file: Airdrop.tsx ~ line 49 ~ checkClaim ~ checkClaim")
-
     let user = await AirdropHelper.verifyAddress(account, distributorContract);
     setUser(user)
     if(user)
     setLoading(false)
-    console.log("🚀 ~ file: Airdrop.tsx ~ line 44 ~ checkClaim ~ claimable", user)
-    
   }
 
   // to claim
@@ -60,7 +56,6 @@ function Airdrop() {
       let sendWithTxPromise
       sendWithTxPromise = await distributorContract.claim(user.index, user.account, user.amount, user.proof)
       const tx = await sendWithTxPromise;
-
       console.log(tx);
       console.log("waiting for tx to finish");
       let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
@@ -109,8 +104,6 @@ function Airdrop() {
     </Toaster>
   )
 
- 
-
   return (
     <Container>
       {loading &&
@@ -125,33 +118,25 @@ function Airdrop() {
       }
 
       {!loading && controlAt == 0 && 
-      <>
-        <InfoBox>
-          {/* <ViewInfoItem/> */}
-          <Container >
-            <ChannelInfo>
-              <ChannelTitle>
-
-                {user.verified && user.claimable &&
-                  <Continue theme='#674c9f' onClick={() => {handleClaim(user)}}>Claim $PUSH Tokens</Continue>
-                }
-                {user.verified && !user.claimable &&
-                  <Continue theme='#674c9f'>$PUSH Tokens Claimed</Continue>
-                }
-                {!user.verified &&
-                  <Continue theme='#674c9f'>Ineligible</Continue>
-
-
-                }
-
-                
-                
-                
-              </ChannelTitle>
-            </ChannelInfo>
-          </Container>
-        </InfoBox>
-      </>
+        <>
+          <InfoBox>
+            <Container >
+              <ChannelInfo>
+                <ChannelTitle>
+                  {user.verified && user.claimable &&
+                    <Continue theme='#674c9f' onClick={() => {handleClaim(user)}}>Claim $PUSH Tokens</Continue>
+                  }
+                  {user.verified && !user.claimable &&
+                    <Continue theme='#674c9f'>$PUSH Tokens Claimed</Continue>
+                  }
+                  {!user.verified &&
+                    <Continue theme='#674c9f'>Ineligible</Continue>
+                  }
+                </ChannelTitle>
+              </ChannelInfo>
+            </Container>
+          </InfoBox>
+        </>
       }
     </Container>
   );
