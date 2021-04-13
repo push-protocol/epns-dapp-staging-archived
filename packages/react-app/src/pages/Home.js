@@ -16,6 +16,7 @@ import ViewChannels from 'segments/ViewChannels';
 import Info from "segments/Info";
 import ChannelOwnerDashboard from 'segments/ChannelOwnerDashboard';
 import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
+import YieldFarming from 'segments/YieldFarming';
 import NFT from 'segments/NFT';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
@@ -55,7 +56,7 @@ function Home({ setBadgeCount, bellPressed }) {
     // Reset when account refreshes
     setChannelAdmin(false);
     setAdminStatusLoaded(false);
-    userClickedAt(1);
+    userClickedAt(4);
     setChannelJson([]);
 
     // EPNS Read Provider Set
@@ -72,7 +73,7 @@ function Home({ setBadgeCount, bellPressed }) {
 
   // Revert to Feedbox on bell pressed
   React.useEffect(() => {
-    setControlAt(0);
+    setControlAt(4);
   }, [bellPressed]);
 
   // handle user action at control center
@@ -177,7 +178,7 @@ function Home({ setBadgeCount, bellPressed }) {
           }}
         >
           <ControlImage src="./svg/share.svg" active={controlAt == 4 ? 1 : 0} />
-          <ControlText active={controlAt == 4 ? 1 : 0}>NFT</ControlText>
+          <ControlText active={controlAt == 4 ? 1 : 0}>Yield Farming</ControlText>
         </ControlButton>
 
         <ControlButton index={5} active={controlAt == 5 ? 1 : 0} border="#e20880"
@@ -188,6 +189,17 @@ function Home({ setBadgeCount, bellPressed }) {
           <ControlImage src="./svg/share.svg" active={controlAt == 5 ? 1 : 0} />
           <ControlText active={controlAt == 5 ? 1 : 0}>Airdrop</ControlText>
         </ControlButton>
+      
+
+        <ControlButton index={6} active={controlAt == 6 ? 1 : 0} border="#e20880"
+          onClick={() => {
+            userClickedAt(6)
+          }}
+        >
+          <ControlImage src="./svg/share.svg" active={controlAt == 6 ? 1 : 0} />
+          <ControlText active={controlAt == 6 ? 1 : 0}>NFT</ControlText>
+        </ControlButton>
+
       </Controls>
       <Interface>
         {controlAt == 0 &&
@@ -211,13 +223,15 @@ function Home({ setBadgeCount, bellPressed }) {
           <Info/>
         }
         {controlAt == 4 &&
-          <NFT
-          epnsReadProvider={epnsReadProvider}
-          epnsWriteProvide={epnsWriteProvider}
-          />
+          <YieldFarming />
         }
         {controlAt == 5 &&
-          <Airdrop
+          <Airdrop />
+        }
+        {controlAt == 6 && 
+          <NFT
+            epnsReadProvider={epnsReadProvider}
+            epnsWriteProvide={epnsWriteProvider}
           />
         }
       </Interface>
