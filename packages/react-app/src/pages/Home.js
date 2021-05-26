@@ -16,12 +16,9 @@ import ViewChannels from 'segments/ViewChannels';
 import Info from "segments/Info";
 import ChannelOwnerDashboard from 'segments/ChannelOwnerDashboard';
 import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
-import YieldFarming from 'segments/YieldFarming';
-import NFT from 'segments/NFT';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
-import Airdrop from "segments/Airdrop";
 
 
 // Create Header
@@ -56,7 +53,7 @@ function Home({ setBadgeCount, bellPressed }) {
     // Reset when account refreshes
     setChannelAdmin(false);
     setAdminStatusLoaded(false);
-    userClickedAt(4);
+    userClickedAt(1);
     setChannelJson([]);
 
     // EPNS Read Provider Set
@@ -73,7 +70,7 @@ function Home({ setBadgeCount, bellPressed }) {
 
   // Revert to Feedbox on bell pressed
   React.useEffect(() => {
-    setControlAt(4);
+    setControlAt(0);
   }, [bellPressed]);
 
   // handle user action at control center
@@ -171,35 +168,6 @@ function Home({ setBadgeCount, bellPressed }) {
           <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
           <ControlText active={controlAt == 3 ? 1 : 0}>Receive Notifs</ControlText>
         </ControlButton>
-
-        <ControlButton index={4} active={controlAt == 4 ? 1 : 0} border="#e20880"
-          onClick={() => {
-            userClickedAt(4)
-          }}
-        >
-          <ControlImage src="./svg/share.svg" active={controlAt == 4 ? 1 : 0} />
-          <ControlText active={controlAt == 4 ? 1 : 0}>Yield Farming</ControlText>
-        </ControlButton>
-
-        <ControlButton index={5} active={controlAt == 5 ? 1 : 0} border="#e20880"
-          onClick={() => {
-            userClickedAt(5)
-          }}
-        >
-          <ControlImage src="./svg/share.svg" active={controlAt == 5 ? 1 : 0} />
-          <ControlText active={controlAt == 5 ? 1 : 0}>Airdrop</ControlText>
-        </ControlButton>
-      
-
-        <ControlButton index={6} active={controlAt == 6 ? 1 : 0} border="#e20880"
-          onClick={() => {
-            userClickedAt(6)
-          }}
-        >
-          <ControlImage src="./svg/share.svg" active={controlAt == 6 ? 1 : 0} />
-          <ControlText active={controlAt == 6 ? 1 : 0}>NFT</ControlText>
-        </ControlButton>
-
       </Controls>
       <Interface>
         {controlAt == 0 &&
@@ -221,18 +189,6 @@ function Home({ setBadgeCount, bellPressed }) {
         }
         {controlAt == 3 &&
           <Info/>
-        }
-        {controlAt == 4 &&
-          <YieldFarming />
-        }
-        {controlAt == 5 &&
-          <Airdrop />
-        }
-        {controlAt == 6 && 
-          <NFT
-            epnsReadProvider={epnsReadProvider}
-            epnsWriteProvide={epnsWriteProvider}
-          />
         }
       </Interface>
     </Container>
@@ -257,9 +213,9 @@ const Controls = styled.div`
 `
 
 const ControlButton = styled.div`
-  flex: 1 1 10%;
+  flex: 1 1 21%;
   height: 120px;
-  min-width: 100px;
+  min-width: 200px;
   background: #fff;
 
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
@@ -296,7 +252,7 @@ const ControlImage = styled.img`
 
   transition: transform .2s ease-out;
   ${ props => props.active && css`
-    transform: scale(2) translate(-20px, 0px);
+    transform: scale(3.5) translate(-20px, 0px);
     opacity: 0.4;
   `};
 `

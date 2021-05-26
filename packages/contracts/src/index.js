@@ -17,7 +17,7 @@ export const abis = {
   dai: daiAbi,
   epnsToken: epnsTokenAbi,
   staking: stakingAbi,
-  yieldFarming: yieldFarmingAbi
+  yieldFarming: yieldFarmingAbi,
   rockstar: rockstarAbi,
   erc721: ec721Abi,
   NFTRewards: NFTRewards,

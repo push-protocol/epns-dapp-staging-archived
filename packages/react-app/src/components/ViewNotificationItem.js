@@ -62,7 +62,7 @@ function ViewNotificationItem({ notificationObject }) {
             </>
           }
           {!loading &&
-          
+
             <ChannelDescLabel>{notification.notificationBody}</ChannelDescLabel>
           }
         </ChannelDesc>
