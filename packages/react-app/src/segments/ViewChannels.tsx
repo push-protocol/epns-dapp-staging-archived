@@ -22,6 +22,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
   const [controlAt, setControlAt] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [channels, setChannels] = React.useState([]);
+  const [totalChannelLength, setChannelLength] = React.useState(0);
   const [paginatedChannels, setPaginatedChannels] = React.useState([]);
   const [user, setUser] = React.useState(null);
   const [owner, setOwner] = React.useState(null);
@@ -31,7 +32,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
   const channelsVisited = page * channelsPerPage;
 
   React.useEffect(() => {
-    fetchChannels();
+    fetchInitialsChannels();
   }, [account]);
 
   //update paginatedChannels array when scrolled till the end
@@ -45,9 +46,18 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
   const userClickedAt = (controlIndex) => {
     setControlAt(controlIndex);
   }
+  // to update a page
+  const updateCurrentPage = () => {
+    // fetch more channel information
+    setPage(prev => {
+      const newPage = prev + 1;
+      loadMoreChannels(newPage);
+      return newPage;
+    });
+  }
 
   // to fetch channels
-  const fetchChannels = async () => {
+  const fetchInitialsChannels = async () => {
     // get and set user and owner first
     const userMeta = await UsersDataStore.instance.getUserMetaAsync();
     setUser(userMeta);
@@ -56,8 +66,9 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
     setOwner(ownerAddr);
 
     // const channelsMeta = await EPNSCoreHelper.getChannelsMetaLatestToOldest(-1, -1, epnsReadProvider);
-    const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(-1, -1);
-
+    const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(channelsVisited, channelsPerPage);
+    const totalChannelsLength = await ChannelsDataStore.instance.getChannelsCountAsync();
+    setChannelLength(totalChannelsLength)
     // sort this again, this time with subscriber count
     // channelsMeta.sort((a, b) => {
     //   if (a.memberCount.toNumber() < b.memberCount.toNumber()) return -1;
@@ -69,6 +80,21 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
 
     setChannels(channelsMeta);
     setLoading(false);
+  }
+
+  // load more channels when we get to the bottom of the page
+  const loadMoreChannels = async (newPageNumber) => {
+    const startingPoint = newPageNumber * channelsPerPage;
+    const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(startingPoint, channelsPerPage);
+    setChannels(oldChannels => ([
+      ...oldChannels,
+      ...moreChannels
+    ]));
+  }
+
+  // conditionally display the waymore bar which loads more information
+  const showWayPoint = (index) => {
+    return ( Number(index) === paginatedChannels.length -1 )
   }
 
   
@@ -109,7 +135,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
             if (paginatedChannels[index].addr !== "0x0000000000000000000000000000000000000000") {
               return (
                 <>
-                {Number(index) === paginatedChannels.length -1 && (<Waypoint onEnter = { () => setPage(prev => prev + 1)}/>)}
+                {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
                 <ViewChannelItem
                   key={paginatedChannels[index].addr}
                   channelObject={paginatedChannels[index]}
@@ -123,7 +149,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
             else if (paginatedChannels[index].addr === "0x0000000000000000000000000000000000000000" && user.channellized) {
               return (
                 <>
-                {Number(index) === paginatedChannels.length -1 && (<Waypoint onEnter = { () => setPage(prev => prev + 1)}/>)}
+                {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
                 <ViewChannelItem
                   key={paginatedChannels[index].addr}
                   channelObject={paginatedChannels[index]}
@@ -137,7 +163,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
             else {
               return(
                 <>
-                {Number(index) === paginatedChannels.length -1 && (<Waypoint onEnter = { () => setPage(prev => prev + 1)}/>)}
+                {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
                 </>
               )
             }
