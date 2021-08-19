@@ -28,11 +28,11 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
   const [owner, setOwner] = React.useState(null);
 
   const [page, setPage] = React.useState(0);
-  const channelsPerPage = 2;
+  const channelsPerPage = 3;
   const channelsVisited = page * channelsPerPage;
 
   React.useEffect(() => {
-    fetchInitialsChannels();
+    fetchInitialsChannelMeta();
   }, [account]);
 
   //update paginatedChannels array when scrolled till the end
@@ -51,13 +51,13 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
     // fetch more channel information
     setPage(prev => {
       const newPage = prev + 1;
-      loadMoreChannels(newPage);
+      loadMoreChannelMeta(newPage);
       return newPage;
     });
   }
 
   // to fetch channels
-  const fetchInitialsChannels = async () => {
+  const fetchInitialsChannelMeta = async () => {
     // get and set user and owner first
     const userMeta = await UsersDataStore.instance.getUserMetaAsync();
     setUser(userMeta);
@@ -83,7 +83,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
   }
 
   // load more channels when we get to the bottom of the page
-  const loadMoreChannels = async (newPageNumber) => {
+  const loadMoreChannelMeta = async (newPageNumber) => {
     const startingPoint = newPageNumber * channelsPerPage;
     const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(startingPoint, channelsPerPage);
     setChannels(oldChannels => ([

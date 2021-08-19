@@ -271,6 +271,8 @@ export default class ChannelsDataStore {
 
     // CHANNELS META FUNCTIONS
     // To get channels meta
+    // get channels meta in a paginated format
+    // by passing in the starting index and the number of items per page
     getChannelsMetaAsync = async (startIndex, pageCount) => {
       return new Promise (async (resolve, reject) => {
         // get total number of channels
@@ -297,11 +299,11 @@ export default class ChannelsDataStore {
         });
 
         // wait until all promises are resolved
-        const newData = await Promise.all(promises);
+        const channelMetaData = await Promise.all(promises);
 
         // return channels meta
-        console.log("getChannelsMetaAsync(From %d to %d) --> %o", startIndex, stopIndex, newData);
-        resolve(newData);
+        console.log("getChannelsMetaAsync(From %d to %d) --> %o", startIndex, stopIndex, channelMetaData);
+        resolve(channelMetaData);
       });
     }
 
