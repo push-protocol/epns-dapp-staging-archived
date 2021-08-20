@@ -271,55 +271,39 @@ export default class ChannelsDataStore {
 
     // CHANNELS META FUNCTIONS
     // To get channels meta
-    getChannelsMetaAsync = async (atIndex, numChannels) => {
+    // get channels meta in a paginated format
+    // by passing in the starting index and the number of items per page
+    getChannelsMetaAsync = async (startIndex, pageCount) => {
       return new Promise (async (resolve, reject) => {
         // get total number of channels
         const channelsCount = await this.getChannelsCountAsync();
+        let stopIndex = startIndex + pageCount;
 
-        if (atIndex == -1) {
-          atIndex = channelsCount - 1;
+        // if the stop index is -1 then get all channels
+        if (stopIndex == -1 || stopIndex > channelsCount) {
+          stopIndex = channelsCount;
         }
 
-        if (numChannels == -1) {
-          numChannels = channelsCount;
+        // initialise an array with the values from 0 to the length of the number of channels
+        let channelIDs = [];
+
+        for(let i=startIndex; i < stopIndex ; i++){
+          channelIDs.push(i)
         }
 
-        // Get channels
-        let channelsMeta = [];
-        let channelsDummy = [];
-
-        // prefil and then refil
-        let count = 0;
-        for (let i = 0; i < numChannels; i++) {
-          const assignedChannelID = atIndex - i;
-          channelsDummy[count] = assignedChannelID;
-          count = count + 1;
-        }
-
-        const promises = channelsDummy.map(async (channelID) => {
+        const promises = channelIDs.map(async (channelID) => {
           // Match the cache
-          await this.getChannelMetaAsync(channelID)
-            .then(response => {
-              const mappings = { ...response };
-              mappings.id = channelID;
-
-              channelsMeta = [mappings, ...channelsMeta];
-            })
+          return this.getChannelMetaAsync(channelID)
+            .then(response => response )
             .catch(err => console.log("!!!Error (but skipping), getChannelMetaAsync() --> %o", err))
         });
 
         // wait until all promises are resolved
-        await Promise.all(promises);
-
-        channelsMeta.sort((a, b) => {
-          if (a.id < b.id) return -1;
-          if (a.id > b.id) return 1;
-          return 0;
-        });
+        const channelMetaData = await Promise.all(promises);
 
         // return channels meta
-        console.log("getChannelsMetaAsync(From %d to %d) --> %o", atIndex - numChannels + 1, atIndex, channelsMeta);
-        resolve(channelsMeta);
+        console.log("getChannelsMetaAsync(From %d to %d) --> %o", startIndex, stopIndex, channelMetaData);
+        resolve(channelMetaData);
       });
     }
 
