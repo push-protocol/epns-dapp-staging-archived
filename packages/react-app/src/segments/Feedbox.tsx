@@ -9,6 +9,7 @@ import { addresses, abis } from "@project/contracts";
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import { ethers } from "ethers";
 import { BigNumber, bigNumberify, formatEther } from 'ethers/utils'
+import ChannelsDataStore from "singletons/ChannelsDataStore";
 
 import ViewNotificationItem from "components/ViewNotificationItem";
 import NotificationToast from "components/NotificationToast";
@@ -29,7 +30,7 @@ function Feedbox({ epnsReadProvider }) {
 
   const [currentPage, setCurrentPage] = React.useState(1);
   //define query
-  const notificationsPerPage = 20;
+  const notificationsPerPage = 6;
   
   const loadNotifications = (currentPage) => {
     const body = {
@@ -93,7 +94,8 @@ function Feedbox({ epnsReadProvider }) {
   //handle new notification
   const onReceive = async notification => {
     showToast(notification);
-    setNotifications(notifications => [notification].concat(notifications));
+    setNotifications(existingNotifications => [notification, ...existingNotifications]);
+    // setNotifications(notifications => [notification].concat(notifications));
   };
 
   //subscribe to SendNotification
@@ -114,23 +116,24 @@ function Feedbox({ epnsReadProvider }) {
         .concat('+')
         .concat(eventUserAddress)
         .toLocaleLowerCase()
-      const ipfsId = identity.split('+')[1]
+      const ipfsId = identity.split('+')[1];
+
+      const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(eventChannelAddress);
 
       // Form Gateway URL
       const url = "https://ipfs.io/ipfs/" + ipfsId;
       fetch(url)
         .then(result => result.json())
         .then(result => {
-      const ipfsNotification = result
+      const ipfsNotification = {...result}
       const notification = {
-          
         id: notificationId,
         userAddress: eventUserAddress,
         channelAddress: eventChannelAddress,
-        indexTimestamp: Date.now() / 1000, // todo
-        notificationTitle: ipfsNotification.notification.title,
+        indexTimeStamp: Date.now() / 1000, // todo
+        notificationTitle: ipfsNotification.notification.title || channelJson.name,
         notificationBody: ipfsNotification.notification.body,
-        ...ipfsNotification.data,
+        // ...ipfsNotification.data,
       }
       if (ipfsNotification.data.type === '1') {
         const isSubscribed = 
