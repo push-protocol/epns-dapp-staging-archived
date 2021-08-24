@@ -199,7 +199,7 @@ function CreateChannel() {
       .catch(err => {
         console.log("Error --> %o", err);
         setProcessing(3);
-        setProcessingInfo("!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet");
+        setProcessingInfo(`!!! ERROR !!! ${err.message}`);
       });
   }
 
