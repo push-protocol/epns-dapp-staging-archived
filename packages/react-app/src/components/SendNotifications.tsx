@@ -102,7 +102,7 @@ function SendNotifications() {
     // if we are sending for a subset and there 
     if(nfType === "4" && !multipleRecipients.length){
       toast.update(notificationToast, {
-        render: "Please enter at least two recipients in order to use subset notifications",
+        render: "Please enter at least two recipients in order to use subset notifications type",
         type: toast.TYPE.ERROR,
         autoClose: 5000
       });
@@ -273,6 +273,9 @@ function SendNotifications() {
       if(nfType === "4"){
         jsonPayload["recipients"] = [...multipleRecipients];
       }
+      console.log('\n\n\n\n\n\n');
+      console.log(jsonPayload);
+      console.log('\n\n\n\n\n\n');
 
       const input = JSON.stringify(jsonPayload);
 
@@ -466,7 +469,7 @@ function SendNotifications() {
                 <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
                   <Input
                     required={multipleRecipients.length === 0}
-                    placeholder="Enter recipients wallet addresses seperated by a comma"
+                    placeholder="Enter recipients wallet addresses seperated by a comma or by pressing the enter key"
                     radius="4px"
                     padding="12px"
                     border="1px solid #674c9f"
@@ -693,17 +696,18 @@ const MultiRecipientsContainer = styled.div`
   padding-top: 10px;
   box-sizing: border-box;
   display: flex;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 7px 15px;
   
   span {
     color: white;
     background: #e20880;
-    padding: 3px 10px;
+    padding: 6px 10px;
     border-radius: 5px;
 
     i{
       cursor: pointer;
-      margin-left: 10px;
+      margin-left: 25px;
     }
   }
 `;
