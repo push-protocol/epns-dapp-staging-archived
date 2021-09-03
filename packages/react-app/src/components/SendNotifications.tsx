@@ -22,7 +22,6 @@ import { addresses, abis } from "@project/contracts";
 import { CloseIcon } from 'assets/icons';
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import CryptoHelper from 'helpers/CryptoHelper';
-import { validate } from "graphql";
 const ethers = require('ethers');
 
 const ipfs = require('ipfs-api')();
