@@ -1,19 +1,11 @@
 import React from "react";
-import styled, { css } from 'styled-components';
-import { Device } from 'assets/Device';
-
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
-import Loader from 'react-loader-spinner';
+import styled from 'styled-components';
 
 import Skeleton from '@yisheng90/react-loading';
 
 import { useWeb3React } from '@web3-react/core';
-import { ethers } from "ethers";
-import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
 import moment from 'moment';
 
-import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 
 function ViewNotificationItem({ notificationObject }) {
   const { account, library } = useWeb3React();
