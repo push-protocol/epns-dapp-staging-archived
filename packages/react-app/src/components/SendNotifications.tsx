@@ -19,6 +19,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
 
 import { addresses, abis } from "@project/contracts";
+import { CloseIcon } from 'assets/icons';
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import CryptoHelper from 'helpers/CryptoHelper';
 const ethers = require('ethers');
@@ -30,7 +31,10 @@ const NFTypes = [
   { value: "1", label: 'Broadcast (IPFS Payload)' },
   { value: "2", label: 'Secret (IPFS Payload)' },
   { value: "3", label: 'Targetted (IPFS Payload)' },
+  { value: "4", label: 'Subset (IPFS Payload)' },
 ];
+const LIMITER_KEYS = ['Enter', ','];
+
 
 // Create Header
 function SendNotifications() {
@@ -39,6 +43,8 @@ function SendNotifications() {
   const [nfProcessing, setNFProcessing] = React.useState(0);
 
   const [nfRecipient, setNFRecipient] = React.useState('');
+  const [multipleRecipients, setMultipleRecipients] = React.useState([]);
+  const [tempRecipeint, setTempRecipient] = React.useState(''); // to temporarily hold the address of one recipient who would be entered into the recipeints array above.
   const [nfType, setNFType] = React.useState('');
 
   const [nfSub, setNFSub] = React.useState('');
@@ -54,8 +60,33 @@ function SendNotifications() {
 
   const [nfInfo, setNFInfo] = React.useState('');
 
+  // on change for the subset type notifications input
+  const handleSubsetInputChange = (e) => {
+    // if the user enters in a comma or an enter then seperate the addresses
+    if(LIMITER_KEYS.includes(e.key)){
+      e.preventDefault();
+      // if they enter a limiter key, then add the temp value to the recipeints list
+      // then clear the value of the temp text
+      setMultipleRecipients((oldRecipients) =>(
+        // use this combination to remove duplicates
+        Array.from(new Set([
+        ...oldRecipients,
+        tempRecipeint
+        ]))
+      ));
+      setTempRecipient('');
+    }
+  };
+  // when to remove a subscriber
+  const removeRecipient = (recipientAddress) => {
+    const filteredRecipients = multipleRecipients.filter(rec => rec !== recipientAddress);
+    setMultipleRecipients(filteredRecipients);
+  };
+
   React.useEffect(() => {
-    if (nfType === "1") {
+    const broadcastIds = ["1", "4"]; //id's of notifications which qualify as broadcast
+    setMultipleRecipients([]); //reset array when type changes/
+    if (broadcastIds.includes(nfType)) {
       // This is broadcast, nfRecipient will be the same
       setNFRecipient(account);
     }
@@ -64,12 +95,24 @@ function SendNotifications() {
     }
   }, [nfType]);
 
+  // validate the body being sent, return true if no errors
+  const bodyValidated = (notificationToast) => {
+    let validated = true;
+    // if we are sending for a subset and there 
+    if(nfType === "4" && !multipleRecipients.length){
+      toast.update(notificationToast, {
+        render: "Please enter at least two recipients in order to use subset notifications type",
+        type: toast.TYPE.ERROR,
+        autoClose: 5000
+      });
+      validated = false; 
+    }
+    return validated;
+  }
+
   const handleSendMessage = async (e) => {
     // Check everything in order
     e.preventDefault();
-
-    // Set to processing
-    setNFProcessing(1);
 
     // Toastify
     let notificationToast = toast.dark(<LoaderToast msg="Preparing Notification" color="#fff"/>, {
@@ -81,6 +124,12 @@ function SendNotifications() {
       draggable: true,
       progress: undefined,
     });
+
+    // do some validation
+    if(!bodyValidated(notificationToast)) return;
+
+    // Set to processing
+    setNFProcessing(1);
 
     // Form signer and contract connection
     var signer = library.getSigner(account);
@@ -140,6 +189,10 @@ function SendNotifications() {
         acta = CryptoHelper.encryptWithAES(nfCTA, secret);
         aimg = CryptoHelper.encryptWithAES(nfMedia, secret);
         break;
+  
+      // Targetted Notification
+      case "4":
+        break;
 
       default:
         break;
@@ -149,7 +202,7 @@ function SendNotifications() {
     let storagePointer = '';
 
     // IPFS PAYLOAD --> 1, 2, 3
-    if (nfType === "1" || nfType === "2" || nfType === "3") {
+    if (nfType === "1" || nfType === "2" || nfType === "3" || nfType === "4") {
       // Checks for optional fields
       if (nfSubEnabled && isEmpty(nfSub)) {
         setNFInfo("Enter Subject or Disable it");
@@ -200,22 +253,30 @@ function SendNotifications() {
         return;
       }
 
-      const input = JSON.stringify(
-        {
-          "notification": {
-            "title": nsub,
-            "body": nmsg
-          },
-          "data": {
-            "type": nfType,
-            "secret": secretEncrypted,
-            "asub": asub,
-            "amsg": amsg,
-            "acta": acta,
-            "aimg": aimg
-          }
+      const jsonPayload = {
+        "notification": {
+          "title": nsub,
+          "body": nmsg
+        },
+        "data": {
+          "type": nfType,
+          "secret": secretEncrypted,
+          "asub": asub,
+          "amsg": amsg,
+          "acta": acta,
+          "aimg": aimg
         }
-      );
+      };
+
+      // if we are sending a subset type, then include recipients
+      if(nfType === "4"){
+        jsonPayload["recipients"] = [...multipleRecipients];
+      }
+      console.log('\n\n\n\n\n\n');
+      console.log(jsonPayload);
+      console.log('\n\n\n\n\n\n');
+
+      const input = JSON.stringify(jsonPayload);
 
       console.log("Uploding to IPFS...");
       toast.update(notificationToast, {
@@ -315,7 +376,7 @@ function SendNotifications() {
             <H2 textTransform="uppercase" spacing="0.1em">
               <Span weight="200">Send </Span><Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">Notification</Span>
             </H2>
-            <H3>EPNS supports three types of notifications (for now!). <b>Groups</b>, <b>Secrets</b> and <b>Targetted</b>.</H3>
+            <H3>EPNS supports four types of notifications (for now!). <b>Groups</b>, <b>Secrets</b>, <b>Targetted</b> and <b>Subsets</b>.</H3>
           </Item>
         </Content>
       </Section>
@@ -390,6 +451,53 @@ function SendNotifications() {
                       </Span>
                     }
                 </Item>
+              }
+
+              {(nfType === "4") &&
+              <>
+                <MultiRecipientsContainer>
+                  {
+                    multipleRecipients.map(oneRecipient => (
+                      <span key={oneRecipient}>
+                        {oneRecipient}
+                        <i onClick={() => removeRecipient(oneRecipient)}><CloseIcon /></i>
+                      </span>
+                    ))
+                  }
+                </MultiRecipientsContainer>
+                <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
+                  <Input
+                    required={multipleRecipients.length === 0}
+                    placeholder="Enter recipients wallet addresses seperated by a comma or by pressing the enter key"
+                    radius="4px"
+                    padding="12px"
+                    border="1px solid #674c9f"
+                    bg="#fff"
+                    value={tempRecipeint}
+                    onKeyPress={handleSubsetInputChange}
+                    onChange={e => {
+                      const text = e.target.value;
+                      if(!LIMITER_KEYS.includes(text)){
+                        setTempRecipient(e.target.value)
+                      }
+                    }}
+                  />
+                  {nfRecipient.trim().length == 0 &&
+                      <Span
+                        padding="4px 10px"
+                        right="0px"
+                        top="0px"
+                        pos="absolute"
+                        color="#fff"
+                        bg="#000"
+                        size="0.7rem"
+                        z="1"
+                      >
+                        Recipient Wallet
+                      </Span>
+                    }
+                </Item>
+              </>
               }
 
               {nfType && nfSubEnabled &&
@@ -580,6 +688,28 @@ const DropdownStyledParent = styled.div `
     margin-bottom: 130px;
   }
 `
+
+const MultiRecipientsContainer = styled.div`
+  width: 100%;
+  padding: 0px 20px;
+  padding-top: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 15px;
+  
+  span {
+    color: white;
+    background: #e20880;
+    padding: 6px 10px;
+    border-radius: 5px;
+
+    i{
+      cursor: pointer;
+      margin-left: 25px;
+    }
+  }
+`;
 
 const DropdownStyled = styled(Dropdown)`
 
