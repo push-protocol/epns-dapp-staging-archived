@@ -217,7 +217,7 @@ function SendNotifications() {
         return;
       }
 
-      if (nfMediaEnabled && isEmpty(nfMediaEnabled)) {
+      if (nfMediaEnabled && isEmpty(nfMedia)) {
         setNFInfo("Enter Media URL or Disable it");
         setNFProcessing(2);
 
