@@ -400,3 +400,4 @@ node_modules
 bin_output
 logs
 dump.rdb
+package-lock.json
