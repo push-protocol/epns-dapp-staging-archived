@@ -21,7 +21,7 @@ function NotificationToast({ notification, clearToast }) {
  
   // Render
   return (
-    <>{
+    <NotificationWrapper>{
     toast.dark(<LoaderToast onClick={clearToast} color="#35c5f3"/>, {
           position: "bottom-right",
           autoClose: false,
@@ -32,9 +32,13 @@ function NotificationToast({ notification, clearToast }) {
           progress: undefined,
         })
     }
-    </>
+    </NotificationWrapper>
   );
 }
+
+const NotificationWrapper = styled.div`
+  display: none;
+`;
 
 const Toaster = styled.div`
   align-items: center;

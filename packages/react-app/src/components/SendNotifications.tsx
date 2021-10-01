@@ -34,7 +34,7 @@ const NFTypes = [
   { value: "4", label: 'Subset (IPFS Payload)' },
 ];
 const LIMITER_KEYS = ['Enter', ','];
-
+const ETH_COMMUNICATOR_NETWORK = 3;//Default to communicating on ropsten
 
 // Create Header
 function SendNotifications() {
@@ -133,7 +133,12 @@ function SendNotifications() {
 
     // Form signer and contract connection
     var signer = library.getSigner(account);
+    // define the core epns contract
     let contract = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
+    // define the comms epns contracts
+    // const ethCommsContract = 
+    // const polygonCommsContract = 
+    // const communicatorContract = chainId === ETH_COMMUNICATOR_NETWORK ? ethCommsContract : polygonCommsContract;
 
     // For payload basic
     let nsub = nfSub;

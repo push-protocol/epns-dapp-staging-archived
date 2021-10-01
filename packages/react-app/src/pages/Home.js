@@ -21,15 +21,16 @@ import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 
-const ALLOWED_CORE_NETWORKS = [3 /** For ropsten */]; //chainId of networks which we have deployed the core contract on
-const DEFAULT_OPEN_TAB = 1 //Default to 1 which is the channel tab
+const ALLOWED_CORE_NETWORK = 3 //chainId of networks which we have deployed the core contract on
+const CHANNEL_TAB = 1 //Default to 1 which is the channel tab
+const NOTIF_TAB = 0;
 // Create Header
 function Home({ setBadgeCount, bellPressed }) {
   ReactGA.pageview('/home');
 
   const { active, error, account, library, chainId } = useWeb3React();
-  const onCoreNetwork = ALLOWED_CORE_NETWORKS.includes(chainId);
-  const INITIAL_OPEN_TAB =  onCoreNetwork ? DEFAULT_OPEN_TAB : 1 ;//if they are not on a core network.redirect then to the notifications page
+  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
+  const INITIAL_OPEN_TAB =  onCoreNetwork ? CHANNEL_TAB : NOTIF_TAB ;//if they are not on a core network.redirect then to the notifications page
 
   const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
   const [epnsWriteProvider, setEpnsWriteProvider] = React.useState(null);
@@ -57,7 +58,8 @@ function Home({ setBadgeCount, bellPressed }) {
   // toast related section
 
   React.useEffect(() => {
-    const contractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, library);
+    const coreProvider = ethers.getDefaultProvider(ALLOWED_CORE_NETWORK);
+    const contractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
     setEpnsReadProvider(contractInstance);
 
     if (!!(library && account)) {
@@ -66,7 +68,7 @@ function Home({ setBadgeCount, bellPressed }) {
       setEpnsWriteProvider(signerInstance);
     }
 
-  }, [account]);
+  }, [account, chainId]);
 
   React.useEffect(() => {
     // Reset when account refreshes
@@ -85,6 +87,11 @@ function Home({ setBadgeCount, bellPressed }) {
     }
 
   }, [epnsReadProvider]);
+
+  React.useEffect(() => {
+    console.log({INITIAL_OPEN_TAB, chainId})
+    userClickedAt(INITIAL_OPEN_TAB);
+  }, [chainId]);
 
 
   // Revert to Feedbox on bell pressed
@@ -157,6 +164,10 @@ function Home({ setBadgeCount, bellPressed }) {
           disabled={!adminStatusLoaded}
           onClick={() => {
             if (adminStatusLoaded) {
+              // if youre not on ropsten and you dont have a channel, you cannot create except on ropsten, so throw weeoe
+              if(!channelAdmin && !onCoreNetwork){
+                return showNetworkToast();
+              }
               userClickedAt(2)
             }
           }}
