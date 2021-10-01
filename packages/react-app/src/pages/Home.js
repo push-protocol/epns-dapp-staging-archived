@@ -11,6 +11,7 @@ import Loader from 'react-loader-spinner'
 
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 
+import NotificationToast from "components/NotificationToast";
 import Feedbox from 'segments/Feedbox';
 import ViewChannels from 'segments/ViewChannels';
 import Info from "segments/Info";
@@ -20,12 +21,15 @@ import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 
-
+const ALLOWED_CORE_NETWORKS = [3 /** For ropsten */]; //chainId of networks which we have deployed the core contract on
+const DEFAULT_OPEN_TAB = 1 //Default to 1 which is the channel tab
 // Create Header
 function Home({ setBadgeCount, bellPressed }) {
   ReactGA.pageview('/home');
 
   const { active, error, account, library, chainId } = useWeb3React();
+  const onCoreNetwork = ALLOWED_CORE_NETWORKS.includes(chainId);
+  const INITIAL_OPEN_TAB =  onCoreNetwork ? DEFAULT_OPEN_TAB : 1 ;//if they are not on a core network.redirect then to the notifications page
 
   const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
   const [epnsWriteProvider, setEpnsWriteProvider] = React.useState(null);
@@ -35,7 +39,22 @@ function Home({ setBadgeCount, bellPressed }) {
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
 
-
+  // toast related section
+  const [toast, showToast] = React.useState(null);
+  const clearToast = () => showToast(null);
+  const showNetworkToast = () => {
+    showToast({
+      notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
+      notificationBody: "Please connect to the Ropsten network to access channels"
+    });
+  }
+  //clear toast variable after it is shown
+  React.useEffect(() => {
+    if (toast) {
+      clearToast()
+    }
+  }, [toast]);
+  // toast related section
 
   React.useEffect(() => {
     const contractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, library);
@@ -53,7 +72,7 @@ function Home({ setBadgeCount, bellPressed }) {
     // Reset when account refreshes
     setChannelAdmin(false);
     setAdminStatusLoaded(false);
-    userClickedAt(1);
+    userClickedAt(INITIAL_OPEN_TAB);
     setChannelJson([]);
 
     // EPNS Read Provider Set
@@ -123,6 +142,10 @@ function Home({ setBadgeCount, bellPressed }) {
 
         <ControlButton index={1} active={controlAt == 1 ? 1 : 0} border="#35c5f3"
           onClick={() => {
+            // if they arent connected to the right channels then we have to restrict access to here
+            if(!onCoreNetwork){
+              return showNetworkToast();
+            }
             userClickedAt(1)
           }}
         >
@@ -189,6 +212,12 @@ function Home({ setBadgeCount, bellPressed }) {
         }
         {controlAt == 3 &&
           <Info/>
+        }
+        { toast && 
+          <NotificationToast
+            notification={toast}
+            clearToast = {clearToast}
+          />
         }
       </Interface>
     </Container>
