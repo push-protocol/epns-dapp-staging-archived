@@ -5,35 +5,6 @@ import { injected } from './connectors'
 
 require('dotenv').config();
 
-export function useWrongNetworkToast(errorMessage: string){
-  const { chainId } = useWeb3React();
-
-  const ALLOWED_CORE_NETWORK = 3
-  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
-
-  const clearToast = () => showToast(null);
-  const [toast, showToast] = useState<any>(null);
-  const showNetworkToast = () => {
-    showToast({
-      notificationTitle: "Invalid Network",
-      notificationBody: errorMessage
-    })
-  }
-  //clear toast variable after it is shown
-  useEffect(() => {
-    if (toast) {
-      clearToast()
-    }
-  }, [toast]);
-  // toast related section
-
-  return {
-    allowedCoreNetwork: ALLOWED_CORE_NETWORK,
-    onCoreNetwork, clearToast,
-    toast, showNetworkToast
-  }
-}
-
 export function useEagerConnect() {
   const { activate, active } = useWeb3React()
 

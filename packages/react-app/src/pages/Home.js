@@ -10,7 +10,7 @@ import { ethers } from "ethers";
 import Loader from 'react-loader-spinner'
 
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
-
+import config from 'config';
 import NotificationToast from "components/NotificationToast";
 import Feedbox from 'segments/Feedbox';
 import ViewChannels from 'segments/ViewChannels';
@@ -58,10 +58,9 @@ function Home({ setBadgeCount, bellPressed }) {
   // toast related section
 
   React.useEffect(() => {
-    const coreProvider = onCoreNetwork ? library :  ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: "TZCWZ8YCQDH4THP54865SDGTG3XXY8ZAQU"})
-    console.log({
-      coreProvider
-    })
+    const coreProvider = onCoreNetwork ?
+      library :  ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
+
     const contractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
     setEpnsReadProvider(contractInstance);
 
@@ -92,7 +91,6 @@ function Home({ setBadgeCount, bellPressed }) {
   }, [epnsReadProvider]);
 
   React.useEffect(() => {
-    console.log({INITIAL_OPEN_TAB, chainId})
     userClickedAt(INITIAL_OPEN_TAB);
   }, [chainId]);
 

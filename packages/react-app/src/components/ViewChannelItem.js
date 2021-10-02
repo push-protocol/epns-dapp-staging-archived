@@ -35,7 +35,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
   const showNetworkToast = () => {
     showToast({
       notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
-      notificationBody: "Please connect to the Ropsten network to join or leave channels"
+      notificationBody: "Please connect to the Ropsten network to opt-in/opt-out of channels"
     });
   }
   //clear toast variable after it is shown

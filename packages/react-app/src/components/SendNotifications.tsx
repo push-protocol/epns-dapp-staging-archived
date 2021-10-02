@@ -22,6 +22,7 @@ import { addresses, abis } from "@project/contracts";
 import { CloseIcon } from 'assets/icons';
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import CryptoHelper from 'helpers/CryptoHelper';
+import { ALLOWED_CORE_NETWORK as ETH_COMMUNICATOR_NETWORK } from 'pages/Home';
 const ethers = require('ethers');
 
 const ipfs = require('ipfs-api')();
@@ -34,7 +35,6 @@ const NFTypes = [
   { value: "4", label: 'Subset (IPFS Payload)' },
 ];
 const LIMITER_KEYS = ['Enter', ','];
-const ETH_COMMUNICATOR_NETWORK = 3;//Default to communicating on ropsten
 
 // Create Header
 function SendNotifications() {
