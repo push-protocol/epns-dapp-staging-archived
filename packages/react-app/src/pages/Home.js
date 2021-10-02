@@ -20,7 +20,6 @@ import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
-import { useWrongNetworkToast } from "hooks";
 
 export const ALLOWED_CORE_NETWORK = 3 //chainId of networks which we have deployed the core contract on
 const CHANNEL_TAB = 1 //Default to 1 which is the channel tab
@@ -30,10 +29,7 @@ function Home({ setBadgeCount, bellPressed }) {
   ReactGA.pageview('/home');
 
   const { active, error, account, library, chainId } = useWeb3React();
-  const {
-    ALLOWED_CORE_NETWORK, onCoreNetwork, 
-    clearToast, toast, showNetworkToast
-  } = useWrongNetworkToast("Please connect to Ropsten network to create a channel");
+  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB =  onCoreNetwork ? CHANNEL_TAB : NOTIF_TAB ;//if they are not on a core network.redirect then to the notifications page
 
   const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
@@ -44,6 +40,22 @@ function Home({ setBadgeCount, bellPressed }) {
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
 
+  // toast related section
+  const [toast, showToast] = React.useState(null);
+  const clearToast = () => showToast(null);
+  const showNetworkToast = () => {
+    showToast({
+      notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
+      notificationBody: "Please connect to the Ropsten network to access channels"
+    });
+  }
+  //clear toast variable after it is shown
+  React.useEffect(() => {
+    if (toast) {
+      clearToast()
+    }
+  }, [toast]);
+  // toast related section
 
   React.useEffect(() => {
     const coreProvider = onCoreNetwork ? library :  ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: "TZCWZ8YCQDH4THP54865SDGTG3XXY8ZAQU"})
@@ -141,6 +153,10 @@ function Home({ setBadgeCount, bellPressed }) {
 
         <ControlButton index={1} active={controlAt == 1 ? 1 : 0} border="#35c5f3"
           onClick={() => {
+            // if they arent connected to the right channels then we have to restrict access to here
+            // if(!onCoreNetwork){
+            //   return showNetworkToast();
+            // }
             userClickedAt(1)
           }}
         >

@@ -18,8 +18,7 @@ import NotificationToast from "components/NotificationToast";
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
-import { useWrongNetworkToast } from "hooks";
-
+import { ALLOWED_CORE_NETWORK } from 'pages/Home';
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWriteProvide }) {
   const { account, library, chainId } = useWeb3React();
@@ -30,10 +29,22 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
 
   const [ txInProgress, setTxInProgress ] = React.useState(false);
   // toast related section
-  const {
-    ALLOWED_CORE_NETWORK, onCoreNetwork, 
-    clearToast, toast, showNetworkToast
-  } = useWrongNetworkToast("Please connect to Ropsten network to opt-in/opt-out of a channel");  
+  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
+  const [toast, showToast] = React.useState(null);
+  const clearToast = () => showToast(null);
+  const showNetworkToast = () => {
+    showToast({
+      notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
+      notificationBody: "Please connect to the Ropsten network to join or leave channels"
+    });
+  }
+  //clear toast variable after it is shown
+  React.useEffect(() => {
+    if (toast) {
+      clearToast()
+    }
+  }, [toast]);
+  // toast related section
 
 
   React.useEffect(() => {
