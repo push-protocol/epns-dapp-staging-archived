@@ -13,20 +13,27 @@ import { GiTwoCoins } from 'react-icons/gi';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from "ethers";
 import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
+import NotificationToast from "components/NotificationToast";
 
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
+import { useWrongNetworkToast } from "hooks";
 
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWriteProvide }) {
-  const { account, library } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
 
   const [ channelJson, setChannelJson ] = React.useState({});
   const [ subscribed, setSubscribed ] = React.useState(false);
   const [ loading, setLoading ] = React.useState(true);
 
   const [ txInProgress, setTxInProgress ] = React.useState(false);
+  // toast related section
+  const {
+    ALLOWED_CORE_NETWORK, onCoreNetwork, 
+    clearToast, toast, showNetworkToast
+  } = useWrongNetworkToast("Please connect to Ropsten network to opt-in/opt-out of a channel");  
 
 
   React.useEffect(() => {
@@ -87,6 +94,9 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
 
   // to subscribe
   const subscribe = async () => {
+    if(!onCoreNetwork){
+      return showNetworkToast();
+    }
     // Check if public key is broadcasted or not
     const userMeta = await UsersDataStore.instance.getUserMetaAsync();
     if (!userMeta.publicKeyRegistered) {
@@ -185,6 +195,9 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
   }
 
   const unsubscribeAction = async () => {
+    if(!onCoreNetwork){
+      return showNetworkToast();
+    }
     setTxInProgress(true);
 
     let sendWithTxPromise = epnsWriteProvide.unsubscribe(channelObject.addr);
@@ -373,6 +386,12 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
             }
           </ChannelActions>
         </>
+      }
+      { toast && 
+        <NotificationToast
+          notification={toast}
+          clearToast = {clearToast}
+        />
       }
     </Container>
   );

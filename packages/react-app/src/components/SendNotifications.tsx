@@ -135,10 +135,11 @@ function SendNotifications() {
     var signer = library.getSigner(account);
     // define the core epns contract
     let contract = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
-    // define the comms epns contracts
-    // const ethCommsContract = 
-    // const polygonCommsContract = 
-    // const communicatorContract = chainId === ETH_COMMUNICATOR_NETWORK ? ethCommsContract : polygonCommsContract;
+    // define the epns comms contracts
+    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsRopstenComm, signer);
+    const polygonCommsContract = new ethers.Contract(addresses.epnsRopComm, abis.epnsPolyComm, signer);
+    const communicatorContract = chainId === ETH_COMMUNICATOR_NETWORK ? ethCommsContract : polygonCommsContract;
+    // define the epns comms contracts
 
     // For payload basic
     let nsub = nfSub;
@@ -277,9 +278,6 @@ function SendNotifications() {
       if(nfType === "4"){
         jsonPayload["recipients"] = [...multipleRecipients];
       }
-      console.log('\n\n\n\n\n\n');
-      console.log(jsonPayload);
-      console.log('\n\n\n\n\n\n');
 
       const input = JSON.stringify(jsonPayload);
 
@@ -309,7 +307,17 @@ function SendNotifications() {
     const identity = nfType + "+" + storagePointer;
     const identityBytes = ethers.utils.toUtf8Bytes(identity);
 
-    var anotherSendTxPromise = contract.sendNotification(nfRecipient, identityBytes);
+    var anotherSendTxPromise;
+    // check the chain id, this is a temporary step because both contracts do not have the same interface
+    // when both contracts have the same interface then this would no lonver be necessary
+    //  = contract.sendNotification(nfRecipient, identityBytes);
+    if(chainId === 3){
+      anotherSendTxPromise = communicatorContract.sendNotification(nfRecipient, identityBytes);
+    }else{
+      // temp fix for polygon contracts
+      anotherSendTxPromise = communicatorContract.sendNotification(account, account, nfRecipient, identityBytes);
+    }
+
 
     console.log ("Sending Transaction... ");
     toast.update(notificationToast, {

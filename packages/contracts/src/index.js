@@ -8,12 +8,16 @@ import yieldFarmingAbi from "./abis/YieldFarm.json";
 import rockstarAbi from "./abis/Rockstar.json";
 import ec721Abi from "./abis/ERC721.json";
 import NFTRewards from "./abis/NFTRewards.json";
+import epnsRopstenCommAbi from "./abis/epnsRopstenCommunicator.json";
+import epnsPolyCommAbi from "./abis/epnsPolygonCommunicator.json";
 import MerkleDistributorAbi from "./abis/MerkleDistributor.json";
 
 export const abis = {
   erc20: erc20Abi,
   ownable: ownableAbi,
   epnscore: epnscoreAbi,
+  epnsRopstenComm: epnsRopstenCommAbi,
+  epnsPolyComm: epnsPolyCommAbi,
   dai: daiAbi,
   epnsToken: epnsTokenAbi,
   staking: stakingAbi,
