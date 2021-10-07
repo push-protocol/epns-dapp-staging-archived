@@ -220,7 +220,8 @@ function CreateChannel() {
 
     var anotherSendTxPromise = contract.createChannelWithFees(
       channelType,
-      identityBytes
+      identityBytes,
+      fees
     );
 
     setProcessingInfo("Creating Channel TX in progress");

@@ -32,9 +32,11 @@ function Home({ setBadgeCount, bellPressed }) {
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB =  onCoreNetwork ? CHANNEL_TAB : NOTIF_TAB ;//if they are not on a core network.redirect then to the notifications page
 
-  const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
+  const [epnsReadProvider, setEpnsReadProvider] = React.useState(null); // read provider for epns core functions
+  const [epnsCommReadProvider, setEpnsCommReadProvider] = React.useState(null); // read provider for epns communicator functions
   const [epnsWriteProvider, setEpnsWriteProvider] = React.useState(null);
-
+  const [epnsCommWriteProvider, setEpnsCommWriteProvider] = React.useState(null);
+ 
   const [controlAt, setControlAt] = React.useState(0);
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
   const [channelAdmin, setChannelAdmin] = React.useState(false);
@@ -59,20 +61,30 @@ function Home({ setBadgeCount, bellPressed }) {
 
   React.useEffect(() => {
     const coreProvider = onCoreNetwork ?
-      library :  ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
+      library : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
+    // inititalise the read contract for the core network
+    const coreContractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
+    setEpnsReadProvider(coreContractInstance);
+    // inititalise the read contract for the core network
 
-    const contractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
-    setEpnsReadProvider(contractInstance);
+    // initialise the read contract for the communicator function
+    const commAddress = onCoreNetwork ? addresses.epnsEthComm : addresses.epnsPolyComm;
+    const commContractInstance = new ethers.Contract(commAddress, abis.epnsComm, library);
+    setEpnsCommReadProvider(commContractInstance);
+    // initialise the read contract for the communicator function
 
     if (!!(library && account)) {
       let signer = library.getSigner(account);
-      const signerInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
-      setEpnsWriteProvider(signerInstance);
+      const coreSignerInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
+      setEpnsWriteProvider(coreSignerInstance);
+      const communicatorSignerInstance = new ethers.Contract(commAddress, abis.epnsComm, signer);
+      setEpnsCommWriteProvider(communicatorSignerInstance)
     }
 
   }, [account, chainId]);
 
   React.useEffect(() => {
+    if(!epnsReadProvider || !epnsCommReadProvider) return;
     // Reset when account refreshes
     setChannelAdmin(false);
     setAdminStatusLoaded(false);
@@ -80,15 +92,14 @@ function Home({ setBadgeCount, bellPressed }) {
     setChannelJson([]);
 
     // EPNS Read Provider Set
-    if (epnsReadProvider != null) {
+    if (epnsReadProvider != null && epnsCommReadProvider != null) {
       // Instantiate Data Stores
-      UsersDataStore.instance.init(account, epnsReadProvider);
-      ChannelsDataStore.instance.init(account, epnsReadProvider);
-
+      UsersDataStore.instance.init(account, epnsReadProvider, epnsCommReadProvider);
+      ChannelsDataStore.instance.init(account, epnsReadProvider, epnsCommReadProvider);
       checkUserForChannelRights();
     }
 
-  }, [epnsReadProvider]);
+  }, [epnsReadProvider, epnsCommReadProvider]);
 
   React.useEffect(() => {
     userClickedAt(INITIAL_OPEN_TAB);
@@ -104,7 +115,6 @@ function Home({ setBadgeCount, bellPressed }) {
   const userClickedAt = (controlIndex) => {
     setControlAt(controlIndex);
   }
-  console.log('rerendered')
 
   //Start Listening...
   const listenerForChannelRights = async () => {
@@ -214,7 +224,9 @@ function Home({ setBadgeCount, bellPressed }) {
         {controlAt == 1 &&
           <ViewChannels
             epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvide={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
           />
         }
         {controlAt == 2 && !channelAdmin && adminStatusLoaded &&

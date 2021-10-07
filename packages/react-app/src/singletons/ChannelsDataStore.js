@@ -28,16 +28,18 @@ export default class ChannelsDataStore {
 
       account: null,
       epnsReadProvider: null,
+      epnsCommReadProvider: null
     }
 
     // init
-    init = (account, epnsReadProvider) => {
+    init = (account, epnsReadProvider, epnsCommReadProvider) => {
       // set account
       this.state.account = account;
 
       // First attach listeners then overwrite the old one if any
       this.resetChannelsListeners();
       this.state.epnsReadProvider = epnsReadProvider;
+      this.state.epnsCommReadProvider = epnsCommReadProvider;
       this.initChannelsListenersAsync();
 
       // next get store channels count
@@ -50,8 +52,8 @@ export default class ChannelsDataStore {
       if (this.state.epnsReadProvider) {
         this.state.epnsReadProvider.removeAllListeners("AddChannel");
         this.state.epnsReadProvider.removeAllListeners("UpdateChannel");
-        this.state.epnsReadProvider.removeAllListeners("Subscribe");
-        this.state.epnsReadProvider.removeAllListeners("Unsubscribe");
+        this.state.epnsCommReadProvider.removeAllListeners("Subscribe");
+        this.state.epnsCommReadProvider.removeAllListeners("Unsubscribe");
       }
     }
 
@@ -64,6 +66,7 @@ export default class ChannelsDataStore {
       await this.listenForUpdateChannelAnyAsync();
       await this.listenForUpdateChannelSelfAsync();
 
+      // use the communicator contract for the below
       await this.listenForSubscribeAnyAsync();
       await this.listenForSubscribeSelfAsync();
       await this.listenForUnsubscribeAnyAsync();
@@ -138,17 +141,17 @@ export default class ChannelsDataStore {
 
     // 5. Subscriber Any
     listenForSubscribeAnyAsync = async () => {
-      const contract = this.state.epnsReadProvider;
+      const contract = this.state.epnsCommReadProvider;
       let filter = contract.filters.Subscribe(null, null);
 
       contract.on(filter, async (channel, user) => {
-        // Do own stuff
-        if (this.state.channelsMeta[channel]) {
-          const channelID = this.state.channelsMeta[channel];
-          let count = this.state.channelsMeta[channelID].memberCount.toNumber();
-          count = count + 1;
-          this.state.channelsMeta[channelID].memberCount = bigNumberify(count);
-        }
+      //   // Do own stuff
+      //   if (this.state.channelsMeta[channel]) {
+      //     const channelID = this.state.channelsMeta[channel];
+      //     let count = this.state.channelsMeta[channelID].memberCount.toNumber();
+      //     count = count + 1;
+      //     this.state.channelsMeta[channelID].memberCount = bigNumberify(count);
+      //   }
 
         // then perform callbacks
         if (this.state.callbacks[ChannelEvents.SUBSCRIBER_ANY_CHANNEL]) {
@@ -161,7 +164,7 @@ export default class ChannelsDataStore {
 
     // 6. Subscriber Self
     listenForSubscribeSelfAsync = async () => {
-      const contract = this.state.epnsReadProvider;
+      const contract = this.state.epnsCommReadProvider;
       let filter = contract.filters.Subscribe(this.state.account, null);
 
       contract.on(filter, async (channel, user) => {
@@ -176,17 +179,17 @@ export default class ChannelsDataStore {
 
     // 7. Unsubscribe Any
     listenForUnsubscribeAnyAsync = async () => {
-      const contract = this.state.epnsReadProvider;
+      const contract = this.state.epnsCommReadProvider;
       let filter = contract.filters.Unsubscribe(null, null);
 
       contract.on(filter, async (channel, user) => {
         // Do own stuff
-        if (this.state.channelsMeta[channel]) {
-          const channelID = this.state.channelsMeta[channel];
-          let count = this.state.channelsMeta[channelID].memberCount.toNumber();
-          count = count - 1;
-          this.state.channelsMeta[channelID].memberCount = bigNumberify(count);
-        }
+        // if (this.state.channelsMeta[channel]) {
+        //   const channelID = this.state.channelsMeta[channel];
+        //   let count = this.state.channelsMeta[channelID].memberCount.toNumber();
+        //   count = count - 1;
+        //   this.state.channelsMeta[channelID].memberCount = bigNumberify(count);
+        // }
 
         // then perform callbacks
         if (this.state.callbacks[ChannelEvents.UNSUBSCRIBER_ANY_CHANNEL]) {
@@ -199,7 +202,7 @@ export default class ChannelsDataStore {
 
     // 8. Unsubscribe Self
     listenForUnsubscribeSelfAsync = async () => {
-      const contract = this.state.epnsReadProvider;
+      const contract = this.state.epnsCommReadProvider;
       let filter = contract.filters.Unsubscribe(this.state.account, null);
 
       contract.on(filter, async (channel, user) => {

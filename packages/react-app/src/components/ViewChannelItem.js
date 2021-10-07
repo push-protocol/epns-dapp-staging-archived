@@ -2,7 +2,7 @@ import React from "react";
 import styled, { css } from 'styled-components';
 import { Device } from 'assets/Device';
 
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast as toaster  } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import Loader from 'react-loader-spinner';
 
@@ -20,7 +20,7 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 import { ALLOWED_CORE_NETWORK } from 'pages/Home';
 // Create Header
-function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWriteProvide }) {
+function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
   const { account, library, chainId } = useWeb3React();
 
   const [ channelJson, setChannelJson ] = React.useState({});
@@ -49,58 +49,16 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
 
   React.useEffect(() => {
     fetchChannelJson();
-    registerCallbacks();
   }, [account, channelObject]);
 
   // to fetch channels
   const fetchChannelJson = async () => {
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
-    const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsReadProvider);
+    const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsCommReadProvider);
     setSubscribed(subs);
 
     setChannelJson(channelJson);
     setLoading(false);
-  }
-
-  // to register callbacks
-  const registerCallbacks = () => {
-    UsersDataStore.instance.addCallbacks(
-      UserEvents.SUBSCRIBED,
-      "FromViewChannelItem",
-      () => {
-        setSubscribed(true);
-        channelObject.memberCount = channelObject.memberCount.add(1);
-      }
-    );
-
-    UsersDataStore.instance.addCallbacks(
-      UserEvents.UNSUBSCRIBED,
-      "FromViewChannelItem",
-      () => {
-        setSubscribed(false);
-        channelObject.memberCount = channelObject.memberCount.sub(1);
-      }
-    );
-
-    ChannelsDataStore.instance.addCallbacks(
-      ChannelEvents.SUBSCRIBER_ANY_CHANNEL,
-      "FromViewChannelItem",
-      (channel, user) => {
-        if (channel === channelObject.addr) {
-          channelObject.memberCount = channelObject.memberCount.add(1);
-        }
-      }
-    );
-
-    ChannelsDataStore.instance.addCallbacks(
-      ChannelEvents.UNSUBSCRIBER_ANY_CHANNEL,
-      "FromViewChannelItem",
-      (channel, user) => {
-        if (channel === channelObject.addr) {
-          channelObject.memberCount = channelObject.memberCount.sub(1);
-        }
-      }
-    );
   }
 
   // to subscribe
@@ -125,7 +83,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
         })
         .catch(error => {
           // Show toast as well
-          toast.dark('Skipped for now... Encrypted messages will require this!', {
+          toaster.dark('Skipped for now... Encrypted messages will require this!', {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -148,17 +106,17 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
 
     let sendWithTxPromise;
 
-    if (withPublicKey) {
-      sendWithTxPromise = epnsWriteProvide.subscribeWithPublicKey(channelObject.addr, withPublicKey);
-    }
-    else {
-      sendWithTxPromise = epnsWriteProvide.subscribe(channelObject.addr);
-    }
+    // if (withPublicKey) {
+    //   sendWithTxPromise = epnsWriteProvide.subscribeWithPublicKey(channelObject.addr, withPublicKey);
+    // }
+    // else {
+    sendWithTxPromise = epnsCommWriteProvider.subscribe(channelObject.addr);
+    // }
 
     sendWithTxPromise
       .then(async tx => {
 
-        let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+        let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
           position: "bottom-right",
           autoClose: false,
           hideProgressBar: true,
@@ -171,18 +129,18 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
         try {
           await library.waitForTransaction(tx.hash);
 
-          toast.update(txToast, {
+          toaster.update(txToast, {
             render: "Transaction Completed!",
-            type: toast.TYPE.SUCCESS,
+            type: toaster.TYPE.SUCCESS,
             autoClose: 5000
           });
-
+          setSubscribed(true);
           setTxInProgress(false);
         }
         catch(e) {
-          toast.update(txToast, {
+          toaster.update(txToast, {
             render: "Transaction Failed! (" + e.name + ")",
-            type: toast.TYPE.ERROR,
+            type: toaster.TYPE.ERROR,
             autoClose: 5000
           });
 
@@ -190,9 +148,10 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
         }
       })
       .catch(err => {
-        toast.dark('Transaction Cancelled!', {
+        console.log(err);
+        toaster.dark('Transaction Cancelled!', {
           position: "bottom-right",
-          type: toast.TYPE.ERROR,
+          type: toaster.TYPE.ERROR,
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -211,12 +170,12 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
     }
     setTxInProgress(true);
 
-    let sendWithTxPromise = epnsWriteProvide.unsubscribe(channelObject.addr);
+    let sendWithTxPromise = epnsCommWriteProvider.unsubscribe(channelObject.addr);
 
     sendWithTxPromise
       .then(async tx => {
 
-        let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+        let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
           position: "bottom-right",
           autoClose: false,
           hideProgressBar: true,
@@ -229,18 +188,19 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
         try {
           await library.waitForTransaction(tx.hash);
 
-          toast.update(txToast, {
+          toaster.update(txToast, {
             render: "Transaction Completed!",
-            type: toast.TYPE.SUCCESS,
+            type: toaster.TYPE.SUCCESS,
             autoClose: 5000
           });
 
           setTxInProgress(false);
+          setSubscribed(false);
         }
         catch(e) {
-          toast.update(txToast, {
+          toaster.update(txToast, {
             render: "Transaction Failed! (" + e.name + ")",
-            type: toast.TYPE.ERROR,
+            type: toaster.TYPE.ERROR,
             autoClose: 5000
           });
 
@@ -248,9 +208,9 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
         }
       })
       .catch(err => {
-        toast.dark('Transaction Cancelled!', {
+        toaster.dark('Transaction Cancelled!', {
           position: "bottom-right",
-          type: toast.TYPE.ERROR,
+          type: toaster.TYPE.ERROR,
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -336,7 +296,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsWritePr
               <Subscribers>
                 <IoMdPeople size={20} color="#ccc"/>
                 <SubscribersCount>
-                  {EPNSCoreHelper.formatBigNumberToMetric(channelObject.memberCount)}
+                  {channelObject.memberCount ? EPNSCoreHelper.formatBigNumberToMetric(channelObject.memberCount) : 0}
                 </SubscribersCount>
               </Subscribers>
               <Pool>

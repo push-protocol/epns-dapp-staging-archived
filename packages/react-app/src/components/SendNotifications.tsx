@@ -136,8 +136,8 @@ function SendNotifications() {
     // define the core epns contract
     let contract = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
     // define the epns comms contracts
-    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsRopstenComm, signer);
-    const polygonCommsContract = new ethers.Contract(addresses.epnsRopComm, abis.epnsPolyComm, signer);
+    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsComm, signer);
+    const polygonCommsContract = new ethers.Contract(addresses.epnsPolyComm, abis.epnsComm, signer);
     const communicatorContract = chainId === ETH_COMMUNICATOR_NETWORK ? ethCommsContract : polygonCommsContract;
     // define the epns comms contracts
 
@@ -310,13 +310,7 @@ function SendNotifications() {
     var anotherSendTxPromise;
     // check the chain id, this is a temporary step because both contracts do not have the same interface
     // when both contracts have the same interface then this would no lonver be necessary
-    //  = contract.sendNotification(nfRecipient, identityBytes);
-    if(chainId === 3){
-      anotherSendTxPromise = communicatorContract.sendNotification(nfRecipient, identityBytes);
-    }else{
-      // temp fix for polygon contracts
-      anotherSendTxPromise = communicatorContract.sendNotification(account, account, nfRecipient, identityBytes);
-    }
+    anotherSendTxPromise = communicatorContract.sendNotification(account, account, nfRecipient, identityBytes);
 
 
     console.log ("Sending Transaction... ");

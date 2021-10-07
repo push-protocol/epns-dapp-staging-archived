@@ -58,7 +58,6 @@ const EPNSCoreHelper = {
   // To retrieve a channel's Info from channel address
   getChannelInfo: async (channel, contract) => {
     const enableLogs = 0;
-
     return new Promise ((resolve, reject) => {
       // To get channel info from a channel address
       contract.channels(channel)
@@ -163,8 +162,9 @@ const EPNSCoreHelper = {
 
     return new Promise ((resolve, reject) => {
       // To get channel info from a channel address
-      EPNSCoreHelper.getUserInfo(user, contract)
-        .then(response => EPNSCoreHelper.getChannelJsonFromChannelAddress(user, contract))
+      // EPNSCoreHelper.getUserInfo(user, contract)
+      //   .then(response => EPNSCoreHelper.getChannelJsonFromChannelAddress(user, contract))
+        EPNSCoreHelper.getChannelJsonFromChannelAddress(user, contract)
         .then(response => {
           if (enableLogs) console.log("getChannelJsonFromUserAddress() --> %o", response);
           resolve(response);
@@ -289,11 +289,12 @@ const EPNSCoreHelper = {
   },
   // Get Total Subsbribed Channels
   getSubscribedStatus: async (user, channel, contract) => {
+
     return new Promise ((resolve, reject) => {
       // Get User Info from EPNS Core
-      contract.memberExists(user, channel)
+      contract.isUserSubscribed(channel, user)
         .then(response => {
-          console.log("getSubscribedStatus() --> %o", response);
+          console.log("getSubscribedStatus() --> %o", {response, user, channel});
           resolve(response);
         })
         .catch(err => { console.log("!!!Error, getSubscribedStatus() --> %o", err); reject(err); });

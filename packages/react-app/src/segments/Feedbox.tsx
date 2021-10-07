@@ -36,8 +36,8 @@ function Feedbox() {
   React.useEffect(() => {
     const signer = library.getSigner(account);
     // define the epns comms contracts
-    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsRopstenComm, signer);
-    const polygonCommsContract = new ethers.Contract(addresses.epnsRopComm, abis.epnsPolyComm, signer);
+    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsComm, signer);
+    const polygonCommsContract = new ethers.Contract(addresses.epnsPolyComm, abis.epnsComm, signer);
     const communicatorContract = chainId === ALLOWED_CORE_NETWORK ? ethCommsContract : polygonCommsContract;
     // define the epns comms contracts
     setEpnsReadProvider(communicatorContract);

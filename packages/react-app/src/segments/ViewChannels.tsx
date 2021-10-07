@@ -16,7 +16,7 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 
 // Create Header
-function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
+function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider, epnsCommWriteProvider }) {
   const { account, library } = useWeb3React();
 
   const [controlAt, setControlAt] = React.useState(0);
@@ -61,7 +61,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
     // get and set user and owner first
     const userMeta = await UsersDataStore.instance.getUserMetaAsync();
     setUser(userMeta);
-
+    
     const ownerAddr = await UsersDataStore.instance.getOwnerMetaAsync();
     setOwner(ownerAddr);
 
@@ -69,13 +69,6 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
     const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(channelsVisited, channelsPerPage);
     const totalChannelsLength = await ChannelsDataStore.instance.getChannelsCountAsync();
     setChannelLength(totalChannelsLength)
-    // sort this again, this time with subscriber count
-    // channelsMeta.sort((a, b) => {
-    //   if (a.memberCount.toNumber() < b.memberCount.toNumber()) return -1;
-    //   if (a.memberCount.toNumber() > b.memberCount.toNumber()) return 1;
-    //   return 0;
-    // });
-
     // Filter out channel
 
     setChannels(channelsMeta);
@@ -142,6 +135,8 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
                   isOwner={isOwner}
                   epnsReadProvider={epnsReadProvider}
                   epnsWriteProvide={epnsWriteProvide}
+                  epnsCommReadProvider={epnsCommReadProvider}
+                  epnsCommWriteProvider={epnsCommWriteProvider}
                 />
                 </>
               );
@@ -156,6 +151,8 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
                   isOwner={isOwner}
                   epnsReadProvider={epnsReadProvider}
                   epnsWriteProvide={epnsWriteProvide}
+                  epnsCommReadProvider={epnsCommReadProvider}
+                  epnsCommWriteProvider={epnsCommWriteProvider}
                 />
                 </>
               );
