@@ -17,10 +17,11 @@ import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 
 // Create Header
 function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider, epnsCommWriteProvider }) {
-  const { account, library } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
 
   const [controlAt, setControlAt] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
+  const [moreLoading, setMoreLoading] = React.useState(false);
   const [channels, setChannels] = React.useState([]);
   const [totalChannelLength, setChannelLength] = React.useState(0);
   const [paginatedChannels, setPaginatedChannels] = React.useState([]);
@@ -32,8 +33,9 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
   const channelsVisited = page * channelsPerPage;
 
   React.useEffect(() => {
+    setChannels([]);
     fetchInitialsChannelMeta();
-  }, [account]);
+  }, [account, chainId]);
 
   //update paginatedChannels array when scrolled till the end
   React.useEffect(() => {
@@ -77,12 +79,14 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
 
   // load more channels when we get to the bottom of the page
   const loadMoreChannelMeta = async (newPageNumber) => {
+    setMoreLoading(true)
     const startingPoint = newPageNumber * channelsPerPage;
     const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(startingPoint, channelsPerPage);
     setChannels(oldChannels => ([
       ...oldChannels,
       ...moreChannels
     ]));
+    setMoreLoading(false)
   }
 
   // conditionally display the waymore bar which loads more information
@@ -114,7 +118,6 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
           />
         </ContainerInfo>
       }
-
       {!loading && controlAt == 0 && channels.length != 0 &&
         <Items id="scrollstyle-secondary">
           <Faucets/>
@@ -165,6 +168,16 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
               )
             }
           })}
+          {moreLoading && channels.length &&
+            <CenterContainer>
+              <Loader
+              type="Oval"
+              color="#35c5f3"
+              height={40}
+              width={40}
+              />
+            </CenterContainer>
+          }
         </Items>
       }
     </Container>
@@ -189,6 +202,11 @@ const Container = styled.div`
 const ContainerInfo = styled.div`
   padding: 20px;
 `
+
+const CenterContainer = styled(ContainerInfo)`
+  width: fit-content;
+  margin: auto;
+`;
 
 const Items = styled.div`
   display: block;

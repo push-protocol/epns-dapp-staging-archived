@@ -30,7 +30,7 @@ function Home({ setBadgeCount, bellPressed }) {
 
   const { active, error, account, library, chainId } = useWeb3React();
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
-  const INITIAL_OPEN_TAB =  onCoreNetwork ? CHANNEL_TAB : NOTIF_TAB ;//if they are not on a core network.redirect then to the notifications page
+  const INITIAL_OPEN_TAB =  CHANNEL_TAB ;//if they are not on a core network.redirect then to the notifications page
 
   const [epnsReadProvider, setEpnsReadProvider] = React.useState(null); // read provider for epns core functions
   const [epnsCommReadProvider, setEpnsCommReadProvider] = React.useState(null); // read provider for epns communicator functions
@@ -100,10 +100,6 @@ function Home({ setBadgeCount, bellPressed }) {
     }
 
   }, [epnsReadProvider, epnsCommReadProvider]);
-
-  React.useEffect(() => {
-    userClickedAt(INITIAL_OPEN_TAB);
-  }, [chainId]);
 
 
   // Revert to Feedbox on bell pressed

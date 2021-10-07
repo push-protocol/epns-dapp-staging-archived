@@ -24,7 +24,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const { account, library, chainId } = useWeb3React();
 
   const [ channelJson, setChannelJson ] = React.useState({});
-  const [ subscribed, setSubscribed ] = React.useState(false);
+  const [ subscribed, setSubscribed ] = React.useState(true);
   const [ loading, setLoading ] = React.useState(true);
 
   const [ txInProgress, setTxInProgress ] = React.useState(false);
@@ -53,6 +53,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
 
   // to fetch channels
   const fetchChannelJson = async () => {
+    console.log(channelObject)
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
     const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsCommReadProvider);
     setSubscribed(subs);
@@ -309,7 +310,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
           }
         </ChannelMeta>
       </ChannelInfo>
-      {!!account && !!library &&
+      {!!account && !!library && onCoreNetwork &&
         <>
           <LineBreak />
           <ChannelActions>
