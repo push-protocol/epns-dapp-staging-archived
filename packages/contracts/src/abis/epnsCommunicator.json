@@ -22,6 +22,37 @@
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "_chainName",
+				"type": "string"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "_chainID",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_channelOwnerAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "_ethereumChannelAddress",
+				"type": "string"
+			}
+		],
+		"name": "ChannelAlias",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "owner",
@@ -178,6 +209,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "NAME_HASH",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "SEND_NOTIFICATION_TYPEHASH",
 		"outputs": [
 			{
@@ -280,6 +324,32 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "chainID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "chainName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -371,6 +441,11 @@
 				"internalType": "address",
 				"name": "_pushChannelAdmin",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_chainName",
+				"type": "string"
 			}
 		],
 		"name": "initialize",
@@ -541,11 +616,6 @@
 			},
 			{
 				"internalType": "address",
-				"name": "_delegate",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
 				"name": "_recipient",
 				"type": "address"
 			},
@@ -590,11 +660,6 @@
 			{
 				"internalType": "address",
 				"name": "_channel",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_delegate",
 				"type": "address"
 			},
 			{
@@ -859,6 +924,19 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_channelAddress",
+				"type": "string"
+			}
+		],
+		"name": "verifyChannelAlias",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]
