@@ -9,6 +9,7 @@ import { ethers } from "ethers";
 
 import Loader from 'react-loader-spinner'
 
+import AliasVerificationodal from 'components/AliasVerificationModal';
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import config from 'config';
 import NotificationToast from "components/NotificationToast";
@@ -20,6 +21,7 @@ import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
+import { postReq } from "api"
 
 export const ALLOWED_CORE_NETWORK = 3 //chainId of networks which we have deployed the core contract on
 const CHANNEL_TAB = 1 //Default to 1 which is the channel tab
@@ -38,7 +40,10 @@ function Home({ setBadgeCount, bellPressed }) {
   const [epnsCommWriteProvider, setEpnsCommWriteProvider] = React.useState(null);
  
   const [controlAt, setControlAt] = React.useState(0);
+  const [modalOpen, setModalOpen] = React.useState(false);
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
+  const [aliasEthAccount, setAliasEthAccount] = React.useState(null);
+  const [aliasVerified, setAliasVerified] = React.useState(false);
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
 
@@ -60,26 +65,56 @@ function Home({ setBadgeCount, bellPressed }) {
   // toast related section
 
   React.useEffect(() => {
-    const coreProvider = onCoreNetwork ?
-      library : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
-    // inititalise the read contract for the core network
-    const coreContractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
-    setEpnsReadProvider(coreContractInstance);
-    // inititalise the read contract for the core network
-
-    // initialise the read contract for the communicator function
-    const commAddress = onCoreNetwork ? addresses.epnsEthComm : addresses.epnsPolyComm;
-    const commContractInstance = new ethers.Contract(commAddress, abis.epnsComm, library);
-    setEpnsCommReadProvider(commContractInstance);
-    // initialise the read contract for the communicator function
-
-    if (!!(library && account)) {
-      let signer = library.getSigner(account);
-      const coreSignerInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
-      setEpnsWriteProvider(coreSignerInstance);
-      const communicatorSignerInstance = new ethers.Contract(commAddress, abis.epnsComm, signer);
-      setEpnsCommWriteProvider(communicatorSignerInstance)
-    }
+    (async function(){
+      const coreProvider = onCoreNetwork ?
+        library : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
+      // if we are not on the core network then check for if this account is an alias for another channel
+      if(!onCoreNetwork){
+        // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
+        const aliasEth = await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve({data: account });
+          }, 300);
+        })
+        .then(({data}) => {
+          const ethAccount =  data;
+          setAliasEthAccount(ethAccount);
+          return ethAccount;
+        }); 
+        if(aliasEth){
+          // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
+          const aliasVerified = await new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve({data: false });
+            }, 300);
+          })
+          .then(({data}) => {
+            const aliasIsVerified =  data;
+            setAliasVerified(false);
+            return aliasIsVerified
+          }); 
+        } 
+      }
+      // if we are not on the core network then fetch if there is an alias address from the api
+      // inititalise the read contract for the core network
+      const coreContractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
+      setEpnsReadProvider(coreContractInstance);
+      // inititalise the read contract for the core network
+  
+      // initialise the read contract for the communicator function
+      const commAddress = onCoreNetwork ? addresses.epnsEthComm : addresses.epnsPolyComm;
+      const commContractInstance = new ethers.Contract(commAddress, abis.epnsComm, library);
+      setEpnsCommReadProvider(commContractInstance);
+      // initialise the read contract for the communicator function
+  
+      if (!!(library && account)) {
+        let signer = library.getSigner(account);
+        const coreSignerInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
+        setEpnsWriteProvider(coreSignerInstance);
+        const communicatorSignerInstance = new ethers.Contract(commAddress, abis.epnsComm, signer);
+        setEpnsCommWriteProvider(communicatorSignerInstance)
+      }
+    })();
 
   }, [account, chainId]);
 
@@ -126,9 +161,9 @@ function Home({ setBadgeCount, bellPressed }) {
   // Check if a user is a channel or not
   const checkUserForChannelRights = async () => {
     // Check if account is admin or not and handle accordingly
-    EPNSCoreHelper.getChannelJsonFromUserAddress(account, epnsReadProvider)
+    const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
+    EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(response => {
-        console.log(response);
         setChannelJson(response);
         setChannelAdmin(true);
         setAdminStatusLoaded(true);
@@ -176,6 +211,9 @@ function Home({ setBadgeCount, bellPressed }) {
               if(!channelAdmin && !onCoreNetwork){
                 return showNetworkToast();
               }
+              if(channelAdmin && !aliasVerified){
+                return setModalOpen(true);
+              }
               userClickedAt(2)
             }
           }}
@@ -188,10 +226,16 @@ function Home({ setBadgeCount, bellPressed }) {
                width={32}
             />
           }
-          {channelAdmin && adminStatusLoaded &&
+          {channelAdmin && adminStatusLoaded && aliasVerified &&
             <ControlChannelContainer>
               <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
               <ControlChannelText active={controlAt == 2 ? 1 : 0}>{channelJson.name}</ControlChannelText>
+            </ControlChannelContainer>
+          }
+          {channelAdmin && adminStatusLoaded && !aliasVerified &&
+            <ControlChannelContainer>
+              <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
+              <ControlChannelText active={controlAt == 2 ? 1 : 0}>Verify channel alias</ControlChannelText>
             </ControlChannelContainer>
           }
           {!channelAdmin && adminStatusLoaded &&
@@ -238,6 +282,13 @@ function Home({ setBadgeCount, bellPressed }) {
           <NotificationToast
             notification={toast}
             clearToast = {clearToast}
+          />
+        }
+        {
+          modalOpen &&
+          <AliasVerificationodal
+            onClose={() => setModalOpen(false)}
+            onSuccess={() => setAliasVerified(true)}
           />
         }
       </Interface>

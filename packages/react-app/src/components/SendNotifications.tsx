@@ -25,7 +25,6 @@ import CryptoHelper from 'helpers/CryptoHelper';
 import { ALLOWED_CORE_NETWORK as ETH_COMMUNICATOR_NETWORK } from 'pages/Home';
 const ethers = require('ethers');
 
-const ipfs = require('ipfs-api')();
 
 // Set Notification Form Type | 0 is reserved for protocol storage
 const NFTypes = [
