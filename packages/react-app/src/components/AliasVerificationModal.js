@@ -61,7 +61,7 @@ export default function AliasVerificationModal({
                 <Item align="flex-start">
                     <CustomInput
                         required
-                        placeholder="Enter ethereum wallet address"
+                        placeholder="Enter ethereum wallet address of this channel"
                         radius="4px"
                         padding="12px"
                         border="1px solid #674c9f"
@@ -104,6 +104,7 @@ export default function AliasVerificationModal({
 const StyledInput = styled(Input)`
     width: 100%;
     text-align: center;
+    caret-color: transparent;
 `
 
 const CustomInput = styled(Input)`

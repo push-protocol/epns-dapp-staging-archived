@@ -49,7 +49,7 @@ const EPNSCoreHelper = {
       // To get channel info from a channel address
       contract.mapAddressChannels(channelID)
         .then(response => {
-          console.log("getChannelAddressFromID() --> %o", response.toString());
+          // console.log("getChannelAddressFromID() --> %o", response.toString());
           resolve(response.toString());
         })
         .catch(err => { console.log("!!!Error, getChannelAddressFromID() --> %o", err); reject(err); });
@@ -294,7 +294,7 @@ const EPNSCoreHelper = {
       // Get User Info from EPNS Core
       contract.isUserSubscribed(channel, user)
         .then(response => {
-          console.log("getSubscribedStatus() --> %o", {response, user, channel});
+          // console.log("getSubscribedStatus() --> %o", {response, user, channel});
           resolve(response);
         })
         .catch(err => { console.log("!!!Error, getSubscribedStatus() --> %o", err); reject(err); });

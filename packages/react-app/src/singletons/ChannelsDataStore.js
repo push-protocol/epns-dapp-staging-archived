@@ -290,7 +290,7 @@ export default class ChannelsDataStore {
         // initialise an array with the values from 0 to the length of the number of channels
         let channelIDs = [];
 
-        for(let i=startIndex; i < stopIndex ; i++){
+        for(let i = startIndex; i < stopIndex ; i++){
           channelIDs.push(i)
         }
 
@@ -305,7 +305,7 @@ export default class ChannelsDataStore {
         const channelMetaData = await Promise.all(promises);
 
         // return channels meta
-        console.log("getChannelsMetaAsync(From %d to %d) --> %o", startIndex, stopIndex, channelMetaData);
+        // console.log("getChannelsMetaAsync(From %d to %d) --> %o", startIndex, stopIndex, channelMetaData);
         resolve(channelMetaData);
       });
     }
@@ -330,7 +330,7 @@ export default class ChannelsDataStore {
                   this.state.channelsMeta[channelAddress] = channelID;
 
                   // resolve
-                  console.log("getChannelMetaAsync() [Address: %s] --> %o", channelAddress, response);
+                  // console.log("getChannelMetaAsync() [Address: %s] --> %o", channelAddress, response);
                   resolve(response);
                 })
             })
@@ -353,7 +353,7 @@ export default class ChannelsDataStore {
           await EPNSCoreHelper.getChannelInfo(channelAddress, this.state.epnsReadProvider)
             .then(response => {
               // resolve
-              console.log("getChannelMetaViaAddressAsync() [Address: %s] --> %o", channelAddress, response);
+              // console.log("getChannelMetaViaAddressAsync() [Address: %s] --> %o", channelAddress, response);
               resolve(response);
             })
             .catch(err => { console.log("!!!Error, getChannelMetaViaAddressAsync() --> %o", err); reject(err); })
@@ -366,7 +366,7 @@ export default class ChannelsDataStore {
     getChannelJsonAsync = async (channelAddress) => {
       return new Promise (async (resolve, reject) => {
         if (this.state.channelsJson[channelAddress]) {
-          console.log("getChannelJsonAsync() [CACHED] --> %o", this.state.channelsJson[channelAddress]);
+          // console.log("getChannelJsonAsync() [CACHED] --> %o", this.state.channelsJson[channelAddress]);
           resolve(this.state.channelsJson[channelAddress]);
         }
         else {
@@ -376,7 +376,7 @@ export default class ChannelsDataStore {
               this.state.channelsJson[channelAddress] = response;
 
               // resolve
-              console.log("getChannelJsonAsync() [Address: %s] --> %o", channelAddress, response);
+              // console.log("getChannelJsonAsync() [Address: %s] --> %o", channelAddress, response);
               resolve(response);
             })
             .catch(err => { console.log("!!!Error, getChannelJsonAsync() --> %o", err); reject(err); })

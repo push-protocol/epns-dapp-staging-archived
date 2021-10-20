@@ -29,7 +29,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
   const [owner, setOwner] = React.useState(null);
 
   const [page, setPage] = React.useState(0);
-  const channelsPerPage = 3;
+  const channelsPerPage = 200;
   const channelsVisited = page * channelsPerPage;
 
   React.useEffect(() => {
@@ -40,18 +40,18 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
   //update paginatedChannels array when scrolled till the end
   React.useEffect(() => {
     if(channels){
-      setPaginatedChannels(prev => [...prev, ...channels.slice(channelsVisited, channelsVisited + channelsPerPage)])
+      // setPaginatedChannels(prev => [...prev, ...channels.slice(channelsVisited, channelsVisited + channelsPerPage)])
+      setPaginatedChannels(channels)
     }
   }, [channels, page]);
 
-  // handle user action at control center
-  const userClickedAt = (controlIndex) => {
-    setControlAt(controlIndex);
-  }
+
   // to update a page
   const updateCurrentPage = () => {
+    if(loading || moreLoading) return;
     // fetch more channel information
-    setPage(prev => {
+    setMoreLoading(true);
+    setPage((prev) => {
       const newPage = prev + 1;
       loadMoreChannelMeta(newPage);
       return newPage;
@@ -79,8 +79,8 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
 
   // load more channels when we get to the bottom of the page
   const loadMoreChannelMeta = async (newPageNumber) => {
-    setMoreLoading(true)
     const startingPoint = newPageNumber * channelsPerPage;
+    // console.log({startingPoint, channelsPerPage})
     const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(startingPoint, channelsPerPage);
     setChannels(oldChannels => ([
       ...oldChannels,
@@ -93,8 +93,6 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
   const showWayPoint = (index) => {
     return ( Number(index) === paginatedChannels.length -1 )
   }
-
-  
 
   return (
     <>
@@ -132,15 +130,18 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
               return (
                 <>
                 {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
-                <ViewChannelItem
+                <div
                   key={paginatedChannels[index].addr}
-                  channelObject={paginatedChannels[index]}
-                  isOwner={isOwner}
-                  epnsReadProvider={epnsReadProvider}
-                  epnsWriteProvide={epnsWriteProvide}
-                  epnsCommReadProvider={epnsCommReadProvider}
-                  epnsCommWriteProvider={epnsCommWriteProvider}
-                />
+                >
+                  <ViewChannelItem
+                    channelObject={paginatedChannels[index]}
+                    isOwner={isOwner}
+                    epnsReadProvider={epnsReadProvider}
+                    epnsWriteProvide={epnsWriteProvide}
+                    epnsCommReadProvider={epnsCommReadProvider}
+                    epnsCommWriteProvider={epnsCommWriteProvider}
+                  />
+                </div>
                 </>
               );
             }
@@ -148,15 +149,18 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
               return (
                 <>
                 {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
-                <ViewChannelItem
+                <div
                   key={paginatedChannels[index].addr}
-                  channelObject={paginatedChannels[index]}
-                  isOwner={isOwner}
-                  epnsReadProvider={epnsReadProvider}
-                  epnsWriteProvide={epnsWriteProvide}
-                  epnsCommReadProvider={epnsCommReadProvider}
-                  epnsCommWriteProvider={epnsCommWriteProvider}
-                />
+                >
+                  <ViewChannelItem
+                    channelObject={paginatedChannels[index]}
+                    isOwner={isOwner}
+                    epnsReadProvider={epnsReadProvider}
+                    epnsWriteProvide={epnsWriteProvide}
+                    epnsCommReadProvider={epnsCommReadProvider}
+                    epnsCommWriteProvider={epnsCommWriteProvider}
+                  />
+                </div>
                 </>
               );
             }

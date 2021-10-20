@@ -307,9 +307,8 @@ function SendNotifications() {
     const identityBytes = ethers.utils.toUtf8Bytes(identity);
 
     var anotherSendTxPromise;
-    // check the chain id, this is a temporary step because both contracts do not have the same interface
-    // when both contracts have the same interface then this would no lonver be necessary
-    anotherSendTxPromise = communicatorContract.sendNotification(account, account, nfRecipient, identityBytes);
+
+    anotherSendTxPromise = communicatorContract.sendNotification(account, nfRecipient, identityBytes);
 
 
     console.log ("Sending Transaction... ");

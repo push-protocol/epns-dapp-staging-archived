@@ -43,7 +43,7 @@ function Home({ setBadgeCount, bellPressed }) {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
   const [aliasEthAccount, setAliasEthAccount] = React.useState(null);
-  const [aliasVerified, setAliasVerified] = React.useState(false);
+  const [aliasVerified, setAliasVerified] = React.useState(true);
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
 
@@ -211,7 +211,7 @@ function Home({ setBadgeCount, bellPressed }) {
               if(!channelAdmin && !onCoreNetwork){
                 return showNetworkToast();
               }
-              if(channelAdmin && !aliasVerified){
+              if(channelAdmin && !aliasVerified && !onCoreNetwork){
                 return setModalOpen(true);
               }
               userClickedAt(2)
@@ -226,13 +226,13 @@ function Home({ setBadgeCount, bellPressed }) {
                width={32}
             />
           }
-          {channelAdmin && adminStatusLoaded && aliasVerified &&
+          {channelAdmin && adminStatusLoaded && (onCoreNetwork ? true : aliasVerified) &&
             <ControlChannelContainer>
               <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
               <ControlChannelText active={controlAt == 2 ? 1 : 0}>{channelJson.name}</ControlChannelText>
             </ControlChannelContainer>
           }
-          {channelAdmin && adminStatusLoaded && !aliasVerified &&
+          {channelAdmin && adminStatusLoaded && (!aliasVerified && !onCoreNetwork) &&
             <ControlChannelContainer>
               <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
               <ControlChannelText active={controlAt == 2 ? 1 : 0}>Verify channel alias</ControlChannelText>
