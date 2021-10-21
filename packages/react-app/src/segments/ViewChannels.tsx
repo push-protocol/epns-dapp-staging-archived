@@ -29,7 +29,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
   const [owner, setOwner] = React.useState(null);
 
   const [page, setPage] = React.useState(0);
-  const channelsPerPage = 200;
+  const channelsPerPage = 10;
   const channelsVisited = page * channelsPerPage;
 
   React.useEffect(() => {
@@ -40,8 +40,8 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
   //update paginatedChannels array when scrolled till the end
   React.useEffect(() => {
     if(channels){
-      // setPaginatedChannels(prev => [...prev, ...channels.slice(channelsVisited, channelsVisited + channelsPerPage)])
-      setPaginatedChannels(channels)
+      setPaginatedChannels(prev => [...prev, ...channels.slice(channelsVisited, channelsVisited + channelsPerPage)])
+      // setPaginatedChannels(channels)
     }
   }, [channels, page]);
 
