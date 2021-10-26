@@ -71,26 +71,26 @@ function Home({ setBadgeCount, bellPressed }) {
       // if we are not on the core network then check for if this account is an alias for another channel
       if(!onCoreNetwork){
         // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
-        const aliasEth = await new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve({data: account });
-          }, 300);
+        const aliasEth = await postReq('/channels/get_alias' , {
+            "aliasAddress": account,
+            "aliasBlockchain":"POLYGON_TEST_MUMBAI", //use this for now, since we are only on polygon network
+            "op":"read"
         })
         .then(({data}) => {
-          const ethAccount =  data;
+          const ethAccount =  data || account;
           setAliasEthAccount(ethAccount);
-          return ethAccount;
+          return data;
         }); 
         if(aliasEth){
           // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
-          const aliasVerified = await new Promise((resolve, reject) => {
-            setTimeout(() => {
-              resolve({data: false });
-            }, 300);
+          const aliasVerified = await postReq('/channels/get_alias_verification_status', {
+            "aliasAddress":account,
+            "op":"read"
           })
           .then(({data}) => {
+            const {status} = data;
             const aliasIsVerified =  data;
-            setAliasVerified(false);
+            setAliasVerified(status);
             return aliasIsVerified
           }); 
         } 
