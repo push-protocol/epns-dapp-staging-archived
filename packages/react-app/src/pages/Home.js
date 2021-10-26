@@ -77,6 +77,7 @@ function Home({ setBadgeCount, bellPressed }) {
             "op":"read"
         })
         .then(({data}) => {
+          console.log({data})
           const ethAccount =  data || account;
           setAliasEthAccount(ethAccount);
           return data;
@@ -89,6 +90,7 @@ function Home({ setBadgeCount, bellPressed }) {
           })
           .then(({data}) => {
             const {status} = data;
+            console.log({secd: data})
             const aliasIsVerified =  data;
             setAliasVerified(status);
             return aliasIsVerified
