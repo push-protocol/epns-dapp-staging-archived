@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { bigNumber, bigNumberify } from 'ethers/utils'
 
 import { addresses, abis } from "@project/contracts";
+import { postReq } from 'api';
 
 // STATIC SINGLETON
 export const ChannelEvents = {
@@ -360,6 +361,15 @@ export default class ChannelsDataStore {
         }
       });
     }
+
+    getChannelSubscribers = async (channelAddress) => {
+      return postReq("/channels/get_subscribers", { channel: channelAddress })
+        .then(({ data }) => data.subscribers)
+        .catch((err) => {
+          console.log(`getChannelSubscribers => ${err.message}`);
+          return []
+        });
+    };
 
     // CHANNELS INFO FUNCTIONS
     // To get a single channel meta via id

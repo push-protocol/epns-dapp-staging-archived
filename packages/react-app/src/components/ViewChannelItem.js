@@ -19,6 +19,7 @@ import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 import { ALLOWED_CORE_NETWORK } from 'pages/Home';
+import { postReq } from "api";
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
   const { account, library, chainId } = useWeb3React();
@@ -26,6 +27,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const [ channelJson, setChannelJson ] = React.useState({});
   const [ subscribed, setSubscribed ] = React.useState(true);
   const [ loading, setLoading ] = React.useState(true);
+  const [ memberCount, setMemberCount ] = React.useState(0);
 
   const [ txInProgress, setTxInProgress ] = React.useState(false);
   // toast related section
@@ -56,6 +58,8 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     // console.log(channelObject)
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
     const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsCommReadProvider);
+    const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
+    setMemberCount(channelSubscribers.length);
     setSubscribed(subs);
 
     setChannelJson(channelJson);
@@ -106,13 +110,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     setTxInProgress(true);
 
     let sendWithTxPromise;
-
-    // if (withPublicKey) {
-    //   sendWithTxPromise = epnsWriteProvide.subscribeWithPublicKey(channelObject.addr, withPublicKey);
-    // }
-    // else {
     sendWithTxPromise = epnsCommWriteProvider.subscribe(channelObject.addr);
-    // }
 
     sendWithTxPromise
       .then(async tx => {
@@ -137,6 +135,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
           });
           setSubscribed(true);
           setTxInProgress(false);
+          setMemberCount(memberCount + 1);
         }
         catch(e) {
           toaster.update(txToast, {
@@ -197,6 +196,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
 
           setTxInProgress(false);
           setSubscribed(false);
+          setMemberCount(memberCount - 1);
         }
         catch(e) {
           toaster.update(txToast, {
@@ -297,7 +297,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
               <Subscribers>
                 <IoMdPeople size={20} color="#ccc"/>
                 <SubscribersCount>
-                  {channelObject.memberCount ? EPNSCoreHelper.formatBigNumberToMetric(channelObject.memberCount) : 0}
+                  {memberCount}
                 </SubscribersCount>
               </Subscribers>
               <Pool>

@@ -83,6 +83,7 @@ function ViewNotificationItem({ notificationObject }) {
 // css styles
 const ChannelDetailsWrapper = styled.div`
   align-self: center;
+  max-width: 80%;
 `;
 
 
