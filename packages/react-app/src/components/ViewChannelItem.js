@@ -218,7 +218,42 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       type,
       message
     );
-    alert(signature);
+
+    let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
+    postReq('/channels/unsubscribe_offchain', {
+      signature,
+      message,
+      op: "write",
+      chainId,
+      contractAddress: epnsCommReadProvider.address 
+    }).then((res) => {
+      setSubscribed(true);
+      setMemberCount(memberCount + 1);
+      toaster.update(txToast, {
+        render: "Sucesfully opted out of channel !",
+        type: toaster.TYPE.SUCCESS,
+        autoClose: 5000
+      });
+      console.log(res);
+    }).catch(err => {
+      toaster.update(txToast, {
+        render: "There was an error opting into channel (" + err.message + ")",
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+      console.log(err);
+    }).finally(() => {
+      setTxInProgress(false);
+    })
     // setTxInProgress(true);
 
     // let sendWithTxPromise = epnsCommWriteProvider.unsubscribe(channelObject.addr);
