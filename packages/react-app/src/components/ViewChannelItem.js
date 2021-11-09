@@ -20,9 +20,17 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 import { ALLOWED_CORE_NETWORK } from 'pages/Home';
 import { postReq } from "api";
+const VERIFYING_CONTRACT = "0xc882da9660d29c084345083922f8a9292e58787d";
+
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
   const { account, library, chainId } = useWeb3React();
+  const EPNS_DOMAIN = {
+    name: 'EPNS',
+    version: '1.0.0',
+    chainId: chainId,
+    verifyingContract: VERIFYING_CONTRACT,
+  }
 
   const [ channelJson, setChannelJson ] = React.useState({});
   const [ subscribed, setSubscribed ] = React.useState(true);
@@ -70,158 +78,201 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const subscribe = async () => {
     if(!onCoreNetwork){
       return showNetworkToast();
-    }
-    // Check if public key is broadcasted or not
-    const userMeta = await UsersDataStore.instance.getUserMetaAsync();
-    if (false && !userMeta.publicKeyRegistered) {
-      const msg = "Sign to enable Secrets! (Encrypted Messages)\n Read more: https://epns.io/secret-messages";
-
-      // Sign a message and extract public key
-      library
-        .getSigner(account)
-        .signMessage(msg)
-        .then(async signature => {
-          const publicKey = recoverPublicKey(arrayify(hashMessage(msg)), signature);
-          const formattedPubKey = publicKey.slice(0, 2) + publicKey.slice(4);
-
-          subscribeAction(formattedPubKey);
-        })
-        .catch(error => {
-          // Show toast as well
-          toaster.dark('Skipped for now... Encrypted messages will require this!', {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-
-          subscribeAction(false);
-        })
-    }
-    else {
+    } else {
       subscribeAction(false);
     }
   }
 
-  const subscribeAction = async (withPublicKey) => {
+  const subscribeAction = async () => {
     setTxInProgress(true);
+    const type = {
+      Subscribe: [
+        { name: "channel", type: "address" },
+        { name: "subscriber", type: "address" },
+        { name: "action", type: "string" }
+      ],
+    };
+    const message = {
+        channel: channelObject.addr,
+        subscriber: account,
+        action: "Subscribe"
+    }
 
-    let sendWithTxPromise;
-    sendWithTxPromise = epnsCommWriteProvider.subscribe(channelObject.addr);
+    const signature = await library.getSigner(account)._signTypedData(
+      EPNS_DOMAIN,
+      type,
+      message
+    );
 
-    sendWithTxPromise
-      .then(async tx => {
+    let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
 
-        let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
-          position: "bottom-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+    postReq('/channels/subscribe_offchain', {
+      signature,
+      message,
+      op: "write",
+      chainId,
+      contractAddress: epnsCommReadProvider.address 
+    }).then((res) => {
+      setSubscribed(true);
+      setMemberCount(memberCount + 1);
+      toaster.update(txToast, {
+        render: "Sucesfully opted into channel !",
+        type: toaster.TYPE.SUCCESS,
+        autoClose: 5000
+      });
+      console.log(res);
+    }).catch(err => {
+      toaster.update(txToast, {
+        render: "There was an error opting into channel (" + err.message + ")",
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+      console.log(err);
+    }).finally(() => {
+      setTxInProgress(false);
+    })
+    
+    // make a post request to server with data containing the details
 
-        try {
-          await library.waitForTransaction(tx.hash);
+    // let sendWithTxPromise;
+    // sendWithTxPromise = epnsCommWriteProvider.subscribe(channelObject.addr);
 
-          toaster.update(txToast, {
-            render: "Transaction Completed!",
-            type: toaster.TYPE.SUCCESS,
-            autoClose: 5000
-          });
-          setSubscribed(true);
-          setTxInProgress(false);
-          setMemberCount(memberCount + 1);
-        }
-        catch(e) {
-          toaster.update(txToast, {
-            render: "Transaction Failed! (" + e.name + ")",
-            type: toaster.TYPE.ERROR,
-            autoClose: 5000
-          });
+    // sendWithTxPromise
+    //   .then(async tx => {
 
-          setTxInProgress(false);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        toaster.dark('Transaction Cancelled!', {
-          position: "bottom-right",
-          type: toaster.TYPE.ERROR,
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+    //     let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+    //       position: "bottom-right",
+    //       autoClose: false,
+    //       hideProgressBar: true,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //     });
 
-        setTxInProgress(false);
-      })
+    //     try {
+    //       await library.waitForTransaction(tx.hash);
+
+    //       toaster.update(txToast, {
+    //         render: "Transaction Completed!",
+    //         type: toaster.TYPE.SUCCESS,
+    //         autoClose: 5000
+    //       });
+    //       setSubscribed(true);
+    //       setTxInProgress(false);
+    //       setMemberCount(memberCount + 1);
+    //     }
+    //     catch(e) {
+    //       toaster.update(txToast, {
+    //         render: "Transaction Failed! (" + e.name + ")",
+    //         type: toaster.TYPE.ERROR,
+    //         autoClose: 5000
+    //       });
+
+    //       setTxInProgress(false);
+    //     }
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //     toaster.dark('Transaction Cancelled!', {
+    //       position: "bottom-right",
+    //       type: toaster.TYPE.ERROR,
+    //       autoClose: 5000,
+    //       hideProgressBar: false,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //     });
+
+    //     setTxInProgress(false);
+    //   })
   }
 
   const unsubscribeAction = async () => {
     if(!onCoreNetwork){
       return showNetworkToast();
     }
-    setTxInProgress(true);
+    const type = {
+      Unsubscribe: [
+        { name: "channel", type: "address" },
+        { name: "unsubscriber", type: "address" },
+        { name: "action", type: "string" }
+      ],
+    };
+    const message = {
+      channel: channelObject.addr,
+      unsubscriber: account,
+      action: "Unsubscribe"
+    }
+    const signature = await library.getSigner(account)._signTypedData(
+      EPNS_DOMAIN,
+      type,
+      message
+    );
+    alert(signature);
+    // setTxInProgress(true);
 
-    let sendWithTxPromise = epnsCommWriteProvider.unsubscribe(channelObject.addr);
+    // let sendWithTxPromise = epnsCommWriteProvider.unsubscribe(channelObject.addr);
 
-    sendWithTxPromise
-      .then(async tx => {
+    // sendWithTxPromise
+    //   .then(async tx => {
 
-        let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
-          position: "bottom-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+    //     let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+    //       position: "bottom-right",
+    //       autoClose: false,
+    //       hideProgressBar: true,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //     });
 
-        try {
-          await library.waitForTransaction(tx.hash);
+    //     try {
+    //       await library.waitForTransaction(tx.hash);
 
-          toaster.update(txToast, {
-            render: "Transaction Completed!",
-            type: toaster.TYPE.SUCCESS,
-            autoClose: 5000
-          });
+    //       toaster.update(txToast, {
+    //         render: "Transaction Completed!",
+    //         type: toaster.TYPE.SUCCESS,
+    //         autoClose: 5000
+    //       });
 
-          setTxInProgress(false);
-          setSubscribed(false);
-          setMemberCount(memberCount - 1);
-        }
-        catch(e) {
-          toaster.update(txToast, {
-            render: "Transaction Failed! (" + e.name + ")",
-            type: toaster.TYPE.ERROR,
-            autoClose: 5000
-          });
+    //       setTxInProgress(false);
+    //       setSubscribed(false);
+    //       setMemberCount(memberCount - 1);
+    //     }
+    //     catch(e) {
+    //       toaster.update(txToast, {
+    //         render: "Transaction Failed! (" + e.name + ")",
+    //         type: toaster.TYPE.ERROR,
+    //         autoClose: 5000
+    //       });
 
-          setTxInProgress(false);
-        }
-      })
-      .catch(err => {
-        toaster.dark('Transaction Cancelled!', {
-          position: "bottom-right",
-          type: toaster.TYPE.ERROR,
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+    //       setTxInProgress(false);
+    //     }
+    //   })
+    //   .catch(err => {
+    //     toaster.dark('Transaction Cancelled!', {
+    //       position: "bottom-right",
+    //       type: toaster.TYPE.ERROR,
+    //       autoClose: 5000,
+    //       hideProgressBar: false,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //     });
 
-        setTxInProgress(false);
-      })
+    //     setTxInProgress(false);
+    //   })
   }
 
   // toast customize

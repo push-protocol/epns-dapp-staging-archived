@@ -363,7 +363,7 @@ export default class ChannelsDataStore {
     }
 
     getChannelSubscribers = async (channelAddress) => {
-      return postReq("/channels/get_subscribers", { channel: channelAddress })
+      return postReq("/channels/get_subscribers", { channel: channelAddress, op: 'read' })
         .then(({ data }) => data.subscribers)
         .catch((err) => {
           console.log(`getChannelSubscribers => ${err.message}`);
