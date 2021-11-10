@@ -5,7 +5,6 @@ import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import { ethers } from "ethers";
-import { BigNumber, bigNumberify, formatEther } from 'ethers/utils'
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
