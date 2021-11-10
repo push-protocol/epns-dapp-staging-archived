@@ -22,9 +22,9 @@ import { addresses, abis } from "@project/contracts";
 import { CloseIcon } from 'assets/icons';
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import CryptoHelper from 'helpers/CryptoHelper';
+import { ALLOWED_CORE_NETWORK as ETH_COMMUNICATOR_NETWORK } from 'pages/Home';
 const ethers = require('ethers');
 
-const ipfs = require('ipfs-api')();
 
 // Set Notification Form Type | 0 is reserved for protocol storage
 const NFTypes = [
@@ -34,7 +34,6 @@ const NFTypes = [
   { value: "4", label: 'Subset (IPFS Payload)' },
 ];
 const LIMITER_KEYS = ['Enter', ','];
-
 
 // Create Header
 function SendNotifications() {
@@ -133,7 +132,13 @@ function SendNotifications() {
 
     // Form signer and contract connection
     var signer = library.getSigner(account);
+    // define the core epns contract
     let contract = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
+    // define the epns comms contracts
+    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsComm, signer);
+    const polygonCommsContract = new ethers.Contract(addresses.epnsPolyComm, abis.epnsComm, signer);
+    const communicatorContract = chainId === ETH_COMMUNICATOR_NETWORK ? ethCommsContract : polygonCommsContract;
+    // define the epns comms contracts
 
     // For payload basic
     let nsub = nfSub;
@@ -272,9 +277,6 @@ function SendNotifications() {
       if(nfType === "4"){
         jsonPayload["recipients"] = [...multipleRecipients];
       }
-      console.log('\n\n\n\n\n\n');
-      console.log(jsonPayload);
-      console.log('\n\n\n\n\n\n');
 
       const input = JSON.stringify(jsonPayload);
 
@@ -304,7 +306,10 @@ function SendNotifications() {
     const identity = nfType + "+" + storagePointer;
     const identityBytes = ethers.utils.toUtf8Bytes(identity);
 
-    var anotherSendTxPromise = contract.sendNotification(nfRecipient, identityBytes);
+    var anotherSendTxPromise;
+
+    anotherSendTxPromise = communicatorContract.sendNotification(account, nfRecipient, identityBytes);
+
 
     console.log ("Sending Transaction... ");
     toast.update(notificationToast, {

@@ -2,7 +2,9 @@
 // Goerli, Kovan, Rinkeby and Ropsten. Replace it with your smart contracts.
 const addresses = {
   ceaErc20: "0xc1C0472c0C80bCcDC7F5D01A376Bd97a734B8815",
-  epnscore: "0xc882dA9660d29c084345083922F8a9292E58787D",
+  epnscore: "0x77589b22d37C94473c17128beeb6bc3DaB58c09a",
+  epnsEthComm: "0x5B995e9831Be34aea8Ee38E0389245B6A35493Fd", // the ropsten core contract
+  epnsPolyComm: "0x3f9b6838C31F466266d50A8192dE95f5BEb37e8A", // the ploygon comm contract
   dai: "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108",
   aDai: "0xcB1Fe6F440c49E9290c3eb7f158534c2dC374201",
   staking: "0xd9218bb2a7Ff0131555A9b6F179fF5103a27a286",

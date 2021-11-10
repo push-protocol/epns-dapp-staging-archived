@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import Loader from 'react-loader-spinner'
 import { Waypoint } from "react-waypoint";
 
+import {ALLOWED_CORE_NETWORK} from 'pages/Home'
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
@@ -17,9 +18,9 @@ import hex2ascii from 'hex2ascii'
 
 const NOTIFICATIONS_URL = "https://backend-staging.epns.io/apis/feeds/get_feeds";
 // Create Header
-function Feedbox({ epnsReadProvider }) {
-
-  const { account, library } = useWeb3React();
+function Feedbox() {
+  const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
+  const { account, library, chainId } = useWeb3React();
 
   const [notifications, setNotifications] = React.useState([]);
   // since we dont have how many notifications there are in total
@@ -31,6 +32,16 @@ function Feedbox({ epnsReadProvider }) {
   const [currentPage, setCurrentPage] = React.useState(1);
   //define query
   const notificationsPerPage = 6;
+
+  React.useEffect(() => {
+    const signer = library.getSigner(account);
+    // define the epns comms contracts
+    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsComm, signer);
+    const polygonCommsContract = new ethers.Contract(addresses.epnsPolyComm, abis.epnsComm, signer);
+    const communicatorContract = chainId === ALLOWED_CORE_NETWORK ? ethCommsContract : polygonCommsContract;
+    // define the epns comms contracts
+    setEpnsReadProvider(communicatorContract);
+  }, [chainId]);
   
   const loadNotifications = (currentPage) => {
     const body = {

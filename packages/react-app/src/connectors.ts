@@ -12,13 +12,16 @@ import { TrezorConnector } from '@web3-react/trezor-connector'
 // import { TorusConnector } from '@web3-react/torus-connector'
 
 require('dotenv').config();
-
+const SUPPORTED_CHAIN_IDS = [
+  3 ,//for ropsten
+  80001 //for mumbai
+];
 const POLLING_INTERVAL = 12000
 const RPC_URLS: { [chainId: number]: string } = {
   3: process.env.REACT_APP_RPC_URL_3 as string
 }
 
-export const injected = new InjectedConnector({ supportedChainIds: [3] })
+export const injected = new InjectedConnector({ supportedChainIds: SUPPORTED_CHAIN_IDS })
 
 // export const network = new NetworkConnector({
 //   urls: { 3: RPC_URLS[3] },

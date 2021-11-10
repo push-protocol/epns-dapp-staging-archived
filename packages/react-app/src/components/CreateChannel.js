@@ -220,7 +220,8 @@ function CreateChannel() {
 
     var anotherSendTxPromise = contract.createChannelWithFees(
       channelType,
-      identityBytes
+      identityBytes,
+      fees
     );
 
     setProcessingInfo("Creating Channel TX in progress");
@@ -229,6 +230,7 @@ function CreateChannel() {
         console.log(tx);
         console.log("Check: " + account);
         await library.waitForTransaction(tx.hash);
+        setProcessing(3);
         setProcessingInfo("Channel Created");
       })
       .catch((err) => {
