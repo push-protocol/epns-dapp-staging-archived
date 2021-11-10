@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { css } from 'styled-components';
 import { Device } from 'assets/Device';
+import { recoverTypedSignature_v4 as recoverTypedSignatureV4 } from "eth-sig-util"
 
 import { ToastContainer, toast as toaster  } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -20,7 +21,7 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 import { ALLOWED_CORE_NETWORK } from 'pages/Home';
 import { postReq } from "api";
-const VERIFYING_CONTRACT = "0xc882da9660d29c084345083922f8a9292e58787d";
+// const VERIFYING_CONTRACT = "0xc882da9660d29c084345083922f8a9292e58787d";
 
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
@@ -29,7 +30,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     name: 'EPNS',
     version: '1.0.0',
     chainId: chainId,
-    verifyingContract: VERIFYING_CONTRACT,
+    verifyingContract: epnsCommReadProvider.address ,
   }
 
   const [ channelJson, setChannelJson ] = React.useState({});
@@ -63,14 +64,17 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
 
   // to fetch channels
   const fetchChannelJson = async () => {
-    // console.log(channelObject)
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
     const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsCommReadProvider);
     const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
+    const subscribed = channelSubscribers.find(sub => {
+      return sub.toLowerCase() === account.toLowerCase();
+    });
     setMemberCount(channelSubscribers.length);
-    setSubscribed(subs);
+    setSubscribed(subscribed);
 
     setChannelJson(channelJson);
+
     setLoading(false);
   }
 
@@ -236,7 +240,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       chainId,
       contractAddress: epnsCommReadProvider.address 
     }).then((res) => {
-      setSubscribed(true);
+      setSubscribed(false);
       setMemberCount(memberCount + 1);
       toaster.update(txToast, {
         render: "Sucesfully opted out of channel !",
@@ -396,7 +400,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
           }
         </ChannelMeta>
       </ChannelInfo>
-      {!!account && !!library && onCoreNetwork &&
+      {!!account && !!library &&
         <>
           <LineBreak />
           <ChannelActions>
