@@ -13,7 +13,7 @@ import { GiTwoCoins } from 'react-icons/gi';
  
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from "ethers";
-import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
+//import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
 import NotificationToast from "components/NotificationToast";
 
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
