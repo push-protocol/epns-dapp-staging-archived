@@ -196,7 +196,7 @@ function CreateChannel() {
     let daiContract = new ethers.Contract(addresses.dai, abis.erc20, signer);
 
     // Pick between 50 DAI AND 25K DAI
-    const fees = parseUnits(channelStakeFees.toString(), 18);
+    const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
 
     var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
     const tx = await sendTransactionPromise;
@@ -255,7 +255,7 @@ function CreateChannel() {
     let daiContract = new ethers.Contract(addresses.dai, abis.dai, signer);
 
     let daiAmount = 1000;
-    const amount = parseUnits(daiAmount.toString(), 18);
+    const amount = ethers.utils.parseUnits(daiAmount.toString(), 18);
     var mintTransactionPromise = daiContract.mint(amount);
     const tx = await mintTransactionPromise;
     console.log(tx);
