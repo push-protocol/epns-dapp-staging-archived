@@ -66,12 +66,17 @@ function SendNotifications({
   const [nfMediaEnabled, setNFMediaEnabled] = React.useState(false);
 
   const [nfInfo, setNFInfo] = React.useState('');
+  const [loadingChannels, setLoadingChannels] = React.useState(false);
 
   // fetch basic channel information
   React.useEffect(() => {
+    setLoadingChannels(true);
     epnsReadProvider.channels(account)
     .then(res => {
       setChannelState(res.channelState);
+    })
+    .finally(() => {
+      setLoadingChannels(false);
     })
   }, [account]);
 
@@ -388,6 +393,8 @@ function SendNotifications({
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
   )
+
+  if(loadingChannels) return <></>
 
   return (
     <>

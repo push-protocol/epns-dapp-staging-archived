@@ -133,10 +133,36 @@ function ChannelSettings({
 
   const activateChannel = async () => {
     setLoading(true);
-    console.log(channelStakeFees);
-    setLoading(false);
-    setChannelState(CHANNEL_ACTIVE_STATE);
-    setShowPopup(false);
+    const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
+
+    await epnsWriteProvider.reactivateChannel(+fees)
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction sending",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+      setChannelState(CHANNEL_ACTIVE_STATE);
+    })
+    .catch(err => {
+      console.log("!!!Error reactivateChannel() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error?.message || err.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
+    .finally(() => {
+      
+      setLoading(false);
+      setShowPopup(false);
+    })
   }
 
   const deactivateChannel = async () => {
