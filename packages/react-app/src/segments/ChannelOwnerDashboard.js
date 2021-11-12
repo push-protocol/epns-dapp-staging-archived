@@ -1,21 +1,21 @@
 import React from "react";
 
-import styled, { css } from 'styled-components';
-import {Section, Content} from 'components/SharedStyling';
+import styled, { css } from "styled-components";
+import { Section, Content } from "components/SharedStyling";
 
-import SendNotifications from 'components/SendNotifications';
+import SendNotifications from "components/SendNotifications";
+import ChannelSettings from "components/ChannelSettings";
 
 // CREATE CHANNEL OWNER DASHBOARD
 function ChannelOwnerDashboard() {
-  React.useEffect(() => {
-
-  });
+  React.useEffect(() => {});
 
   // RRENDER
   return (
     <>
       <Section>
         <Content padding="0px">
+          <ChannelSettings />
           <SendNotifications />
         </Content>
       </Section>
@@ -24,7 +24,6 @@ function ChannelOwnerDashboard() {
 }
 
 // css styles
-
 
 // Export Default
 export default ChannelOwnerDashboard;

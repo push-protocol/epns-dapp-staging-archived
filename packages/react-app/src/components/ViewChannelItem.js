@@ -37,6 +37,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const [ subscribed, setSubscribed ] = React.useState(true);
   const [ loading, setLoading ] = React.useState(true);
   const [ memberCount, setMemberCount ] = React.useState(0);
+  const [ isPushAdmin, setIsPushAdmin ] = React.useState(false);
 
   const [ txInProgress, setTxInProgress ] = React.useState(false);
   // toast related section
@@ -70,6 +71,8 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     const subscribed = channelSubscribers.find(sub => {
       return sub.toLowerCase() === account.toLowerCase();
     });
+    // check if is push admin
+    setIsPushAdmin(true);
     setMemberCount(channelSubscribers.length);
     setSubscribed(subscribed);
 
