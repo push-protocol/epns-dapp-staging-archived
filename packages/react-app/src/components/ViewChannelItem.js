@@ -9,6 +9,7 @@ import Loader from 'react-loader-spinner';
 import Skeleton from '@yisheng90/react-loading';
 import { IoMdPeople } from 'react-icons/io';
 import { GiTwoCoins } from 'react-icons/gi';
+import { GoVerified } from 'react-icons/go';
  
 import { useWeb3React } from '@web3-react/core';
 //import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
@@ -19,6 +20,7 @@ import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { ALLOWED_CORE_NETWORK } from 'pages/Home';
 import { postReq } from "api";
 // const VERIFYING_CONTRACT = "0xc882da9660d29c084345083922f8a9292e58787d";
+const UNVERIFIED_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
@@ -75,10 +77,12 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       return sub.toLowerCase() === account.toLowerCase();
     });
     // check if is push admin
-    setIsPushAdmin(true);
+    const channelAdmin = await epnsWriteProvide.pushChannelAdmin();
+    setIsPushAdmin(channelAdmin === account);
     setMemberCount(channelSubscribers.length);
     setSubscribed(subscribed);
-
+    const channelVerifiedStatus = await epnsWriteProvide.getChannelVerfication( channelObject.addr);
+    setIsVerified(Boolean(channelVerifiedStatus));
     setChannelJson(channelJson);
 
     setLoading(false);
@@ -120,15 +124,60 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const verifyChannel = () => {
     setvLoading(true);
     // post op
-    setvLoading(false);
-    setIsVerified(true);
+    epnsWriteProvide.verifyChannel(channelObject.addr)
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction sending",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+      setIsVerified(true);
+    })
+    .catch((err) => {
+      console.log("!!!Error verifyChannel() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
+    .finally(() => {
+      setvLoading(false);
+    })
   }
 
   const unverifyChannel = () => {
     setvLoading(true);
-    // post op
+    epnsWriteProvide.unverifyChannel(channelObject.addr)
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction Sending",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+      setIsVerified(false);
+    })
+    .catch((err) => {
+      console.log("!!!Error handleSendMessage() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
     setvLoading(false);
-    setIsVerified(false);
   }
   const blockChannel = () => {
     setBLoading(true);
@@ -279,6 +328,9 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   }
 
   if(isBlocked) return <></>
+  console.log({
+    channelObject
+  })
 
 
   // render
@@ -350,6 +402,16 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                   {EPNSCoreHelper.formatBigNumberToMetric(channelObject.poolContribution, true) + " DAI"}
                 </PoolShare>
               </Pool>
+              {
+                isVerified && (
+                  <Subscribers>
+                    <GoVerified size={18} color="#35c4f3"/>
+                    {/* <SubscribersCount>
+                      verified
+                    </SubscribersCount> */}
+                  </Subscribers>
+                )
+              }
             </>
           }
         </ChannelMeta>
@@ -394,7 +456,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                 <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
               </SubscribeButton>
             )}
-            {!loading &&!isPushAdmin && isVerified && (
+            {!loading && isPushAdmin && isVerified && (
               <UnsubscribeButton onClick={unverifyChannel} disabled={vLoading}>
               {vLoading &&
                 <ActionLoader>

@@ -7,7 +7,9 @@ import SendNotifications from "components/SendNotifications";
 import ChannelSettings from "components/ChannelSettings";
 
 // CREATE CHANNEL OWNER DASHBOARD
-function ChannelOwnerDashboard() {
+function ChannelOwnerDashboard({
+  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
+}) {
   React.useEffect(() => {});
 
   // RRENDER
@@ -15,8 +17,18 @@ function ChannelOwnerDashboard() {
     <>
       <Section>
         <Content padding="0px">
-          <ChannelSettings />
-          <SendNotifications />
+          <ChannelSettings
+            epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
+            epnsWriteProvider={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
+          />
+          <SendNotifications
+            epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
+            epnsWriteProvide={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
+          />
         </Content>
       </Section>
     </>

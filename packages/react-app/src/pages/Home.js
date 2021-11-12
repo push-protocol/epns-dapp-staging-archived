@@ -275,7 +275,12 @@ function Home({ setBadgeCount, bellPressed }) {
           <ChannelCreationDashboard />
         }
         {controlAt == 2 && channelAdmin && adminStatusLoaded &&
-          <ChannelOwnerDashboard />
+          <ChannelOwnerDashboard 
+            epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
+            epnsWriteProvider={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
+          />
         }
         {controlAt == 3 &&
           <Info/>

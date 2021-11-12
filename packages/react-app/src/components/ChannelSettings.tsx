@@ -21,6 +21,7 @@ import {
 } from "components/SharedStyling";
 import { useClickAway } from "react-use";
 import styled, { css } from "styled-components";
+import { ToastContainer, toast as toaster  } from 'react-toastify';
 
 
 import Dropdown from "react-dropdown";
@@ -45,14 +46,16 @@ const CHANNEL_ACTIVE_STATE = 1;
 const MIN_STAKE_FEES = 50;
 
 // Create Header
-function ChannelSettings() {
+function ChannelSettings({
+  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
+}) {
   const { active, error, account, library, chainId } = useWeb3React();
   const popupRef = React.useRef(null);
   const [loading, setLoading] = React.useState(false);
   const [channelState, setChannelState] = React.useState(CHANNEL_ACTIVE_STATE);
   const [showPopup, setShowPopup] = React.useState(false);
   const [channelStakeFees, setChannelStakeFees] = React.useState(MIN_STAKE_FEES);
-
+  const [poolContrib, setPoolContrib] = React.useState(0);
 
   useClickAway(popupRef, () => {
     if(showPopup){
@@ -60,19 +63,47 @@ function ChannelSettings() {
     }
   });
 
+  // toaster customize
+  const LoaderToast = ({ msg, color }) => (
+    <Toaster>
+      <Loader
+        type="Oval"
+        color={color}
+        height={30}
+        width={30}
+      />
+      <ToasterMsg>{msg}</ToasterMsg>
+    </Toaster>
+  )
+
+  // Toastify
+  let notificationToast = () => toaster.dark(<LoaderToast msg="Preparing Notification" color="#fff"/>, {
+    position: "bottom-right",
+    autoClose: false,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+
   const isChannelDeactivated = channelState === CHANNNEL_DEACTIVATED_STATE;
   const isChannelBlocked = channelState === CHANNEL_BLOCKED_STATE;
 
   const getChannelData = async (contract, channel) => {
     return new Promise((resolve, reject) => {
-      console.log(contract, channel);
       // To get channel info from a channel address
       contract
         .channels(channel)
         .then((response) => {
           console.log("getChannelInfo() --> %o", response);
           setChannelState(response.channelState);
-          resolve(response.poolContribution);
+          setPoolContrib(
+           +EPNSCoreHelper.formatBigNumberToMetric(
+              response.poolContribution,
+              true
+            )
+          );
         })
         .catch((err) => {
           console.log("!!!Error, getChannelInfo() --> %o", err);
@@ -80,6 +111,16 @@ function ChannelSettings() {
         });
     });
   };
+
+  React.useEffect(() => {
+    var signer = library.getSigner(account);
+    let contract = new ethers.Contract(
+      addresses.epnscore,
+      abis.epnscore,
+      signer
+    );
+    getChannelData(contract, account);
+  }, [account]);
 
   const toggleChannel = () => {
     if(isChannelBlocked) return;
@@ -92,7 +133,6 @@ function ChannelSettings() {
 
   const activateChannel = async () => {
     setLoading(true);
-    // post op
     console.log(channelStakeFees);
     setLoading(false);
     setChannelState(CHANNEL_ACTIVE_STATE);
@@ -101,24 +141,8 @@ function ChannelSettings() {
 
   const deactivateChannel = async () => {
     setLoading(true);
-    var signer = library.getSigner(account);
-    let contract = new ethers.Contract(
-      addresses.epnscore,
-      abis.epnscore,
-      signer
-    );
 
-    var channelData = await getChannelData(
-      contract,
-      signer._address
-    );
-
-    var poolContribution = EPNSCoreHelper.formatBigNumberToMetric(
-      channelData,
-      true
-    );
-
-    const amountToBeConverted = parseInt(poolContribution) - 10;
+    const amountToBeConverted = parseInt(""+poolContrib) - 10;
     console.log("Amount To be converted==>", amountToBeConverted);
 
       
@@ -131,9 +155,34 @@ function ChannelSettings() {
     const amountsOut = pushValue * Math.pow(10, 18);
 
     console.log("amountsOut", amountsOut);
-    setLoading(false);
-    setChannelState(CHANNNEL_DEACTIVATED_STATE);
 
+    await epnsWriteProvider.deactivateChannel()
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction sending",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+      setChannelState(CHANNNEL_DEACTIVATED_STATE);
+    })
+    .catch(err => {
+      console.log("!!!Error deactivateChannel() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
+    .finally(() => {
+      // post op
+      setLoading(false);
+    })
     // const deactivateRes = await contract.deactivateChannel(
     //   amountsOut
     // );
