@@ -115,9 +115,10 @@ const EPNSCoreHelper = {
   getJsonFileFromIdentity: async(identity) => {
     const enableLogs = 0;
 
+
     return new Promise ((resolve, reject) => {
       // Split Channel Identity, delimeter of identity is "+"
-      const ids = identity.split("+"); // First segment is storage type, second is the pointer to it
+      const ids = identity?.split("+") || []; // First segment is storage type, second is the pointer to it
 
       if (ids[0] == 1) {
         // IPFS HASH
