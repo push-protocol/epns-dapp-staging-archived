@@ -47,7 +47,8 @@ const MIN_STAKE_FEES = 50;
 
 // Create Header
 function ChannelSettings({
-  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
+  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider,
+  setKey
 }) {
   const { active, error, account, library, chainId } = useWeb3React();
   const popupRef = React.useRef(null);
@@ -131,24 +132,48 @@ function ChannelSettings({
     }
   }
 
-  const activateChannel = async () => {
-    setLoading(true);
-    const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
+  const bn = function (number, defaultValue = null) { if (number == null) { if (defaultValue == null) { return null } number = defaultValue } return ethers.BigNumber.from(number) }
+  const tokensBN = function (amount) { return (bn(amount).mul(bn(10).pow(18))) }
 
-    await epnsWriteProvider.reactivateChannel(+fees)
+  const activateChannel = async () => {
+    // First Approve DAI
+    setLoading(true);
+    var signer = library.getSigner(account);
+    let daiContract = new ethers.Contract(addresses.dai, abis.erc20, signer);
+    const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
+    var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
+    const tx = await sendTransactionPromise;
+
+    console.log(tx);
+    console.log("waiting for tx to finish");
+
+    await library.waitForTransaction(tx.hash);
+
+    console.log(
+      {
+        bignum: tokensBN(channelStakeFees),
+        bignumstr: tokensBN(channelStakeFees).toString()
+      }
+    )
+    await epnsWriteProvider.reactivateChannel(fees)
     .then(async (tx) => {
       console.log(tx);
       console.log ("Transaction Sent!");
 
       toaster.update(notificationToast(), {
-        render: "Transaction sending",
+        render: "Transaction sent",
         type: toaster.TYPE.INFO,
         autoClose: 5000
       });
 
       await tx.wait(1);
-      console.log ("Transaction Mined!");
+      toaster.update(notificationToast(), {
+        render: "Channel Recreated",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
       setChannelState(CHANNEL_ACTIVE_STATE);
+      setKey(Math.random());//force the sibling component to rerender
     })
     .catch(err => {
       console.log("!!!Error reactivateChannel() --> %o", err);
@@ -159,7 +184,6 @@ function ChannelSettings({
       });
     })
     .finally(() => {
-      
       setLoading(false);
       setShowPopup(false);
     })
@@ -196,11 +220,12 @@ function ChannelSettings({
       await tx.wait(1);
       console.log ("Transaction Mined!");
       setChannelState(CHANNNEL_DEACTIVATED_STATE);
+      setKey(Math.random());//force the sibling component to rerender
     })
     .catch(err => {
       console.log("!!!Error deactivateChannel() --> %o", err);
       toaster.update(notificationToast(), {
-        render: "Transacion Failed: " + err.error.message,
+        render: "Transacion Failed: " + err.error?.message || err,
         type: toaster.TYPE.ERROR,
         autoClose: 5000
       });

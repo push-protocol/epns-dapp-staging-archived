@@ -64,7 +64,8 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   React.useEffect(() => {
     fetchChannelJson();
     setIsBlocked(
-      channelObject.channelState === 3
+      channelObject.channelState === 3 || //dont display channel if blocked
+      channelObject.channelState === 2 //dont display channel if deactivated
     );
   }, [account, channelObject]);
 

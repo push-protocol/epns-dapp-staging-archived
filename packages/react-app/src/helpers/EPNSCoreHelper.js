@@ -118,6 +118,9 @@ const EPNSCoreHelper = {
 
     return new Promise ((resolve, reject) => {
       // Split Channel Identity, delimeter of identity is "+"
+      if(!identity){
+        reject("There is no identity file")
+      }
       const ids = identity?.split("+") || []; // First segment is storage type, second is the pointer to it
 
       if (ids[0] == 1) {

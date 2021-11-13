@@ -11,6 +11,7 @@ function ChannelOwnerDashboard({
   epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
 }) {
   React.useEffect(() => {});
+  const [key, setKey] = React.useState(50);
 
   // RRENDER
   return (
@@ -22,8 +23,10 @@ function ChannelOwnerDashboard({
             epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvider={epnsWriteProvider}
             epnsCommWriteProvider={epnsCommWriteProvider}
+            setKey={setKey}
           />
           <SendNotifications
+            key={key}
             epnsReadProvider={epnsReadProvider}
             epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvide={epnsWriteProvider}

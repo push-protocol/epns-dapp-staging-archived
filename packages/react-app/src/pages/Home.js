@@ -173,6 +173,9 @@ function Home({ setBadgeCount, bellPressed }) {
       .catch(e => {
         setChannelAdmin(false);
         setAdminStatusLoaded(true);
+      })
+      .finally(() =>{
+        setAdminStatusLoaded(true);
       });
 
     // Start listening
