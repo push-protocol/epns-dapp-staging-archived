@@ -13,7 +13,7 @@ import { TrezorConnector } from '@web3-react/trezor-connector'
 
 require('dotenv').config();
 const SUPPORTED_CHAIN_IDS = [
-  3 ,//for ropsten
+  42 ,//for ropsten
   80001 //for mumbai
 ];
 const POLLING_INTERVAL = 12000

@@ -49,7 +49,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const showNetworkToast = () => {
     showToast({
       notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
-      notificationBody: "Please connect to the Ropsten network to opt-in/opt-out of channels"
+      notificationBody: "Please connect to the Kovan network to opt-in/opt-out of channels"
     });
   }
   //clear toast variable after it is shown
@@ -329,9 +329,6 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   }
 
   if(isBlocked) return <></>
-  console.log({
-    channelObject
-  })
 
 
   // render

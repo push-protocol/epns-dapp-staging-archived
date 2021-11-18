@@ -1,21 +1,17 @@
 import React from "react";
-import axios from 'axios';
-import styled, { css } from 'styled-components';
+import { api, utils, NotificationItem } from "@epnsproject/frontend-sdk-staging";
+import styled from 'styled-components';
 import Loader from 'react-loader-spinner'
 import { Waypoint } from "react-waypoint";
 
 import {ALLOWED_CORE_NETWORK} from 'pages/Home'
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
-import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import { ethers } from "ethers";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 
-import ViewNotificationItem from "components/ViewNotificationItem";
 import NotificationToast from "components/NotificationToast";
-import hex2ascii from 'hex2ascii'
 
-const NOTIFICATIONS_URL = "https://backend-staging.epns.io/apis/feeds/get_feeds";
 // Create Header
 function Feedbox() {
   const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
@@ -42,32 +38,23 @@ function Feedbox() {
     setEpnsReadProvider(communicatorContract);
   }, [chainId]);
   
-  const loadNotifications = (currentPage) => {
-    const body = {
-      "user": account,
-      "page": currentPage,
-      "pageSize": notificationsPerPage,
-      "op":"read"
-    }
-    axios.post(NOTIFICATIONS_URL, body)
-    .then(({data}) => {
-      const {count, results} = data;
-      const parsedNotification = results.map(parseAPINotifications);
+  const loadNotifications = async (currentPage:any) => {
+    setLoading(true);
+    try{
+      const {count, results} = await api.fetchNotifications(account, notificationsPerPage, currentPage);
+      const parsedResponse = utils.parseApiResponse(results);
+      setNotifications((oldNotifications) => ([
+        ...oldNotifications,
+        ...parsedResponse,
+      ]));
       if(count === 0){
         setFinishedFetching(true);
       }
-      setNotifications((oldNotifications) => ([
-        ...oldNotifications,
-        ...parsedNotification,
-      ]))
-    })
-    .catch(err => {
-        console.log(`
-        ============== There was an error [loadNotifications] ============
-        `, err.message);
-    }).finally(() => {
+    }catch(err){
+      console.log(err)
+    } finally{
       setLoading(false);
-    })
+    }
   }
 
   const clearToast = () => showToast(null);
@@ -88,7 +75,7 @@ function Feedbox() {
 
   //function to query more notifications
   const handlePagination = async() => {
-    await setCurrentPage((prevPage) => {
+    setCurrentPage((prevPage) => {
       const newPage = prevPage + 1;
       loadNotifications(newPage);
       return newPage;
@@ -209,18 +196,24 @@ function Feedbox() {
       <Container>
         {notifications &&
           <Items id="scrollstyle-secondary">
-            {notifications.map((oneNotification, index) => {  
+            {notifications.map((oneNotification, index) => {
+              const { cta, title, message, app, icon, image} = oneNotification;
+
+              // render the notification item
               return (
                 <>
-                {showWayPoint(index) && (<Waypoint onEnter = { () => handlePagination()}/>)}
-                <ViewNotificationItem
-                  key={oneNotification.id}
-                  notificationObject={oneNotification}
-                />
+                  {showWayPoint(index) && (<Waypoint onEnter = { () => handlePagination()}/>)}
+                  <NotificationItem
+                    notificationTitle={title}
+                    notificationBody={message}
+                    cta={cta}
+                    app={app}
+                    icon={icon}
+                    image={image}
+                  />
                 </>
-              )
-              })
-            }
+              );
+            })}
           </Items>
         }
         {(loading) && 

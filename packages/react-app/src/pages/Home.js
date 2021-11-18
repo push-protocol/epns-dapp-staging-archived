@@ -23,7 +23,7 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 import { postReq } from "api"
 
-export const ALLOWED_CORE_NETWORK = 3 //chainId of networks which we have deployed the core contract on
+export const ALLOWED_CORE_NETWORK = 42 //chainId of networks which we have deployed the core contract on
 const CHANNEL_TAB = 1 //Default to 1 which is the channel tab
 const NOTIF_TAB = 0;
 // Create Header
@@ -212,7 +212,7 @@ function Home({ setBadgeCount, bellPressed }) {
           disabled={!adminStatusLoaded}
           onClick={() => {
             if (adminStatusLoaded) {
-              // if youre not on ropsten and you dont have a channel, you cannot create except on ropsten, so throw weeoe
+              // if youre not on kovan and you dont have a channel, you cannot create except on kovan, so throw error
               if(!channelAdmin && !onCoreNetwork){
                 return showNetworkToast();
               }
