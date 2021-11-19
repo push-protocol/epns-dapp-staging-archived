@@ -86,7 +86,7 @@ function Home({ setBadgeCount, bellPressed }) {
         if(aliasEth){
           // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
           await postReq('/channels/get_alias_verification_status', {
-            "aliasAddress": account,
+            "aliasAddress": aliasEth,
             "op":"read"
           })
           .then(({data}) => {
