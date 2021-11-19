@@ -11,7 +11,7 @@ const ethers = require('ethers');
 
 
 export default function AliasVerificationModal({
-    onClose,onSuccess
+    onClose,onSuccess, verificationStatus
 }) {
     const { active, error, account, library, chainId } = useWeb3React();
     const signer = library.getSigner(account);
@@ -56,46 +56,59 @@ export default function AliasVerificationModal({
                     <H2 textTransform="uppercase" spacing="0.1em">
                     <Span weight="200">Verify </Span><Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">Alias</Span>
                     </H2>
-                    <H3>Before you can use this channel on this chain, you first need to verify your Alias.</H3>
+                    {
+                        verificationStatus === null ?
+                        (
+                            <H3>There has been an error in the verification of your alias, Please contact the admin</H3>
+                        ) : (
+                            <H3>Before you can use this channel on this chain, you first need to verify your Alias.</H3>
+                        )
+                    }
                 </Item>
-                <Item align="flex-start">
-                    <CustomInput
-                        required
-                        placeholder="Enter ethereum wallet address of this channel"
-                        radius="4px"
-                        padding="12px"
-                        border="1px solid #674c9f"
-                        bg="#fff"
-                        value={mainAdress}
-                        onChange={(e) => {setMainAddress(e.target.value)}}
-                    />
-                </Item>
-                <Item margin="15px 0px 0px 0px" flex="1" self="stretch" align="stretch">
-                    <Button
-                        bg='#e20880'
-                        color='#fff'
-                        flex="1"
-                        radius="0px"
-                        padding="20px 10px"
-                        disabled={mainAdress.length !== 42}
-                        onClick={submitAlias}
-                    >
-                        { loading && <Loader
-                            type="Oval"
-                            color="#FFF"
-                            height={16}
-                            width={16}
-                            />
-                        }
-                        <StyledInput
-                            cursor="hand"
-                            textTransform="uppercase"
-                            color="#fff" weight="400"
-                            size="0.8em" spacing="0.2em"
-                            value={loading ? loading : "Verify Alias"}
-                        />
-                    </Button>
-                </Item>
+                {
+                    verificationStatus !== null && (
+                        <>
+                            <Item align="flex-start">
+                                <CustomInput
+                                    required
+                                    placeholder="Enter ethereum wallet address of this channel"
+                                    radius="4px"
+                                    padding="12px"
+                                    border="1px solid #674c9f"
+                                    bg="#fff"
+                                    value={mainAdress}
+                                    onChange={(e) => {setMainAddress(e.target.value)}}
+                                />
+                            </Item>
+                            <Item margin="15px 0px 0px 0px" flex="1" self="stretch" align="stretch">
+                                <Button
+                                    bg='#e20880'
+                                    color='#fff'
+                                    flex="1"
+                                    radius="0px"
+                                    padding="20px 10px"
+                                    disabled={mainAdress.length !== 42}
+                                    onClick={submitAlias}
+                                >
+                                    { loading && <Loader
+                                        type="Oval"
+                                        color="#FFF"
+                                        height={16}
+                                        width={16}
+                                        />
+                                    }
+                                    <StyledInput
+                                        cursor="hand"
+                                        textTransform="uppercase"
+                                        color="#fff" weight="400"
+                                        size="0.8em" spacing="0.2em"
+                                        value={loading ? loading : "Verify Alias"}
+                                    />
+                                </Button>
+                            </Item>
+                        </>
+                    )
+                }
             </AliasModal>
         </Overlay>
     )

@@ -78,11 +78,11 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       return sub.toLowerCase() === account.toLowerCase();
     });
     // check if is push admin
-    const channelAdmin = await epnsWriteProvide.pushChannelAdmin();
+    const channelAdmin = await epnsReadProvider.pushChannelAdmin();
     setIsPushAdmin(channelAdmin === account);
     setMemberCount(channelSubscribers.length);
     setSubscribed(subscribed);
-    const channelVerifiedStatus = await epnsWriteProvide.getChannelVerfication( channelObject.addr);
+    const channelVerifiedStatus = await epnsReadProvider.getChannelVerfication( channelObject.addr);
     setIsVerified(Boolean(channelVerifiedStatus));
     setChannelJson(channelJson);
 
@@ -104,11 +104,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   
   // to subscribe
   const subscribe = async () => {
-    if(!onCoreNetwork){
-      return showNetworkToast();
-    } else {
-      subscribeAction(false);
-    }
+    subscribeAction(false);
   }
 
   // Toastify

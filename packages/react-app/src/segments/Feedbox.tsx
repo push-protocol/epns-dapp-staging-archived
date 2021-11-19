@@ -154,38 +154,7 @@ function Feedbox() {
     epnsReadProvider.on(event, cb)
     return epnsReadProvider.off.bind(epnsReadProvider, event, cb)
   }
-  // transform the data gotten from the API into a workable format
-  const parseAPINotifications = (oneAPINotification) => {
-    // extract required data
-    let {
-      payload_id: payloadId,
-      payload: {
-        data: {
-          amsg
-        },
-        notification: {
-          body,
-          title
-        }
-      }
-    } = oneAPINotification;
 
-    let timeStamp = "";
-    // parse the text for the timestamp
-    const matches = amsg.match(/\[timestamp:(.*?)\]/);
-    if (matches) {
-      timeStamp = matches[1];
-      amsg = amsg.replace(/ *\[timestamp:[^)]*\] */g, "");
-    }
-    // save payload into object
-    const parsedNotification = {
-      id: payloadId,
-      notificationBody: body,
-      notificationTitle: title,
-      indexTimeStamp: parseInt(timeStamp)
-    };
-    return parsedNotification
-  };
   const showWayPoint = (index) => {
     return (Number(index) === notifications.length - 1) && !finishedFetching;
   }
