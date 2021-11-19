@@ -28,5 +28,8 @@
       "**/@graphprotocol/graph-ts",
       "**/@graphprotocol/graph-ts/**"
     ]
+  },
+  "dependencies": {
+    "react-select": "^5.2.1"
   }
 }
