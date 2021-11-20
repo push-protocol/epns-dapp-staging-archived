@@ -34,12 +34,20 @@ const NFTypes = [
   { value: "4", label: 'Subset (IPFS Payload)' },
 ];
 const LIMITER_KEYS = ['Enter', ','];
+const CHANNNEL_DEACTIVATED_STATE = 2;
+const CHANNEL_BLOCKED_STATE = 3;
 
 // Create Header
-function SendNotifications() {
+function SendNotifications({
+  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
+}) {
   const { active, error, account, library, chainId } = useWeb3React();
 
   const [nfProcessing, setNFProcessing] = React.useState(0);
+  const [channelState, setChannelState] = React.useState(1);
+
+  const isChannelDeactivated = channelState === CHANNNEL_DEACTIVATED_STATE;
+  const isChannelBlocked = channelState === CHANNEL_BLOCKED_STATE;
 
   const [nfRecipient, setNFRecipient] = React.useState('');
   const [multipleRecipients, setMultipleRecipients] = React.useState([]);
@@ -58,6 +66,19 @@ function SendNotifications() {
   const [nfMediaEnabled, setNFMediaEnabled] = React.useState(false);
 
   const [nfInfo, setNFInfo] = React.useState('');
+  const [loadingChannels, setLoadingChannels] = React.useState(false);
+
+  // fetch basic channel information
+  React.useEffect(() => {
+    setLoadingChannels(true);
+    epnsReadProvider.channels(account)
+    .then(res => {
+      setChannelState(res.channelState);
+    })
+    .finally(() => {
+      setLoadingChannels(false);
+    })
+  }, [account]);
 
   // on change for the subset type notifications input
   const handleSubsetInputChange = (e) => {
@@ -373,6 +394,8 @@ function SendNotifications() {
     </Toaster>
   )
 
+  if(loadingChannels) return <></>
+
   return (
     <>
       <Section>
@@ -381,295 +404,305 @@ function SendNotifications() {
             <H2 textTransform="uppercase" spacing="0.1em">
               <Span weight="200">Send </Span><Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">Notification</Span>
             </H2>
-            <H3>EPNS supports four types of notifications (for now!). <b>Groups</b>, <b>Secrets</b>, <b>Targetted</b> and <b>Subsets</b>.</H3>
+            {
+              !isChannelDeactivated ? (
+                <H3>EPNS supports four types of notifications (for now!). <b>Groups</b>, <b>Secrets</b>, <b>Targetted</b> and <b>Subsets</b>.</H3>
+              ):(
+                <H3>This channel has been deactivated, please reactivate it!.</H3>
+              )
+            }
           </Item>
         </Content>
       </Section>
 
-      <Section>
-        <Content>
-          <Item align="stretch">
-            <FormSubmision
-              flex="1"
-              direction="column"
-              margin="0px"
-              justify="center"
-              size="1.1rem"
-              onSubmit={handleSendMessage}
-            >
-              <Item margin ="0px 20px" flex="1" self="stretch" align="stretch">
-                <Item flex="5" justify="flex-start" align="stretch" minWidth="280px">
-                  <DropdownStyledParent>
-                    <DropdownStyled options={NFTypes} onChange={(option) => {setNFType(option.value); console.log(option)}} value={nfType} placeholder="Select Type of Notification to Send" />
-                  </DropdownStyledParent>
-                </Item>
-                <Input display="none" value={nfType} onChange={(e) => {setNFType(e.target.value)}} />
-
-                {nfType &&
-                  <ItemH margin="0px 15px 15px 15px" bg="#f1f1f1" flex="1" self="stretch" justify="space-between">
-                    <ItemH margin="15px 10px" flex="inital">
-                      <Span margin="0px 10px 0px 0px" weight="400" spacing="0.1em" textTransform="uppercase" size="0.8em" bg="#e20880" color="#fff" padding="5px 15px" radius="30px">Enable Subject</Span>
-                      <Switch color="primary" size="small" checked={nfSubEnabled} onChange={() => setNFSubEnabled(!nfSubEnabled)} />
-                    </ItemH>
-
-                    <ItemH margin="15px 10px" flex="inital">
-                      <Span margin="0px 10px 0px 0px" weight="400" spacing="0.1em" textTransform="uppercase" size="0.8em" bg="#e20880" color="#fff" padding="5px 15px" radius="30px">Enable Media</Span>
-                      <Switch color="primary" size="small" checked={nfMediaEnabled} onChange={() => setNFMediaEnabled(!nfMediaEnabled)} />
-                    </ItemH>
-
-                    <ItemH margin="15px 10px" flex="inital">
-                      <Span margin="0px 10px 0px 0px" weight="400" spacing="0.1em" textTransform="uppercase" size="0.8em" bg="#e20880" color="#fff" padding="5px 15px" radius="30px">Enable CTA</Span>
-                      <Switch color="primary" size="small" checked={nfCTAEnabled} onChange={() => setNFCTAEnabled(!nfCTAEnabled)} />
-                    </ItemH>
-                  </ItemH>
-                }
-              </Item>
-
-              {!nfType &&
-                <Item padding="0px 20px 30px 20px" />
-              }
-
-              {(nfType === "2" || nfType === "3") &&
-                <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
-                  <Input
-                    required
-                    placeholder="Enter recipient wallet address"
-                    radius="4px"
-                    padding="12px"
-                    border="1px solid #674c9f"
-                    bg="#fff"
-                    value={nfRecipient}
-                    onChange={(e) => {setNFRecipient(e.target.value)}}
-                  />
-                  {nfRecipient.trim().length == 0 &&
-                      <Span
-                        padding="4px 10px"
-                        right="0px"
-                        top="0px"
-                        pos="absolute"
-                        color="#fff"
-                        bg="#000"
-                        size="0.7rem"
-                        z="1"
-                      >
-                        Recipient Wallet
-                      </Span>
-                    }
-                </Item>
-              }
-
-              {(nfType === "4") &&
-              <>
-                <MultiRecipientsContainer>
-                  {
-                    multipleRecipients.map(oneRecipient => (
-                      <span key={oneRecipient}>
-                        {oneRecipient}
-                        <i onClick={() => removeRecipient(oneRecipient)}><CloseIcon /></i>
-                      </span>
-                    ))
-                  }
-                </MultiRecipientsContainer>
-                <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
-                  <Input
-                    required={multipleRecipients.length === 0}
-                    placeholder="Enter recipients wallet addresses seperated by a comma or by pressing the enter key"
-                    radius="4px"
-                    padding="12px"
-                    border="1px solid #674c9f"
-                    bg="#fff"
-                    value={tempRecipeint}
-                    onKeyPress={handleSubsetInputChange}
-                    onChange={e => {
-                      const text = e.target.value;
-                      if(!LIMITER_KEYS.includes(text)){
-                        setTempRecipient(e.target.value)
-                      }
-                    }}
-                  />
-                  {nfRecipient.trim().length == 0 &&
-                      <Span
-                        padding="4px 10px"
-                        right="0px"
-                        top="0px"
-                        pos="absolute"
-                        color="#fff"
-                        bg="#000"
-                        size="0.7rem"
-                        z="1"
-                      >
-                        Recipient Wallet
-                      </Span>
-                    }
-                </Item>
-              </>
-              }
-
-              {nfType && nfSubEnabled &&
-                <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
-                  <Input
-                    required
-                    placeholder="Subject of Notification"
-                    padding="12px"
-                    borderBottom="1px solid #000"
-                    weight="400"
-                    size="1.2em"
-                    bg="#fff"
-                    value={nfSub}
-                    onChange={(e) => {setNFSub(e.target.value)}}
-                  />
-                  {nfSub.trim().length == 0 &&
-                      <Span
-                        padding="4px 10px"
-                        right="0px"
-                        top="0px"
-                        pos="absolute"
-                        color="#fff"
-                        bg="#000"
-                        size="0.7rem"
-                        z="1"
-                      >
-                        Subject
-                      </Span>
-                    }
-                </Item>
-              }
-
-              {nfType &&
-                <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
-                  <TextField
-                    required
-                    placeholder="Notification Message"
-                    rows="6"
-                    radius="4px"
-                    padding="12px"
-                    weight="400"
-                    border="1px solid #000"
-                    bg="#fff"
-                    value={nfMsg}
-                    onChange={(e) => {setNFMsg(e.target.value)}}
-                    autocomplete="off"
-                  />
-                </Item>
-              }
-
-              {nfType && nfMediaEnabled &&
-                <ItemH padding="15px 20px 15px 20px" flex="1" self="stretch" align="center">
-                  <Item flex="0" margin="0px 5px 0px 0px">
-                    <BsFillImageFill size={24} color="#000"/>
-                  </Item>
-                  <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
-                    <Input
-                      required
-                      placeholder="Media URL for Notification"
-                      padding="12px"
-                      border="1px solid #000"
-                      radius="4px"
-                      weight="400"
-                      bg="#f1f1f1"
-                      value={nfMedia}
-                      onChange={(e) => {setNFMedia(e.target.value)}}
-                    />
-                    {nfMedia.trim().length == 0 &&
-                        <Span
-                          padding="4px 10px"
-                          right="0px"
-                          top="0px"
-                          pos="absolute"
-                          color="#fff"
-                          bg="#000"
-                          size="0.7rem"
-                          z="1"
-                        >
-                          Media URL
-                        </Span>
-                      }
-                    </Item>
-                </ItemH>
-              }
-
-              {nfType && nfCTAEnabled &&
-                <ItemH margin="15px 20px 15px 20px" flex="1" self="stretch" align="center">
-                  <Item flex="0" margin="0px 5px 0px 0px">
-                    <FiLink size={24} color="#000"/>
-                  </Item>
-                  <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
-                    <Input
-                      required
-                      placeholder="Call to Action Link"
-                      padding="12px"
-                      border="1px solid #000"
-                      radius="4px"
-                      weight="400"
-                      bg="#f1f1f1"
-                      value={nfCTA}
-                      onChange={(e) => {setNFCTA(e.target.value)}}
-                    />
-                    {nfCTA.trim().length == 0 &&
-                        <Span
-                          padding="4px 10px"
-                          right="0px"
-                          top="0px"
-                          pos="absolute"
-                          color="#fff"
-                          bg="#000"
-                          size="0.7rem"
-                          z="1"
-                        >
-                          Call to Action URL
-                        </Span>
-                      }
-                    </Item>
-                </ItemH>
-              }
-
-              {nfInfo && nfProcessing != 1 &&
-                <Item
-                  color="#fff"
-                  bg="#e1087f"
-                  padding="10px 15px"
-                  margin = "15px 0px"
+      {
+        !isChannelDeactivated && (
+          <Section>
+            <Content>
+              <Item align="stretch">
+                <FormSubmision
+                  flex="1"
+                  direction="column"
+                  margin="0px"
+                  justify="center"
+                  size="1.1rem"
+                  onSubmit={handleSendMessage}
                 >
-                  <Span
-                    color="#fff"
-                    textTransform="uppercase"
-                    spacing="0.1em"
-                    weight="400"
-                    size="1em"
-                  >
-                    {nfInfo}
-                  </Span>
-                </Item>
-              }
+                  <Item margin ="0px 20px" flex="1" self="stretch" align="stretch">
+                    <Item flex="5" justify="flex-start" align="stretch" minWidth="280px">
+                      <DropdownStyledParent>
+                        <DropdownStyled options={NFTypes} onChange={(option) => {setNFType(option.value); console.log(option)}} value={nfType} placeholder="Select Type of Notification to Send" />
+                      </DropdownStyledParent>
+                    </Item>
+                    <Input display="none" value={nfType} onChange={(e) => {setNFType(e.target.value)}} />
 
-              {nfType &&
-                <Item margin="15px 0px 0px 0px" flex="1" self="stretch" align="stretch">
-                  <Button
-                    bg='#e20880'
-                    color='#fff'
-                    flex="1"
-                    radius="0px"
-                    padding="20px 10px"
-                    disabled={nfProcessing == 1 ? true : false}
-                  >
-                    {nfProcessing == 1 &&
-                      <Loader
-                         type="Oval"
-                         color="#fff"
-                         height={24}
-                         width={24}
+                    {nfType &&
+                      <ItemH margin="0px 15px 15px 15px" bg="#f1f1f1" flex="1" self="stretch" justify="space-between">
+                        <ItemH margin="15px 10px" flex="inital">
+                          <Span margin="0px 10px 0px 0px" weight="400" spacing="0.1em" textTransform="uppercase" size="0.8em" bg="#e20880" color="#fff" padding="5px 15px" radius="30px">Enable Subject</Span>
+                          <Switch color="primary" size="small" checked={nfSubEnabled} onChange={() => setNFSubEnabled(!nfSubEnabled)} />
+                        </ItemH>
+
+                        <ItemH margin="15px 10px" flex="inital">
+                          <Span margin="0px 10px 0px 0px" weight="400" spacing="0.1em" textTransform="uppercase" size="0.8em" bg="#e20880" color="#fff" padding="5px 15px" radius="30px">Enable Media</Span>
+                          <Switch color="primary" size="small" checked={nfMediaEnabled} onChange={() => setNFMediaEnabled(!nfMediaEnabled)} />
+                        </ItemH>
+
+                        <ItemH margin="15px 10px" flex="inital">
+                          <Span margin="0px 10px 0px 0px" weight="400" spacing="0.1em" textTransform="uppercase" size="0.8em" bg="#e20880" color="#fff" padding="5px 15px" radius="30px">Enable CTA</Span>
+                          <Switch color="primary" size="small" checked={nfCTAEnabled} onChange={() => setNFCTAEnabled(!nfCTAEnabled)} />
+                        </ItemH>
+                      </ItemH>
+                    }
+                  </Item>
+
+                  {!nfType &&
+                    <Item padding="0px 20px 30px 20px" />
+                  }
+
+                  {(nfType === "2" || nfType === "3") &&
+                    <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
+                      <Input
+                        required
+                        placeholder="Enter recipient wallet address"
+                        radius="4px"
+                        padding="12px"
+                        border="1px solid #674c9f"
+                        bg="#fff"
+                        value={nfRecipient}
+                        onChange={(e) => {setNFRecipient(e.target.value)}}
+                      />
+                      {nfRecipient.trim().length == 0 &&
+                          <Span
+                            padding="4px 10px"
+                            right="0px"
+                            top="0px"
+                            pos="absolute"
+                            color="#fff"
+                            bg="#000"
+                            size="0.7rem"
+                            z="1"
+                          >
+                            Recipient Wallet
+                          </Span>
+                        }
+                    </Item>
+                  }
+
+                  {(nfType === "4") &&
+                  <>
+                    <MultiRecipientsContainer>
+                      {
+                        multipleRecipients.map(oneRecipient => (
+                          <span key={oneRecipient}>
+                            {oneRecipient}
+                            <i onClick={() => removeRecipient(oneRecipient)}><CloseIcon /></i>
+                          </span>
+                        ))
+                      }
+                    </MultiRecipientsContainer>
+                    <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
+                      <Input
+                        required={multipleRecipients.length === 0}
+                        placeholder="Enter recipients wallet addresses seperated by a comma or by pressing the enter key"
+                        radius="4px"
+                        padding="12px"
+                        border="1px solid #674c9f"
+                        bg="#fff"
+                        value={tempRecipeint}
+                        onKeyPress={handleSubsetInputChange}
+                        onChange={e => {
+                          const text = e.target.value;
+                          if(!LIMITER_KEYS.includes(text)){
+                            setTempRecipient(e.target.value)
+                          }
+                        }}
+                      />
+                      {nfRecipient.trim().length == 0 &&
+                          <Span
+                            padding="4px 10px"
+                            right="0px"
+                            top="0px"
+                            pos="absolute"
+                            color="#fff"
+                            bg="#000"
+                            size="0.7rem"
+                            z="1"
+                          >
+                            Recipient Wallet
+                          </Span>
+                        }
+                    </Item>
+                  </>
+                  }
+
+                  {nfType && nfSubEnabled &&
+                    <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
+                      <Input
+                        required
+                        placeholder="Subject of Notification"
+                        padding="12px"
+                        borderBottom="1px solid #000"
+                        weight="400"
+                        size="1.2em"
+                        bg="#fff"
+                        value={nfSub}
+                        onChange={(e) => {setNFSub(e.target.value)}}
+                      />
+                      {nfSub.trim().length == 0 &&
+                          <Span
+                            padding="4px 10px"
+                            right="0px"
+                            top="0px"
+                            pos="absolute"
+                            color="#fff"
+                            bg="#000"
+                            size="0.7rem"
+                            z="1"
+                          >
+                            Subject
+                          </Span>
+                        }
+                    </Item>
+                  }
+
+                  {nfType &&
+                    <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
+                      <TextField
+                        required
+                        placeholder="Notification Message"
+                        rows="6"
+                        radius="4px"
+                        padding="12px"
+                        weight="400"
+                        border="1px solid #000"
+                        bg="#fff"
+                        value={nfMsg}
+                        onChange={(e) => {setNFMsg(e.target.value)}}
+                        autocomplete="off"
+                      />
+                    </Item>
+                  }
+
+                  {nfType && nfMediaEnabled &&
+                    <ItemH padding="15px 20px 15px 20px" flex="1" self="stretch" align="center">
+                      <Item flex="0" margin="0px 5px 0px 0px">
+                        <BsFillImageFill size={24} color="#000"/>
+                      </Item>
+                      <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
+                        <Input
+                          required
+                          placeholder="Media URL for Notification"
+                          padding="12px"
+                          border="1px solid #000"
+                          radius="4px"
+                          weight="400"
+                          bg="#f1f1f1"
+                          value={nfMedia}
+                          onChange={(e) => {setNFMedia(e.target.value)}}
                         />
-                    }
-                    {nfProcessing != 1 &&
-                      <Input cursor="hand" textTransform="uppercase" color="#fff" weight="400" size="0.8em" spacing="0.2em" type="submit" value="Send Notification" />
-                    }
-                  </Button>
-                </Item>
-              }
-            </FormSubmision>
-          </Item>
-        </Content>
-      </Section>
+                        {nfMedia.trim().length == 0 &&
+                            <Span
+                              padding="4px 10px"
+                              right="0px"
+                              top="0px"
+                              pos="absolute"
+                              color="#fff"
+                              bg="#000"
+                              size="0.7rem"
+                              z="1"
+                            >
+                              Media URL
+                            </Span>
+                          }
+                        </Item>
+                    </ItemH>
+                  }
+
+                  {nfType && nfCTAEnabled &&
+                    <ItemH margin="15px 20px 15px 20px" flex="1" self="stretch" align="center">
+                      <Item flex="0" margin="0px 5px 0px 0px">
+                        <FiLink size={24} color="#000"/>
+                      </Item>
+                      <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
+                        <Input
+                          required
+                          placeholder="Call to Action Link"
+                          padding="12px"
+                          border="1px solid #000"
+                          radius="4px"
+                          weight="400"
+                          bg="#f1f1f1"
+                          value={nfCTA}
+                          onChange={(e) => {setNFCTA(e.target.value)}}
+                        />
+                        {nfCTA.trim().length == 0 &&
+                            <Span
+                              padding="4px 10px"
+                              right="0px"
+                              top="0px"
+                              pos="absolute"
+                              color="#fff"
+                              bg="#000"
+                              size="0.7rem"
+                              z="1"
+                            >
+                              Call to Action URL
+                            </Span>
+                          }
+                        </Item>
+                    </ItemH>
+                  }
+
+                  {nfInfo && nfProcessing != 1 &&
+                    <Item
+                      color="#fff"
+                      bg="#e1087f"
+                      padding="10px 15px"
+                      margin = "15px 0px"
+                    >
+                      <Span
+                        color="#fff"
+                        textTransform="uppercase"
+                        spacing="0.1em"
+                        weight="400"
+                        size="1em"
+                      >
+                        {nfInfo}
+                      </Span>
+                    </Item>
+                  }
+
+                  {nfType &&
+                    <Item margin="15px 0px 0px 0px" flex="1" self="stretch" align="stretch">
+                      <Button
+                        bg='#e20880'
+                        color='#fff'
+                        flex="1"
+                        radius="0px"
+                        padding="20px 10px"
+                        disabled={nfProcessing == 1 ? true : false}
+                      >
+                        {nfProcessing == 1 &&
+                          <Loader
+                            type="Oval"
+                            color="#fff"
+                            height={24}
+                            width={24}
+                            />
+                        }
+                        {nfProcessing != 1 &&
+                          <Input cursor="hand" textTransform="uppercase" color="#fff" weight="400" size="0.8em" spacing="0.2em" type="submit" value="Send Notification" />
+                        }
+                      </Button>
+                    </Item>
+                  }
+                </FormSubmision>
+              </Item>
+            </Content>
+          </Section>
+        )
+      }
 
 
     </>

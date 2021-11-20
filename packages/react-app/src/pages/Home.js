@@ -23,7 +23,7 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 import { postReq } from "api"
 
-export const ALLOWED_CORE_NETWORK = 3 //chainId of networks which we have deployed the core contract on
+export const ALLOWED_CORE_NETWORK = 42 //chainId of networks which we have deployed the core contract on
 const CHANNEL_TAB = 1 //Default to 1 which is the channel tab
 const NOTIF_TAB = 0;
 // Create Header
@@ -43,7 +43,7 @@ function Home({ setBadgeCount, bellPressed }) {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
   const [aliasEthAccount, setAliasEthAccount] = React.useState(null);
-  const [aliasVerified, setAliasVerified] = React.useState(true);
+  const [aliasVerified, setAliasVerified] = React.useState(null); // null means error, false means unverified and true means verified
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
 
@@ -53,7 +53,7 @@ function Home({ setBadgeCount, bellPressed }) {
   const showNetworkToast = () => {
     showToast({
       notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
-      notificationBody: "Please connect to the Ropsten network to access channels"
+      notificationBody: "Please connect to the Kovan network to access channels"
     });
   }
   //clear toast variable after it is shown
@@ -78,22 +78,28 @@ function Home({ setBadgeCount, bellPressed }) {
         })
         .then(({data}) => {
           console.log({data})
-          const ethAccount =  data || account;
+          const ethAccount =  data;
+          // const ethAccount =  data || account;
           setAliasEthAccount(ethAccount);
           return data;
         }); 
         if(aliasEth){
           // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
-          const aliasVerified = await postReq('/channels/get_alias_verification_status', {
-            "aliasAddress":account,
+          await postReq('/channels/get_alias_verification_status', {
+            "aliasAddress": aliasEth,
             "op":"read"
           })
           .then(({data}) => {
-            const {status} = data;
-            console.log({secd: data})
-            const aliasIsVerified =  data;
-            setAliasVerified(status);
-            return aliasIsVerified
+            // if it returns undefined then we need to let them know to verify their channel
+            if(!data){
+              setAliasVerified(false);
+              return;
+            }
+            const { status } = data;
+            setAliasVerified(
+              status || null
+            )
+            return data
           }); 
         } 
       }
@@ -173,6 +179,9 @@ function Home({ setBadgeCount, bellPressed }) {
       .catch(e => {
         setChannelAdmin(false);
         setAdminStatusLoaded(true);
+      })
+      .finally(() =>{
+        setAdminStatusLoaded(true);
       });
 
     // Start listening
@@ -209,7 +218,7 @@ function Home({ setBadgeCount, bellPressed }) {
           disabled={!adminStatusLoaded}
           onClick={() => {
             if (adminStatusLoaded) {
-              // if youre not on ropsten and you dont have a channel, you cannot create except on ropsten, so throw weeoe
+              // if youre not on kovan and you dont have a channel, you cannot create except on kovan, so throw error
               if(!channelAdmin && !onCoreNetwork){
                 return showNetworkToast();
               }
@@ -234,10 +243,18 @@ function Home({ setBadgeCount, bellPressed }) {
               <ControlChannelText active={controlAt == 2 ? 1 : 0}>{channelJson.name}</ControlChannelText>
             </ControlChannelContainer>
           }
-          {channelAdmin && adminStatusLoaded && (!aliasVerified && !onCoreNetwork) &&
+          {channelAdmin && adminStatusLoaded && ((aliasVerified === false) && !onCoreNetwork) &&
             <ControlChannelContainer>
               <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
               <ControlChannelText active={controlAt == 2 ? 1 : 0}>Verify channel alias</ControlChannelText>
+            </ControlChannelContainer>
+          }
+          {channelAdmin && adminStatusLoaded && ((aliasVerified === null) && !onCoreNetwork) &&
+            <ControlChannelContainer>
+              <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
+              <ControlChannelText active={controlAt == 2 ? 1 : 0}>
+                Contact the admin
+              </ControlChannelText>
             </ControlChannelContainer>
           }
           {!channelAdmin && adminStatusLoaded &&
@@ -275,7 +292,12 @@ function Home({ setBadgeCount, bellPressed }) {
           <ChannelCreationDashboard />
         }
         {controlAt == 2 && channelAdmin && adminStatusLoaded &&
-          <ChannelOwnerDashboard />
+          <ChannelOwnerDashboard 
+            epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
+            epnsWriteProvider={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
+          />
         }
         {controlAt == 3 &&
           <Info/>
@@ -291,6 +313,7 @@ function Home({ setBadgeCount, bellPressed }) {
           <AliasVerificationodal
             onClose={() => setModalOpen(false)}
             onSuccess={() => setAliasVerified(true)}
+            verificationStatus={aliasVerified}
           />
         }
       </Interface>

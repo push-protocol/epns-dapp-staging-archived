@@ -293,6 +293,7 @@ export default class ChannelsDataStore {
         for(let i = startIndex; i < stopIndex ; i++){
           channelIDs.push(i)
         }
+        console.log({channelIDs});
 
         const promises = channelIDs.map(async (channelID) => {
           // Match the cache
@@ -319,6 +320,9 @@ export default class ChannelsDataStore {
         }
         else {
           let channelAddress;
+          console.log({
+            channelID
+          });
 
           await EPNSCoreHelper.getChannelAddressFromID(channelID, this.state.epnsReadProvider)
             .then(async response => {

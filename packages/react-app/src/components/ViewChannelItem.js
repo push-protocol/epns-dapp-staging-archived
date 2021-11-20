@@ -6,22 +6,21 @@ import { recoverTypedSignature_v4 as recoverTypedSignatureV4 } from "eth-sig-uti
 import { ToastContainer, toast as toaster  } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import Loader from 'react-loader-spinner';
-
 import Skeleton from '@yisheng90/react-loading';
 import { IoMdPeople } from 'react-icons/io';
 import { GiTwoCoins } from 'react-icons/gi';
+import { GoVerified } from 'react-icons/go';
  
 import { useWeb3React } from '@web3-react/core';
-import { ethers } from "ethers";
 //import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
 import NotificationToast from "components/NotificationToast";
 
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
-import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
-import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
+import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { ALLOWED_CORE_NETWORK } from 'pages/Home';
 import { postReq } from "api";
 // const VERIFYING_CONTRACT = "0xc882da9660d29c084345083922f8a9292e58787d";
+const UNVERIFIED_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // Create Header
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
@@ -37,7 +36,11 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const [ subscribed, setSubscribed ] = React.useState(true);
   const [ loading, setLoading ] = React.useState(true);
   const [ memberCount, setMemberCount ] = React.useState(0);
-
+  const [ isPushAdmin, setIsPushAdmin ] = React.useState(false);
+  const [ isVerified, setIsVerified ] = React.useState(false);
+  const [ isBlocked, setIsBlocked] = React.useState(false)
+  const [ vLoading, setvLoading ] = React.useState(false);
+  const [ bLoading, setBLoading ] = React.useState(false);
   const [ txInProgress, setTxInProgress ] = React.useState(false);
   // toast related section
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
@@ -46,7 +49,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const showNetworkToast = () => {
     showToast({
       notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
-      notificationBody: "Please connect to the Ropsten network to opt-in/opt-out of channels"
+      notificationBody: "Please connect to the Kovan network to opt-in/opt-out of channels"
     });
   }
   //clear toast variable after it is shown
@@ -60,6 +63,10 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
 
   React.useEffect(() => {
     fetchChannelJson();
+    setIsBlocked(
+      channelObject.channelState === 3 || //dont display channel if blocked
+      channelObject.channelState === 2 //dont display channel if deactivated
+    );
   }, [account, channelObject]);
 
   // to fetch channels
@@ -70,21 +77,134 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     const subscribed = channelSubscribers.find(sub => {
       return sub.toLowerCase() === account.toLowerCase();
     });
+    // check if is push admin
+    const channelAdmin = await epnsReadProvider.pushChannelAdmin();
+    setIsPushAdmin(channelAdmin === account);
     setMemberCount(channelSubscribers.length);
     setSubscribed(subscribed);
-
+    const channelVerifiedStatus = await epnsReadProvider.getChannelVerfication( channelObject.addr);
+    setIsVerified(Boolean(channelVerifiedStatus));
     setChannelJson(channelJson);
 
     setLoading(false);
   }
 
+    // toast customize
+    const LoaderToast = ({ msg, color }) => (
+      <Toaster>
+        <Loader
+         type="Oval"
+         color={color}
+         height={30}
+         width={30}
+        />
+        <ToasterMsg>{msg}</ToasterMsg>
+      </Toaster>
+    )
+  
   // to subscribe
   const subscribe = async () => {
-    if(!onCoreNetwork){
-      return showNetworkToast();
-    } else {
-      subscribeAction(false);
-    }
+    subscribeAction(false);
+  }
+
+  // Toastify
+  let notificationToast = () => toaster.dark(<LoaderToast msg="Preparing Notification" color="#fff"/>, {
+    position: "bottom-right",
+    autoClose: false,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+
+  const verifyChannel = () => {
+    setvLoading(true);
+    // post op
+    epnsWriteProvide.verifyChannel(channelObject.addr)
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction sending",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+      setIsVerified(true);
+    })
+    .catch((err) => {
+      console.log("!!!Error verifyChannel() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
+    .finally(() => {
+      setvLoading(false);
+    })
+  }
+
+  const unverifyChannel = () => {
+    setvLoading(true);
+    epnsWriteProvide.unverifyChannel(channelObject.addr)
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction Sending",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+      setIsVerified(false);
+    })
+    .catch((err) => {
+      console.log("!!!Error handleSendMessage() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
+    setvLoading(false);
+  }
+  const blockChannel = () => {
+    setBLoading(true);
+    epnsWriteProvide.blockChannel(channelObject.addr)
+    .then(async (tx) => {
+      console.log(tx);
+      console.log ("Transaction Sent!");
+
+      toaster.update(notificationToast(), {
+        render: "Transaction Sent",
+        type: toaster.TYPE.INFO,
+        autoClose: 5000
+      });
+
+      await tx.wait(1);
+      console.log ("Transaction Mined!");
+    })
+    .catch((err) => {
+      console.log("!!!Error handleSendMessage() --> %o", err);
+      toaster.update(notificationToast(), {
+        render: "Transacion Failed: " + err.error.message,
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000
+      });
+    })
+    .finally(()=>{
+      // post op
+      setBLoading(false);
+      setIsBlocked(true);
+    })
   }
 
   const subscribeAction = async () => {
@@ -143,62 +263,6 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     }).finally(() => {
       setTxInProgress(false);
     })
-    
-    // make a post request to server with data containing the details
-
-    // let sendWithTxPromise;
-    // sendWithTxPromise = epnsCommWriteProvider.subscribe(channelObject.addr);
-
-    // sendWithTxPromise
-    //   .then(async tx => {
-
-    //     let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
-    //       position: "bottom-right",
-    //       autoClose: false,
-    //       hideProgressBar: true,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //     });
-
-    //     try {
-    //       await library.waitForTransaction(tx.hash);
-
-    //       toaster.update(txToast, {
-    //         render: "Transaction Completed!",
-    //         type: toaster.TYPE.SUCCESS,
-    //         autoClose: 5000
-    //       });
-    //       setSubscribed(true);
-    //       setTxInProgress(false);
-    //       setMemberCount(memberCount + 1);
-    //     }
-    //     catch(e) {
-    //       toaster.update(txToast, {
-    //         render: "Transaction Failed! (" + e.name + ")",
-    //         type: toaster.TYPE.ERROR,
-    //         autoClose: 5000
-    //       });
-
-    //       setTxInProgress(false);
-    //     }
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //     toaster.dark('Transaction Cancelled!', {
-    //       position: "bottom-right",
-    //       type: toaster.TYPE.ERROR,
-    //       autoClose: 5000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //     });
-
-    //     setTxInProgress(false);
-    //   })
   }
 
   const unsubscribeAction = async () => {
@@ -258,74 +322,10 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     }).finally(() => {
       setTxInProgress(false);
     })
-    // setTxInProgress(true);
-
-    // let sendWithTxPromise = epnsCommWriteProvider.unsubscribe(channelObject.addr);
-
-    // sendWithTxPromise
-    //   .then(async tx => {
-
-    //     let txToast = toaster.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
-    //       position: "bottom-right",
-    //       autoClose: false,
-    //       hideProgressBar: true,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //     });
-
-    //     try {
-    //       await library.waitForTransaction(tx.hash);
-
-    //       toaster.update(txToast, {
-    //         render: "Transaction Completed!",
-    //         type: toaster.TYPE.SUCCESS,
-    //         autoClose: 5000
-    //       });
-
-    //       setTxInProgress(false);
-    //       setSubscribed(false);
-    //       setMemberCount(memberCount - 1);
-    //     }
-    //     catch(e) {
-    //       toaster.update(txToast, {
-    //         render: "Transaction Failed! (" + e.name + ")",
-    //         type: toaster.TYPE.ERROR,
-    //         autoClose: 5000
-    //       });
-
-    //       setTxInProgress(false);
-    //     }
-    //   })
-    //   .catch(err => {
-    //     toaster.dark('Transaction Cancelled!', {
-    //       position: "bottom-right",
-    //       type: toaster.TYPE.ERROR,
-    //       autoClose: 5000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //     });
-
-    //     setTxInProgress(false);
-    //   })
   }
 
-  // toast customize
-  const LoaderToast = ({ msg, color }) => (
-    <Toaster>
-      <Loader
-       type="Oval"
-       color={color}
-       height={30}
-       width={30}
-      />
-      <ToasterMsg>{msg}</ToasterMsg>
-    </Toaster>
-  )
+  if(isBlocked) return <></>
+
 
   // render
   return (
@@ -396,6 +396,16 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                   {EPNSCoreHelper.formatBigNumberToMetric(channelObject.poolContribution, true) + " DAI"}
                 </PoolShare>
               </Pool>
+              {
+                isVerified && (
+                  <Subscribers>
+                    <GoVerified size={18} color="#35c4f3"/>
+                    {/* <SubscribersCount>
+                      verified
+                    </SubscribersCount> */}
+                  </Subscribers>
+                )
+              }
             </>
           }
         </ChannelMeta>
@@ -409,6 +419,52 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                 <Skeleton />
               </SkeletonButton>
             }
+            {!loading && isPushAdmin && (
+              <SubscribeButton onClick={blockChannel} disabled={bLoading}>
+                {bLoading &&
+                  <ActionLoader>
+                    <Loader
+                     type="Oval"
+                     color="#FFF"
+                     height={16}
+                     width={16}
+                    />
+                  </ActionLoader>
+                }
+                <ActionTitle hideit={bLoading}>Block channel</ActionTitle>
+              </SubscribeButton>
+            )
+            }
+            {!loading && isPushAdmin && !isVerified && (
+              <SubscribeButton onClick={verifyChannel} disabled={vLoading}>
+                {vLoading &&
+                  <ActionLoader>
+                    <Loader
+                     type="Oval"
+                     color="#FFF"
+                     height={16}
+                     width={16}
+                    />
+                  </ActionLoader>
+                }
+                <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
+              </SubscribeButton>
+            )}
+            {!loading && isPushAdmin && isVerified && (
+              <UnsubscribeButton onClick={unverifyChannel} disabled={vLoading}>
+              {vLoading &&
+                <ActionLoader>
+                  <Loader
+                   type="Oval"
+                   color="#FFF"
+                   height={16}
+                   width={16}
+                  />
+                </ActionLoader>
+              }
+              <ActionTitle hideit={vLoading}>Unverify Channel</ActionTitle>
+            </UnsubscribeButton>
+            ) }
             {!loading && !subscribed &&
               <SubscribeButton onClick={subscribe} disabled={txInProgress}>
                 {txInProgress &&
@@ -610,9 +666,10 @@ const LineBreak = styled.div`
 const ChannelActions = styled.div`
   margin: 5px;
   flex-grow: 1;
-  max-width: 120px;
+  // max-width: 250px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  // justify-content: center;
   align-items: center;
 `
 

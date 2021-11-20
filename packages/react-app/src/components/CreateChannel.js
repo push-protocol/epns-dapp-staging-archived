@@ -1,5 +1,5 @@
 import React from "react";
-
+import Select from 'react-select';
 import styled, { css } from "styled-components";
 import {
   Section,
@@ -39,6 +39,9 @@ const ethers = require("ethers");
 const ipfs = require("ipfs-api")();
 
 const minStakeFees = 50;
+const ALIAS_CHAINS = [
+  {value: "POLYGON_TEST_MUMBAI:80001", label:"Polygon"}
+];
 
 // Create Header
 function CreateChannel() {
@@ -51,6 +54,7 @@ function CreateChannel() {
   const [stakeFeesChoosen, setStakeFeesChoosen] = React.useState(false);
   const [channelInfoDone, setChannelInfoDone] = React.useState(false);
 
+  const [chainDetails, setChainDetails] = React.useState("");
   const [channelName, setChannelName] = React.useState("");
   const [channelAlias, setChannelAlias] = React.useState("");
   const [channelInfo, setChannelInfo] = React.useState("");
@@ -154,7 +158,8 @@ function CreateChannel() {
       isEmpty(channelInfo) ||
       isEmpty(channelURL) ||
       isEmpty(channelFile) ||
-      isEmpty(channelAlias)
+      isEmpty(channelAlias) ||
+      isEmpty(chainDetails)
     ) {
       setProcessing(3);
       setProcessingInfo("Channel Fields are Empty! Please retry!");
@@ -166,10 +171,11 @@ function CreateChannel() {
     setChannelInfoDone(true);
     setProcessing(1);
 
-    var alias = channelAlias.split(":");
-    var blockchain = alias[0];
-    var chain_id = alias[1];
-    var address = alias[2];
+    var chainDetailsSplit = chainDetails.split(":");
+    var blockchain = chainDetailsSplit[0];
+    var chain_id = chainDetailsSplit[1];
+    var address = channelAlias;
+
 
     const input = JSON.stringify({
       name: channelName,
@@ -460,12 +466,33 @@ function CreateChannel() {
                 flex="1"
                 self="stretch"
                 align="stretch"
+                style={{position: "relative"}}
               >
+                <Select
+                  className="basic-single"
+                  classNamePrefix="select"
+                  placeholder="Alias network"
+                  name="color"
+                  options={ALIAS_CHAINS}
+                  theme={(theme) => ({
+                    ...theme,
+                    borderRadius: 0,
+                    colors: {
+                      ...theme.colors,
+                      primary25: '#e20880',
+                      primary: '#e20880',
+                    },
+                  })}
+                  onChange={(selectedOption) => {
+                    setChainDetails(selectedOption.value)
+                  }}
+                />
                 <Input
                   required
-                  placeholder="Your Channel's Alias"
+                  placeholder="Your Channel's Alias address"
                   maxlength="40"
                   padding="12px"
+                  style={{paddingLeft: "22%"}}
                   border="1px solid #000"
                   weight="400"
                   size="1rem"

@@ -37,6 +37,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
     fetchInitialsChannelMeta();
   }, [account, chainId]);
 
+
   //update paginatedChannels array when scrolled till the end
   React.useEffect(() => {
     if(channels){
@@ -120,7 +121,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
         <Items id="scrollstyle-secondary">
           <Faucets/>
 
-          {Object.keys(paginatedChannels).map(index => {
+          {Object.keys(paginatedChannels.filter(Boolean)).map(index => {
             const isOwner = (
               paginatedChannels[index].addr === account ||
               (account === owner && paginatedChannels[index].addr === "0x0000000000000000000000000000000000000000")
