@@ -57,15 +57,31 @@ function getErrorMessage(error: Error) {
   }
 }
 
-function getLibrary(provider, connector) {
-  return new ethers.providers.Web3Provider(provider); // this will vary according to whether you use e.g. ethers or web3.js
-}
 
 export default function() {
+  const [key, setKey] = React.useState(0);
+  function getLibrary(provider, connector) {
+    const gottenProvider = new ethers.providers.Web3Provider(provider, "any"); // this will vary according to whether you use e.g. ethers or web3.js
+    // adding this is important to deal with changing networks
+    gottenProvider.on("network", (newNetwork, oldNetwork) => {
+      // When a Provider makes its initial connection, it emits a "network"
+      // event with a null oldNetwork along with the newNetwork. So, if the
+      // oldNetwork exists, it represents a changing network
+      if (oldNetwork) {
+          // window.location.reload();
+          // use this tric to rerender the application instead of refreshing the page
+          setKey(Math.random());
+      }
+    });
+    return gottenProvider;
+  }
+
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <App />
-    </Web3ReactProvider>
+    <div key={key}>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <App  />
+      </Web3ReactProvider>
+    </div>
   )
 }
 

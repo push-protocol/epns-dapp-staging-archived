@@ -72,7 +72,6 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   // to fetch channels
   const fetchChannelJson = async () => {
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
-    const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsCommReadProvider);
     const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
     const subscribed = channelSubscribers.find(sub => {
       return sub.toLowerCase() === account.toLowerCase();

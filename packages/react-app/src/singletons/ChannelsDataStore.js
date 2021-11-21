@@ -319,10 +319,7 @@ export default class ChannelsDataStore {
           resolve(this.state.channelsMeta[channelID]);
         }
         else {
-          let channelAddress;
-          console.log({
-            channelID
-          });
+          let channelAddress;    
 
           await EPNSCoreHelper.getChannelAddressFromID(channelID, this.state.epnsReadProvider)
             .then(async response => {
