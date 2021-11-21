@@ -68,20 +68,17 @@ export default function() {
       // event with a null oldNetwork along with the newNetwork. So, if the
       // oldNetwork exists, it represents a changing network
       if (oldNetwork) {
-          // window.location.reload();
+          window.location.reload();
           // use this tric to rerender the application instead of refreshing the page
-          setKey(Math.random());
       }
     });
     return gottenProvider;
   }
 
   return (
-    <div key={key}>
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <App  />
-      </Web3ReactProvider>
-    </div>
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <App  />
+    </Web3ReactProvider>
   )
 }
 

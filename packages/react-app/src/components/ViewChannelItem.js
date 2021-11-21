@@ -67,7 +67,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       channelObject.channelState === 3 || //dont display channel if blocked
       channelObject.channelState === 2 //dont display channel if deactivated
     );
-  }, [account, channelObject]);
+  }, [account, channelObject, chainId]);
 
   // to fetch channels
   const fetchChannelJson = async () => {
@@ -78,6 +78,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     });
     // check if is push admin
     const channelAdmin = await epnsReadProvider.pushChannelAdmin();
+    alert(channelAdmin)
     setIsPushAdmin(channelAdmin === account);
     setMemberCount(channelSubscribers.length);
     setSubscribed(subscribed);
