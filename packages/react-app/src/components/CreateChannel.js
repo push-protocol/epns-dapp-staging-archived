@@ -240,6 +240,7 @@ function CreateChannel() {
       })
       .catch((err) => {
         console.log("Error --> %o", err);
+        console.log({err});
         setProcessing(3);
         setProcessingInfo(
           "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
@@ -257,17 +258,27 @@ function CreateChannel() {
 
   //mind Dai
   const mintDai = async () => {
-    var signer = library.getSigner(account);
-    let daiContract = new ethers.Contract(addresses.dai, abis.dai, signer);
-
-    let daiAmount = 1000;
-    const amount = ethers.utils.parseUnits(daiAmount.toString(), 18);
-    var mintTransactionPromise = daiContract.mint(amount);
-    const tx = await mintTransactionPromise;
-    console.log(tx);
-    await library.waitForTransaction(tx.hash);
-    setProcessingInfo("1000 Dai minted successfully!");
-    console.log("Transaction Completed");
+    try{
+      var signer = library.getSigner(account);
+      let daiContract = new ethers.Contract(addresses.dai, abis.dai, signer);
+      console.log({
+        daiContract
+      });
+      console.log(1);
+      let daiAmount = 1000;
+      const amount = ethers.utils.parseUnits(daiAmount.toString(), 18);
+      console.log(2);
+      var mintTransactionPromise = daiContract.mint(amount);
+      console.log(3);
+      const tx = await mintTransactionPromise;
+      console.log(tx);
+      await library.waitForTransaction(tx.hash);
+      console.log(4);
+      setProcessingInfo("1000 Dai minted successfully!");
+      console.log("Transaction Completed");
+    }catch(err){
+      console.log(err)
+    }
   };
 
   return (

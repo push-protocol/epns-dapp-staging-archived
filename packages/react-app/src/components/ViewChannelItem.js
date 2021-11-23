@@ -78,7 +78,6 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     });
     // check if is push admin
     const channelAdmin = await epnsReadProvider.pushChannelAdmin();
-    alert(channelAdmin)
     setIsPushAdmin(channelAdmin === account);
     setMemberCount(channelSubscribers.length);
     setSubscribed(subscribed);

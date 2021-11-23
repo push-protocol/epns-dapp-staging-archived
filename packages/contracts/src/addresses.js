@@ -5,7 +5,7 @@ const addresses = {
   epnscore: "0x97D7c5f14B8fe94Ef2b4bA589379f5Ec992197dA",
   epnsEthComm: "0x87da9Af1899ad477C67FeA31ce89c1d2435c77DC", // the ropsten core contract
   epnsPolyComm: "0x3f9b6838C31F466266d50A8192dE95f5BEb37e8A", // the ploygon comm contract
-  dai: "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108",
+  dai: "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd",
   aDai: "0xcB1Fe6F440c49E9290c3eb7f158534c2dC374201",
   staking: "0xd9218bb2a7Ff0131555A9b6F179fF5103a27a286",
   yieldFarmPUSH: "0xFe0bcF750d4042480943CC8bA818CA3482DDf691",
