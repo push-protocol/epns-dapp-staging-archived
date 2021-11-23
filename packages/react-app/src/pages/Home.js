@@ -79,8 +79,9 @@ function Home({ setBadgeCount, bellPressed }) {
         .then(({data}) => {
           console.log({data})
           const ethAccount =  data;
-          // const ethAccount =  data || account;
-          setAliasEthAccount(ethAccount);
+          if(ethAccount){
+            setAliasEthAccount(ethAccount);
+          }
           return data;
         }); 
         if(aliasEth){
@@ -170,13 +171,17 @@ function Home({ setBadgeCount, bellPressed }) {
   const checkUserForChannelRights = async () => {
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
+    alert(ownerAccount);
+    console.log({epnsReadProvider});
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(response => {
+        alert(1)
         setChannelJson(response);
         setChannelAdmin(true);
         setAdminStatusLoaded(true);
       })
       .catch(e => {
+        alert(2)
         setChannelAdmin(false);
         setAdminStatusLoaded(true);
       })
