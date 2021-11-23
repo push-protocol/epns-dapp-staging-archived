@@ -73,14 +73,13 @@ function Home({ setBadgeCount, bellPressed }) {
         // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
         const aliasEth = await postReq('/channels/get_eth_address' , {
             "aliasAddress": account,
-            "aliasBlockchain":"POLYGON_TEST_MUMBAI", //use this for now, since we are only on polygon network
             "op":"read"
         })
         .then(({data}) => {
           console.log({data})
           const ethAccount =  data;
           if(ethAccount){
-            setAliasEthAccount(ethAccount);
+            setAliasEthAccount(ethAccount.ethAddress);
           }
           return data;
         }); 
@@ -171,17 +170,14 @@ function Home({ setBadgeCount, bellPressed }) {
   const checkUserForChannelRights = async () => {
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
-    alert(ownerAccount);
     console.log({epnsReadProvider});
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(response => {
-        alert(1)
         setChannelJson(response);
         setChannelAdmin(true);
         setAdminStatusLoaded(true);
       })
       .catch(e => {
-        alert(2)
         setChannelAdmin(false);
         setAdminStatusLoaded(true);
       })
@@ -302,6 +298,7 @@ function Home({ setBadgeCount, bellPressed }) {
             epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvider={epnsWriteProvider}
             epnsCommWriteProvider={epnsCommWriteProvider}
+            channelAccount={!onCoreNetwork ? aliasEthAccount : account}
           />
         }
         {controlAt == 3 &&

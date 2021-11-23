@@ -8,7 +8,8 @@ import ChannelSettings from "components/ChannelSettings";
 
 // CREATE CHANNEL OWNER DASHBOARD
 function ChannelOwnerDashboard({
-  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
+  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider,
+  channelAccount
 }) {
   React.useEffect(() => {});
   const [key, setKey] = React.useState(50);
@@ -31,6 +32,7 @@ function ChannelOwnerDashboard({
             epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvide={epnsWriteProvider}
             epnsCommWriteProvider={epnsCommWriteProvider}
+            channelAccount={channelAccount}
           />
         </Content>
       </Section>

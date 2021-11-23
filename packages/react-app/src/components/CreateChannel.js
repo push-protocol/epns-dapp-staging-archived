@@ -171,6 +171,10 @@ function CreateChannel() {
     setChannelInfoDone(true);
     setProcessing(1);
 
+    console.log({
+      chainDetails,
+      channelAlias
+    })
     var chainDetailsSplit = chainDetails.split(":");
     var blockchain = chainDetailsSplit[0];
     var chain_id = chainDetailsSplit[1];

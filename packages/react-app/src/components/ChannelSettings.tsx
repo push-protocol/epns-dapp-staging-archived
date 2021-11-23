@@ -20,9 +20,10 @@ import {
   TextField,
 } from "components/SharedStyling";
 import { useClickAway } from "react-use";
+import config from "config";
 import styled, { css } from "styled-components";
 import { ToastContainer, toast as toaster  } from 'react-toastify';
-
+import { ALLOWED_CORE_NETWORK } from "pages/Home";
 
 import Dropdown from "react-dropdown";
 import Slider from "@material-ui/core/Slider";
@@ -51,6 +52,7 @@ function ChannelSettings({
   setKey
 }) {
   const { active, error, account, library, chainId } = useWeb3React();
+  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const popupRef = React.useRef(null);
   const [loading, setLoading] = React.useState(false);
   const [channelState, setChannelState] = React.useState(CHANNEL_ACTIVE_STATE);
@@ -114,11 +116,13 @@ function ChannelSettings({
   };
 
   React.useEffect(() => {
+    const coreProvider = onCoreNetwork ?
+    library : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
     var signer = library.getSigner(account);
     let contract = new ethers.Contract(
       addresses.epnscore,
       abis.epnscore,
-      signer
+      coreProvider
     );
     getChannelData(contract, account);
   }, [account]);
@@ -191,6 +195,7 @@ function ChannelSettings({
 
   const deactivateChannel = async () => {
     setLoading(true);
+    if(!poolContrib) return;
 
     const amountToBeConverted = parseInt(""+poolContrib) - 10;
     console.log("Amount To be converted==>", amountToBeConverted);
@@ -204,9 +209,8 @@ function ChannelSettings({
 
     const amountsOut = pushValue * Math.pow(10, 18);
 
-    console.log("amountsOut", amountsOut);
 
-    await epnsWriteProvider.deactivateChannel()
+    await epnsWriteProvider.deactivateChannel(""+amountsOut)
     .then(async (tx) => {
       console.log(tx);
       console.log ("Transaction Sent!");
