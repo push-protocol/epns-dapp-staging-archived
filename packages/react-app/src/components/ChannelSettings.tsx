@@ -248,6 +248,10 @@ function ChannelSettings({
     // console.log(deactivateRes);
   }
 
+  if(!onCoreNetwork){
+    return <></>
+  }
+
 
   return (
     <>
