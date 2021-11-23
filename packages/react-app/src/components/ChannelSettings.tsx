@@ -228,6 +228,9 @@ function ChannelSettings({
     })
     .catch(err => {
       console.log("!!!Error deactivateChannel() --> %o", err);
+      console.log({
+        err
+      });
       toaster.update(notificationToast(), {
         render: "Transacion Failed: " + err.error?.message || err,
         type: toaster.TYPE.ERROR,
