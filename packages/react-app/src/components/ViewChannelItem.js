@@ -67,12 +67,11 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       channelObject.channelState === 3 || //dont display channel if blocked
       channelObject.channelState === 2 //dont display channel if deactivated
     );
-  }, [account, channelObject]);
+  }, [account, channelObject, chainId]);
 
   // to fetch channels
   const fetchChannelJson = async () => {
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
-    const subs = await EPNSCoreHelper.getSubscribedStatus(account, channelObject.addr, epnsCommReadProvider);
     const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
     const subscribed = channelSubscribers.find(sub => {
       return sub.toLowerCase() === account.toLowerCase();

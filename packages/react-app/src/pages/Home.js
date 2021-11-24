@@ -71,22 +71,22 @@ function Home({ setBadgeCount, bellPressed }) {
       // if we are not on the core network then check for if this account is an alias for another channel
       if(!onCoreNetwork){
         // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
-        const aliasEth = await postReq('/channels/get_alias' , {
+        const aliasEth = await postReq('/channels/get_eth_address' , {
             "aliasAddress": account,
-            "aliasBlockchain":"POLYGON_TEST_MUMBAI", //use this for now, since we are only on polygon network
             "op":"read"
         })
         .then(({data}) => {
           console.log({data})
           const ethAccount =  data;
-          // const ethAccount =  data || account;
-          setAliasEthAccount(ethAccount);
+          if(ethAccount){
+            setAliasEthAccount(ethAccount.ethAddress);
+          }
           return data;
         }); 
         if(aliasEth){
           // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
           await postReq('/channels/get_alias_verification_status', {
-            "aliasAddress": aliasEth,
+            "aliasAddress": account,
             "op":"read"
           })
           .then(({data}) => {
@@ -170,6 +170,7 @@ function Home({ setBadgeCount, bellPressed }) {
   const checkUserForChannelRights = async () => {
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
+    console.log({epnsReadProvider});
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(response => {
         setChannelJson(response);
@@ -297,6 +298,7 @@ function Home({ setBadgeCount, bellPressed }) {
             epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvider={epnsWriteProvider}
             epnsCommWriteProvider={epnsCommWriteProvider}
+            channelAccount={!onCoreNetwork ? aliasEthAccount : account}
           />
         }
         {controlAt == 3 &&

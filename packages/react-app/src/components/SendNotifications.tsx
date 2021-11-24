@@ -39,7 +39,7 @@ const CHANNEL_BLOCKED_STATE = 3;
 
 // Create Header
 function SendNotifications({
-  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider 
+  epnsReadProvider, epnsWriteProvider, epnsCommReadProvider, epnsCommWriteProvider, channelAccount
 }) {
   const { active, error, account, library, chainId } = useWeb3React();
 
@@ -71,7 +71,7 @@ function SendNotifications({
   // fetch basic channel information
   React.useEffect(() => {
     setLoadingChannels(true);
-    epnsReadProvider.channels(account)
+    epnsReadProvider.channels(channelAccount)
     .then(res => {
       setChannelState(res.channelState);
     })
