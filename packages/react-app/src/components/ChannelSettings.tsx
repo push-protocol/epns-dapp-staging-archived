@@ -209,8 +209,10 @@ function ChannelSettings({
 
     const amountsOut = pushValue * Math.pow(10, 18);
 
-
-    await epnsWriteProvider.deactivateChannel(""+amountsOut)
+    console.log({
+      epnsWriteProvider
+    });
+    await epnsWriteProvider.deactivateChannel(amountsOut.toString())
     .then(async (tx) => {
       console.log(tx);
       console.log ("Transaction Sent!");
@@ -248,7 +250,7 @@ function ChannelSettings({
     // console.log(deactivateRes);
   }
 
-  if(!onCoreNetwork){
+  if(!onCoreNetwork){ //temporarily deactivate the deactivate button
     return <></>
   }
 
