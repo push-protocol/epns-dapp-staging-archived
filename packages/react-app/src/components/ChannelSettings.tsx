@@ -209,9 +209,6 @@ function ChannelSettings({
 
     const amountsOut = pushValue * Math.pow(10, 18);
 
-    console.log({
-      epnsWriteProvider
-    });
     await epnsWriteProvider.deactivateChannel(amountsOut.toString())
     .then(async (tx) => {
       console.log(tx);
