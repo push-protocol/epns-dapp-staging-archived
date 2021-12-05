@@ -10,8 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import { Web3ReactProvider, useWeb3React, UnsupportedChainIdError } from '@web3-react/core'
-import {
+çimport {
   NoEthereumProviderError,
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector'
@@ -42,24 +41,9 @@ const web3Connectors = {
   Portis: {obj: portis, logo: './svg/login/portis.svg', title: 'Portis'},
 }
 
-function getErrorMessage(error: Error) {
-  if (error instanceof NoEthereumProviderError) {
-    return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
-  } else if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network."
-  } else if (
-    error instanceof UserRejectedRequestErrorInjected
-  ) {
-    return 'Please authorize this website to access your Ethereum account.'
-  } else {
-    console.error(error)
-    return 'An unknown error occurred. Check the console for more details.'
-  }
-}
 
 
 export default function() {
-  const [key, setKey] = React.useState(0);
   function getLibrary(provider, connector) {
     const gottenProvider = new ethers.providers.Web3Provider(provider, "any"); // this will vary according to whether you use e.g. ethers or web3.js
     // adding this is important to deal with changing networks
@@ -82,24 +66,11 @@ export default function() {
   )
 }
 
-function ChainId() {
-  const { chainId } = useWeb3React()
-
-  return (
-    <>
-      <span>Chain Id</span>
-      <span role="img" aria-label="chain">
-        ⛓
-      </span>
-      <span>{Number.isInteger(chainId) ? chainId : ''}</span>
-    </>
-  )
-}
 
 
 function App() {
   const context = useWeb3React<Web3Provider>()
-  const { connector, library, chainId, account, activate, deactivate, active, error } = context
+  const { connector, activate, active, error } = context
 
   const [ badgeCount, setBadgeCount ] = React.useState(0);
   const [ bellPressed, setBellPressed ] = React.useState(0);
