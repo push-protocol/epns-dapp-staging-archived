@@ -158,8 +158,7 @@ function CreateChannel() {
       isEmpty(channelInfo) ||
       isEmpty(channelURL) ||
       isEmpty(channelFile) ||
-      isEmpty(channelAlias) ||
-      isEmpty(chainDetails)
+      channelAlias ? isEmpty(chainDetails) : (chainDetails ? isEmpty(channelAlias) : false)
     ) {
       setProcessing(3);
       setProcessingInfo("Channel Fields are Empty! Please retry!");
@@ -503,7 +502,6 @@ function CreateChannel() {
                   }}
                 />
                 <Input
-                  required
                   placeholder="Your Channel's Alias address"
                   maxlength="40"
                   padding="12px"
