@@ -48,7 +48,7 @@ function SendNotifications({
 
   const isChannelDeactivated = channelState === CHANNNEL_DEACTIVATED_STATE;
   const isChannelBlocked = channelState === CHANNEL_BLOCKED_STATE;
-
+  const [channelAddress, setChannelAddress] =  React.useState("");
   const [nfRecipient, setNFRecipient] = React.useState('');
   const [multipleRecipients, setMultipleRecipients] = React.useState([]);
   const [tempRecipeint, setTempRecipient] = React.useState(''); // to temporarily hold the address of one recipient who would be entered into the recipeints array above.
@@ -67,10 +67,11 @@ function SendNotifications({
 
   const [nfInfo, setNFInfo] = React.useState('');
   const [loadingChannels, setLoadingChannels] = React.useState(false);
-
+  
   // fetch basic channel information
   React.useEffect(() => {
     setLoadingChannels(true);
+    setChannelAddress(account);
     epnsReadProvider.channels(channelAccount)
     .then(res => {
       setChannelState(res.channelState);
@@ -329,7 +330,8 @@ function SendNotifications({
 
     var anotherSendTxPromise;
 
-    anotherSendTxPromise = communicatorContract.sendNotification(account, nfRecipient, identityBytes);
+    // anotherSendTxPromise = communicatorContract.sendNotification(account, nfRecipient, identityBytes); //to be delted after Q/A
+    anotherSendTxPromise = communicatorContract.sendNotification(channelAddress, nfRecipient, identityBytes);
 
 
     console.log ("Sending Transaction... ");
@@ -456,9 +458,39 @@ function SendNotifications({
                     }
                   </Item>
 
-                  {!nfType &&
+                  {!nfType ? (
                     <Item padding="0px 20px 30px 20px" />
+                    ):(
+                    <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
+                      <Input
+                        required
+                        placeholder="Enter channel address"
+                        radius="4px"
+                        padding="12px"
+                        border="1px solid #674c9f"
+                        bg="#fff"
+                        value={channelAddress}
+                        onChange={(e) => {setChannelAddress(e.target.value)}}
+                      />
+                      {/* {nfRecipient.trim().length == 0 && */}
+                          <Span
+                            padding="4px 10px"
+                            right="0px"
+                            top="0px"
+                            pos="absolute"
+                            color="#fff"
+                            bg="#000"
+                            size="0.7rem"
+                            z="1"
+                          >
+                            Channel Address
+                          </Span>
+                        {/* } */}
+                    </Item>
+                    )
                   }
+                  
+
 
                   {(nfType === "2" || nfType === "3") &&
                     <Item margin="15px 20px 15px 20px" flex="1" self="stretch" align="stretch">
