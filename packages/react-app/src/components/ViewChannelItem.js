@@ -73,7 +73,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const fetchChannelJson = async () => {
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
     const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
-    const subscribed = channelSubscribers.find(sub => {
+    const subscribed =  channelSubscribers.find(sub => {
       return sub.toLowerCase() === account.toLowerCase();
     });
     // check if is push admin
@@ -126,7 +126,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       console.log ("Transaction Sent!");
 
       toaster.update(notificationToast(), {
-        render: "Transaction sending",
+        render: "Transaction sent",
         type: toaster.TYPE.INFO,
         autoClose: 5000
       });
@@ -156,7 +156,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       console.log ("Transaction Sent!");
 
       toaster.update(notificationToast(), {
-        render: "Transaction Sending",
+        render: "Transaction sent",
         type: toaster.TYPE.INFO,
         autoClose: 5000
       });
