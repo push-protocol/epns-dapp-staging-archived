@@ -131,8 +131,8 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
         autoClose: 5000
       });
 
-      await tx.wait(1);
-      console.log ("Transaction Mined!");
+      // await tx.wait(1);
+      // console.log ("Transaction Mined!");
       setIsVerified(true);
     })
     .catch((err) => {
@@ -188,8 +188,8 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
         autoClose: 5000
       });
 
-      await tx.wait(1);
-      console.log ("Transaction Mined!");
+      // await tx.wait(1);
+      // console.log ("Transaction Mined!");
     })
     .catch((err) => {
       console.log("!!!Error handleSendMessage() --> %o", err);
