@@ -22,8 +22,9 @@ import {
 import { useClickAway } from "react-use";
 import config from "config";
 import styled, { css } from "styled-components";
-import { ToastContainer, toast as toaster  } from 'react-toastify';
+import { toast as toaster  } from 'react-toastify';
 import { ALLOWED_CORE_NETWORK } from "pages/Home";
+import AddDelegateModal from './AddDelegateModal';
 
 import Dropdown from "react-dropdown";
 import Slider from "@material-ui/core/Slider";
@@ -59,6 +60,10 @@ function ChannelSettings({
   const [showPopup, setShowPopup] = React.useState(false);
   const [channelStakeFees, setChannelStakeFees] = React.useState(MIN_STAKE_FEES);
   const [poolContrib, setPoolContrib] = React.useState(0);
+  const [addDelegateLoading, setAddDelegateLoading] = React.useState(false);
+  const [addModalOpen, setAddModalOpen] = React.useState(false);
+  const [removeDelegateLoading, setRemoveDelegateLoading] = React.useState(false);
+  const [removeModalOpen, setRemoveModalOpen] = React.useState(false);
 
   useClickAway(popupRef, () => {
     if(showPopup){
@@ -118,7 +123,6 @@ function ChannelSettings({
   React.useEffect(() => {
     const coreProvider = onCoreNetwork ?
     library : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
-    var signer = library.getSigner(account);
     let contract = new ethers.Contract(
       addresses.epnscore,
       abis.epnscore,
@@ -152,13 +156,6 @@ function ChannelSettings({
     console.log("waiting for tx to finish");
 
     await library.waitForTransaction(tx.hash);
-
-    console.log(
-      {
-        bignum: tokensBN(channelStakeFees),
-        bignumstr: tokensBN(channelStakeFees).toString()
-      }
-    )
     await epnsWriteProvider.reactivateChannel(fees)
     .then(async (tx) => {
       console.log(tx);
@@ -208,7 +205,7 @@ function ChannelSettings({
     const pushValue = response.response.data.quote.PUSH.price;
 
     const amountsOut = pushValue * Math.pow(10, 18);
-    
+
     await epnsWriteProvider.deactivateChannel(amountsOut.toString())
     .then(async (tx) => {
       console.log(tx);
@@ -243,11 +240,17 @@ function ChannelSettings({
     // const deactivateRes = await contract.deactivateChannel(
     //   amountsOut
     // );
-
-    // console.log(deactivateRes);
   }
 
-  if(!onCoreNetwork){ //temporarily deactivate the deactivate button
+  const addDelegate = async (walletAddress:string) => {
+    return epnsCommWriteProvider.addDelegate(walletAddress);
+  }
+
+  const removeDelegate = (walletAddress:string) => {
+    return epnsCommWriteProvider.removeDelegate(walletAddress);
+  }
+
+  if(!onCoreNetwork){ //temporarily deactivate the deactivate button if not on core network
     return <></>
   }
 
@@ -256,7 +259,44 @@ function ChannelSettings({
     <>
       <Section>
         <Content padding="10px 10px">
-          <Item align="flex-end">
+          <Item
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              flexWrap: "wrap"
+            }}
+            align="flex-end"
+          >
+            <ChannelActionButton
+              onClick={() => setAddModalOpen(true)}
+            >
+              <ActionTitle>
+                { addDelegateLoading ?
+                  <Loader
+                    type="Oval"
+                    color="#FFF"
+                    height={16}
+                    width={16}
+                  /> : "Add Delegate"
+                }
+              </ActionTitle>
+            </ChannelActionButton>
+
+            <ChannelActionButton
+              onClick={() => setRemoveModalOpen(true)}
+            >
+              <ActionTitle>
+                { removeDelegateLoading ?
+                  <Loader
+                    type="Oval"
+                    color="#FFF"
+                    height={16}
+                    width={16}
+                  /> : "Remove Delegate"
+                }
+              </ActionTitle>
+            </ChannelActionButton>
+
             <ChannelActionButton
               onClick={toggleChannel}
             >
@@ -341,7 +381,22 @@ function ChannelSettings({
               </PopupSlider>
             </PopupOverlay>
           )
-        } 
+        }
+        {
+          addModalOpen && (
+            <AddDelegateModal
+              onClose={() => setAddModalOpen(false)}
+              onSuccess={() => {
+                toaster.update(notificationToast(), {
+                  render: "Delegate Added",
+                  type: toaster.TYPE.INFO,
+                  autoClose: 5000
+                });
+              }}
+              addDelegate={addDelegate}
+            />
+          )
+        }
       </Section>
     </>
   );
