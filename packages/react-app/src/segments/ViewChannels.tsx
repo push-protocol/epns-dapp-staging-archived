@@ -16,7 +16,7 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 
 // Create Header
-function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider, epnsCommWriteProvider }) {
+function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider, epnsCommWriteProvider, canVerify }) {
   const { account, library, chainId } = useWeb3React();
 
   const [controlAt, setControlAt] = React.useState(0);
@@ -141,6 +141,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
                     epnsWriteProvide={epnsWriteProvide}
                     epnsCommReadProvider={epnsCommReadProvider}
                     epnsCommWriteProvider={epnsCommWriteProvider}
+                    canVerify={canVerify}
                   />
                 </div>
                 </>
@@ -160,6 +161,7 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider
                     epnsWriteProvide={epnsWriteProvide}
                     epnsCommReadProvider={epnsCommReadProvider}
                     epnsCommWriteProvider={epnsCommWriteProvider}
+                    canVerify={canVerify}
                   />
                 </div>
                 </>

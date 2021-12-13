@@ -23,7 +23,7 @@ import { postReq } from "api";
 const UNVERIFIED_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // Create Header
-function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
+function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider, canVerify }) {
   const { account, library, chainId } = useWeb3React();
   const EPNS_DOMAIN = {
     name: 'EPNS',
@@ -138,7 +138,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     .catch((err) => {
       console.log("!!!Error verifyChannel() --> %o", err);
       toaster.update(notificationToast(), {
-        render: "Transacion Failed: " + err.error.message,
+        render: "Transacion Failed: " + err.error?.message || "Unknown Error",
         type: toaster.TYPE.ERROR,
         autoClose: 5000
       });
@@ -168,7 +168,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     .catch((err) => {
       console.log("!!!Error handleSendMessage() --> %o", err);
       toaster.update(notificationToast(), {
-        render: "Transacion Failed: " + err.error.message,
+        render: "Transacion Failed: " + err.error?.message || "Unknown Error",
         type: toaster.TYPE.ERROR,
         autoClose: 5000
       });
@@ -434,7 +434,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
               </SubscribeButton>
             )
             }
-            {!loading && isPushAdmin && !isVerified && (
+            {!loading && (isPushAdmin || canVerify) && !isVerified && (
               <SubscribeButton onClick={verifyChannel} disabled={vLoading}>
                 {vLoading &&
                   <ActionLoader>
@@ -449,7 +449,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                 <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
               </SubscribeButton>
             )}
-            {!loading && isPushAdmin && isVerified && (
+            {!loading && (isPushAdmin || canVerify) && isVerified && (
               <UnsubscribeButton onClick={unverifyChannel} disabled={vLoading}>
               {vLoading &&
                 <ActionLoader>
