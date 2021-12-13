@@ -46,6 +46,7 @@ function Home({ setBadgeCount, bellPressed }) {
   const [aliasVerified, setAliasVerified] = React.useState(null); // null means error, false means unverified and true means verified
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
+  const [canVerify, setCanVerify] = React.useState(false);
 
   // toast related section
   const [toast, showToast] = React.useState(null);
@@ -170,9 +171,10 @@ function Home({ setBadgeCount, bellPressed }) {
   const checkUserForChannelRights = async () => {
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
-    console.log({epnsReadProvider});
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
-      .then(response => {
+      .then(async response => {
+        const verificationStatus = await epnsWriteProvider.getChannelVerfication(ownerAccount);
+        setCanVerify(Boolean(verificationStatus));
         setChannelJson(response);
         setChannelAdmin(true);
         setAdminStatusLoaded(true);
@@ -287,6 +289,7 @@ function Home({ setBadgeCount, bellPressed }) {
             epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvide={epnsWriteProvider}
             epnsCommWriteProvider={epnsCommWriteProvider}
+            canVerify={canVerify}
           />
         }
         {controlAt == 2 && !channelAdmin && adminStatusLoaded &&

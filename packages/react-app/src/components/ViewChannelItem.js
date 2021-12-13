@@ -23,7 +23,7 @@ import { postReq } from "api";
 const UNVERIFIED_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // Create Header
-function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider }) {
+function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider, canVerify }) {
   const { account, library, chainId } = useWeb3React();
   const EPNS_DOMAIN = {
     name: 'EPNS',
@@ -73,7 +73,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const fetchChannelJson = async () => {
     const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(channelObject.addr);
     const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
-    const subscribed = channelSubscribers.find(sub => {
+    const subscribed =  channelSubscribers.find(sub => {
       return sub.toLowerCase() === account.toLowerCase();
     });
     // check if is push admin
@@ -126,19 +126,19 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       console.log ("Transaction Sent!");
 
       toaster.update(notificationToast(), {
-        render: "Transaction sending",
+        render: "Transaction sent",
         type: toaster.TYPE.INFO,
         autoClose: 5000
       });
 
-      await tx.wait(1);
-      console.log ("Transaction Mined!");
+      // await tx.wait(1);
+      // console.log ("Transaction Mined!");
       setIsVerified(true);
     })
     .catch((err) => {
       console.log("!!!Error verifyChannel() --> %o", err);
       toaster.update(notificationToast(), {
-        render: "Transacion Failed: " + err.error.message,
+        render: "Transacion Failed: " + err.error?.message || "Unknown Error",
         type: toaster.TYPE.ERROR,
         autoClose: 5000
       });
@@ -156,7 +156,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
       console.log ("Transaction Sent!");
 
       toaster.update(notificationToast(), {
-        render: "Transaction Sending",
+        render: "Transaction sent",
         type: toaster.TYPE.INFO,
         autoClose: 5000
       });
@@ -168,7 +168,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     .catch((err) => {
       console.log("!!!Error handleSendMessage() --> %o", err);
       toaster.update(notificationToast(), {
-        render: "Transacion Failed: " + err.error.message,
+        render: "Transacion Failed: " + err.error?.message || "Unknown Error",
         type: toaster.TYPE.ERROR,
         autoClose: 5000
       });
@@ -188,8 +188,8 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
         autoClose: 5000
       });
 
-      await tx.wait(1);
-      console.log ("Transaction Mined!");
+      // await tx.wait(1);
+      // console.log ("Transaction Mined!");
     })
     .catch((err) => {
       console.log("!!!Error handleSendMessage() --> %o", err);
@@ -434,7 +434,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
               </SubscribeButton>
             )
             }
-            {!loading && isPushAdmin && !isVerified && (
+            {!loading && (isPushAdmin || canVerify) && !isVerified && (
               <SubscribeButton onClick={verifyChannel} disabled={vLoading}>
                 {vLoading &&
                   <ActionLoader>
@@ -449,7 +449,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                 <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
               </SubscribeButton>
             )}
-            {!loading && isPushAdmin && isVerified && (
+            {!loading && (isPushAdmin || canVerify) && isVerified && (
               <UnsubscribeButton onClick={unverifyChannel} disabled={vLoading}>
               {vLoading &&
                 <ActionLoader>
