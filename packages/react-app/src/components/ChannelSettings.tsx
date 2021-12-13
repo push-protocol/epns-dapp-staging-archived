@@ -25,6 +25,7 @@ import styled, { css } from "styled-components";
 import { toast as toaster  } from 'react-toastify';
 import { ALLOWED_CORE_NETWORK } from "pages/Home";
 import AddDelegateModal from './AddDelegateModal';
+import RemoveDelegateModal from './RemoveDelegateModal';
 
 import Dropdown from "react-dropdown";
 import Slider from "@material-ui/core/Slider";
@@ -394,6 +395,21 @@ function ChannelSettings({
                 });
               }}
               addDelegate={addDelegate}
+            />
+          )
+        }
+        {
+          removeModalOpen && (
+            <RemoveDelegateModal
+              onClose={() => {setRemoveModalOpen(false)}}
+              onSuccess={() => {
+                toaster.update(notificationToast(), {
+                  render: "Delegate Removed",
+                  type: toaster.TYPE.INFO,
+                  autoClose: 5000
+                });
+              }}
+              removeDelegate={removeDelegate}
             />
           )
         }
