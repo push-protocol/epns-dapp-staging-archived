@@ -41,6 +41,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
   const [ vLoading, setvLoading ] = React.useState(false);
   const [ bLoading, setBLoading ] = React.useState(false);
   const [ txInProgress, setTxInProgress ] = React.useState(false);
+  const [ canUnverify, setCanUnverify ] = React.useState(false);
   // toast related section
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const [toast, showToast] = React.useState(null);
@@ -83,7 +84,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
     const channelVerifiedStatus = await epnsReadProvider.getChannelVerfication( channelObject.addr);
     setIsVerified(Boolean(channelVerifiedStatus));
     setChannelJson(channelJson);
-
+    setCanUnverify(channelObject.verifiedBy == account);
     setLoading(false);
   }
 
@@ -448,7 +449,7 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                 <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
               </SubscribeButton>
             )}
-            {!loading && (isPushAdmin || canVerify) && isVerified && (
+            {!loading && (isPushAdmin || canUnverify) && isVerified && (
               <UnsubscribeButton onClick={unverifyChannel} disabled={vLoading}>
               {vLoading &&
                 <ActionLoader>
