@@ -263,11 +263,32 @@ function ChannelSettings({
           <Item
             style={{
               flexDirection: "row",
-              justifyContent: "flex-end",
+              justifyContent: "space-between",
               flexWrap: "wrap"
             }}
             align="flex-end"
           >
+
+            <ChannelActionButton
+              onClick={toggleChannel}
+              style={{
+                background:"#e20880"
+              }}
+            >
+              <ActionTitle>
+                { loading ?
+                  <Loader
+                    type="Oval"
+                    color="#FFF"
+                    height={16}
+                    width={16}
+                  /> : (isChannelBlocked ? "Channel Blocked" : (isChannelDeactivated ? "Activate Channel" : "Deactivate Channel"))
+                }
+              </ActionTitle>
+            </ChannelActionButton>
+            <div style={{
+              display: "flex"
+            }}>
             <ChannelActionButton
               onClick={() => setAddModalOpen(true)}
             >
@@ -297,21 +318,7 @@ function ChannelSettings({
                 }
               </ActionTitle>
             </ChannelActionButton>
-
-            <ChannelActionButton
-              onClick={toggleChannel}
-            >
-              <ActionTitle>
-                { loading ?
-                  <Loader
-                    type="Oval"
-                    color="#FFF"
-                    height={16}
-                    width={16}
-                  /> : (isChannelBlocked ? "Channel Blocked" : (isChannelDeactivated ? "Activate Channel" : "Deactivate Channel"))
-                }
-              </ActionTitle>
-            </ChannelActionButton>
+            </div>
           </Item>
         </Content>
         {
