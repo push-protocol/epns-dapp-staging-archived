@@ -389,12 +389,12 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                   {memberCount}
                 </SubscribersCount>
               </Subscribers>
-              <Pool>
+              {/* <Pool>
                 <GiTwoCoins size={20} color="#ccc"/>
                 <PoolShare>
                   {EPNSCoreHelper.formatBigNumberToMetric(channelObject.poolContribution, true) + " DAI"}
                 </PoolShare>
-              </Pool>
+              </Pool> */}
               {
                 isVerified && (
                   <Subscribers>
