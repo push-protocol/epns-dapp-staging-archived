@@ -26,8 +26,7 @@ const UNVERIFIED_ADDRESS = "0x0000000000000000000000000000000000000000";
 function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWriteProvider, epnsWriteProvide, epnsCommReadProvider, canVerify }) {
   const { account, library, chainId } = useWeb3React();
   const EPNS_DOMAIN = {
-    name: 'EPNS',
-    version: '1.0.0',
+    name: 'EPNS COMM V1',
     chainId: chainId,
     verifyingContract: epnsCommReadProvider.address ,
   }
