@@ -207,7 +207,7 @@ function ChannelSettings({
 
     const amountsOut = pushValue * Math.pow(10, 18);
 
-    await epnsWriteProvider.deactivateChannel(amountsOut.toString())
+    await epnsWriteProvider.deactivateChannel(amountsOut.toString().replace(/0+$/, '')) //use this to remove trailing zeros 1232323200000000 -> 12323232
     .then(async (tx) => {
       console.log(tx);
       console.log ("Transaction Sent!");
@@ -287,7 +287,7 @@ function ChannelSettings({
               </ActionTitle>
             </ChannelActionButton>
             <div style={{
-              display: "flex"
+              display: (isChannelBlocked || isChannelDeactivated) ? "none" : "flex"
             }}>
             <ChannelActionButton
               onClick={() => setAddModalOpen(true)}
