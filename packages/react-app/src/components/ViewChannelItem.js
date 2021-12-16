@@ -348,7 +348,18 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
             <Skeleton color="#eee" width="50%" height={24} />
           }
           {!loading &&
-            <ChannelTitleLink href={channelJson.url} target="_blank" rel="nofollow">{channelJson.name}</ChannelTitleLink>
+            <ChannelTitleLink href={channelJson.url} target="_blank" rel="nofollow">
+              {channelJson.name}
+              {
+                isVerified && (
+                  <Subscribers
+                    style={{display:"inline",marginLeft: "8px"}}
+                  >
+                    <GoVerified size={18} color="#35c4f3"/>
+                  </Subscribers>
+                )
+              }
+            </ChannelTitleLink>
           }
         </ChannelTitle>
 
@@ -395,16 +406,6 @@ function ViewChannelItem({ channelObject, isOwner, epnsReadProvider, epnsCommWri
                   {EPNSCoreHelper.formatBigNumberToMetric(channelObject.poolContribution, true) + " DAI"}
                 </PoolShare>
               </Pool> */}
-              {
-                isVerified && (
-                  <Subscribers>
-                    <GoVerified size={18} color="#35c4f3"/>
-                    {/* <SubscribersCount>
-                      verified
-                    </SubscribersCount> */}
-                  </Subscribers>
-                )
-              }
             </>
           }
         </ChannelMeta>

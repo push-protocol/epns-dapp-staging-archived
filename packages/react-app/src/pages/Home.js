@@ -201,7 +201,7 @@ function Home({ setBadgeCount, bellPressed }) {
           }}
         >
           <ControlImage src="./svg/feedbox.svg" active={controlAt == 0 ? 1 : 0} />
-          <ControlText active={controlAt == 0 ? 1 : 0}>Feedbox</ControlText>
+          <ControlText active={controlAt == 0 ? 1 : 0}>Inbox</ControlText>
         </ControlButton>
 
         <ControlButton index={1} active={controlAt == 1 ? 1 : 0} border="#35c5f3"
