@@ -11,32 +11,27 @@ import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
 
 import ChannelsDataStore from "singletons/ChannelsDataStore";
-import UsersDataStore from "singletons/UsersDataStore";
+
+import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // Create Header
 function ViewChannels({ canVerify }) {
+  const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
-  const {
-    epnsReadProvider,
-    epnsWriteProvider,
-    epnsCommReadProvider,
-    epnsCommWriteProvider,
-  } = useSelector((state: any) => state.contracts);
+  const { channels, page } = useSelector((state: any) => state.channels);
 
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
-  const [channels, setChannels] = React.useState([]);
-  const [owner, setOwner] = React.useState(null);
-  const [page, setPage] = React.useState(0);
+  // const [page, setPage] = React.useState(0);
 
   const channelsVisited = page * CHANNELS_PER_PAGE;
 
+  // fetch channel data if we are just getting to this pae
   React.useEffect(() => {
-    // setChannels([]);
-    // if(!channels.length)
+    setLoading(!channels.length); //if there are no channels initially then, set the loader
     fetchInitialsChannelMeta();
   }, [account, chainId]);
 
@@ -45,24 +40,20 @@ function ViewChannels({ canVerify }) {
     if (loading || moreLoading) return;
     // fetch more channel information
     setMoreLoading(true);
-    setPage((prev) => {
-      const newPage = prev + 1;
-      loadMoreChannelMeta(newPage);
-      return newPage;
-    });
+    dispatch(incrementPage());
+    loadMoreChannelMeta(page + 1); //load the meta for the next page
   };
 
   // to fetch initial channels and logged in user data
   const fetchInitialsChannelMeta = async () => {
-    const ownerAddr = await UsersDataStore.instance.getOwnerMetaAsync();
-    setOwner(ownerAddr);
-
     // fetch the meta of the first `CHANNELS_PER_PAGE` channels
     const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(
       channelsVisited,
       CHANNELS_PER_PAGE
     );
-    setChannels(channelsMeta);
+    if (!channels.length) {
+      dispatch(setChannelMeta(channelsMeta));
+    }
     setLoading(false);
   };
 
@@ -73,7 +64,7 @@ function ViewChannels({ canVerify }) {
       startingPoint,
       CHANNELS_PER_PAGE
     );
-    setChannels((oldChannels) => [...oldChannels, ...moreChannels]);
+    dispatch(setChannelMeta([...channels, ...moreChannels]));
     setMoreLoading(false);
   };
 
@@ -97,35 +88,25 @@ function ViewChannels({ canVerify }) {
           <Items id="scrollstyle-secondary">
             {!loading && <Faucets />}
 
-            {channels.filter(Boolean).map((channel, index) => {
-              const isOwner =
-                channel.addr === account ||
-                (account === owner && channel.addr === ZERO_ADDRESS);
-
-              return (
-                <>
-                  {channel.addr !== ZERO_ADDRESS && (
-                    <div key={channel.addr}>
-                      <ViewChannelItem
-                        channelObject={channel}
-                        isOwner={isOwner}
-                        epnsReadProvider={epnsReadProvider}
-                        epnsWriteProvide={epnsWriteProvider}
-                        epnsCommReadProvider={epnsCommReadProvider}
-                        epnsCommWriteProvider={epnsCommWriteProvider}
-                        canVerify={canVerify}
-                      />
-                    </div>
-                  )}
-                  {showWayPoint(index) && (
-                    <Waypoint onEnter={updateCurrentPage} />
-                  )}
-                </>
-              );
-            })}
+            {channels.filter(Boolean).map((channel, index) => (
+              <>
+                {channel.addr !== ZERO_ADDRESS && (
+                  <div key={channel.addr}>
+                    <ViewChannelItem
+                      channelObjectProp={channel}
+                      isOwner={channel.addr === account}
+                      canVerify={canVerify}
+                    />
+                  </div>
+                )}
+                {showWayPoint(index) && (
+                  <Waypoint onEnter={updateCurrentPage} />
+                )}
+              </>
+            ))}
 
             {/* display loader if pagination is loading next batch of channels */}
-            {(moreLoading && channels.length || loading) && (
+            {((moreLoading && channels.length) || loading) && (
               <CenterContainer>
                 <Loader type="Oval" color="#35c5f3" height={40} width={40} />
               </CenterContainer>

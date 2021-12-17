@@ -25,6 +25,7 @@ import {
   setCoreWriteProvider,
   setCommunicatorReadProvider,
   setCommunicatorWriteProvider,
+  setPushAdmin
 } from "redux/slices/contractSlice";
 
 export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
@@ -134,7 +135,7 @@ function Home() {
       );
       dispatch(setCommunicatorReadProvider(commContractInstance));
       dispatch(setCoreReadProvider(coreContractInstance));
-      
+
       // initialise the read contract for the communicator function
       if (!!(library && account)) {
         let signer = library.getSigner(account);
@@ -165,6 +166,10 @@ function Home() {
     setAdminStatusLoaded(false);
     userClickedAt(INITIAL_OPEN_TAB);
     setChannelJson([]);
+    // save push admin to global state
+    epnsReadProvider.pushChannelAdmin().then((response) => {
+      dispatch(setPushAdmin(response));
+    });
 
     // EPNS Read Provider Set
     if (epnsReadProvider != null && epnsCommReadProvider != null) {
