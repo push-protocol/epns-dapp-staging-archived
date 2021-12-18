@@ -1,5 +1,5 @@
 import React from "react";
-import Select from 'react-select';
+import Select from "react-select";
 import styled, { css } from "styled-components";
 import {
   Section,
@@ -39,9 +39,7 @@ const ethers = require("ethers");
 const ipfs = require("ipfs-api")();
 
 const minStakeFees = 50;
-const ALIAS_CHAINS = [
-  {value: "POLYGON_TEST_MUMBAI:80001", label:"Polygon"}
-];
+const ALIAS_CHAINS = [{ value: "POLYGON_TEST_MUMBAI:80001", label: "Polygon" }];
 
 // Create Header
 function CreateChannel() {
@@ -158,7 +156,11 @@ function CreateChannel() {
       isEmpty(channelInfo) ||
       isEmpty(channelURL) ||
       isEmpty(channelFile) ||
-      channelAlias ? isEmpty(chainDetails) : (chainDetails ? isEmpty(channelAlias) : false)
+      channelAlias
+        ? isEmpty(chainDetails)
+        : chainDetails
+        ? isEmpty(channelAlias)
+        : false
     ) {
       setProcessing(3);
       setProcessingInfo("Channel Fields are Empty! Please retry!");
@@ -172,13 +174,12 @@ function CreateChannel() {
 
     console.log({
       chainDetails,
-      channelAlias
-    })
+      channelAlias,
+    });
     var chainDetailsSplit = chainDetails.split(":");
     var blockchain = chainDetailsSplit[0];
     var chain_id = chainDetailsSplit[1];
     var address = channelAlias;
-
 
     const input = JSON.stringify({
       name: channelName,
@@ -243,7 +244,7 @@ function CreateChannel() {
       })
       .catch((err) => {
         console.log("Error --> %o", err);
-        console.log({err});
+        console.log({ err });
         setProcessing(3);
         setProcessingInfo(
           "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
@@ -261,11 +262,11 @@ function CreateChannel() {
 
   //mind Dai
   const mintDai = async () => {
-    try{
+    try {
       var signer = library.getSigner(account);
       let daiContract = new ethers.Contract(addresses.dai, abis.dai, signer);
       console.log({
-        daiContract
+        daiContract,
       });
       console.log(1);
       let daiAmount = 1000;
@@ -279,8 +280,8 @@ function CreateChannel() {
       console.log(4);
       setProcessingInfo("1000 Dai minted successfully!");
       console.log("Transaction Completed");
-    }catch(err){
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -480,7 +481,7 @@ function CreateChannel() {
                 flex="1"
                 self="stretch"
                 align="stretch"
-                style={{position: "relative"}}
+                style={{ position: "relative" }}
               >
                 <Select
                   className="basic-single"
@@ -493,19 +494,19 @@ function CreateChannel() {
                     borderRadius: 0,
                     colors: {
                       ...theme.colors,
-                      primary25: '#e20880',
-                      primary: '#e20880',
+                      primary25: "#e20880",
+                      primary: "#e20880",
                     },
                   })}
                   onChange={(selectedOption) => {
-                    setChainDetails(selectedOption.value)
+                    setChainDetails(selectedOption.value);
                   }}
                 />
                 <Input
                   placeholder="Your Channel's Alias address"
                   maxlength="40"
                   padding="12px"
-                  style={{paddingLeft: "22%"}}
+                  style={{ paddingLeft: "22%" }}
                   border="1px solid #000"
                   weight="400"
                   size="1rem"

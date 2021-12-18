@@ -1,10 +1,12 @@
 import {configureStore, combineReducers, getDefaultMiddleware} from '@reduxjs/toolkit';
 import contractReducer from './slices/contractSlice';
 import channelReducer from './slices/channelSlice';
+import adminReducer from './slices/adminSlice';
 
 const rootReducer = combineReducers({
 	contracts: contractReducer,
-    channels: channelReducer
+    channels: channelReducer,
+    admin: adminReducer
 });
 
 const store = configureStore({

@@ -4,6 +4,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  CHANNNEL_DEACTIVATED_STATE: 2,
+  CHANNEL_BLOCKED_STATE: 3,
+  CHANNEL_ACTIVE_STATE: 1,
   page: 0,
   channels: [], // the core contract reader
   channelsCache: {}, // a mapping of channel address to channel details

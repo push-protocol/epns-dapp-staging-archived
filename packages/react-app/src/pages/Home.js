@@ -25,8 +25,9 @@ import {
   setCoreWriteProvider,
   setCommunicatorReadProvider,
   setCommunicatorWriteProvider,
-  setPushAdmin
+  setPushAdmin,
 } from "redux/slices/contractSlice";
+import { setUserChannelDetails } from "redux/slices/adminSlice";
 
 export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
@@ -199,9 +200,12 @@ function Home() {
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
+        // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
         const verificationStatus = await epnsWriteProvider.getChannelVerfication(
           ownerAccount
         );
+        const channelJson = await epnsWriteProvider.channels(ownerAccount);
+        dispatch(setUserChannelDetails({ ...response, ...channelJson }));
         setCanVerify(Boolean(verificationStatus));
         setChannelJson(response);
         setChannelAdmin(true);
@@ -344,19 +348,13 @@ function Home() {
         </ControlButton>
       </Controls>
       <Interface>
-        {controlAt == 0 && <Feedbox epnsReadProvider={epnsReadProvider} />}
+        {controlAt == 0 && <Feedbox />}
         {controlAt == 1 && <ViewChannels canVerify={canVerify} />}
         {controlAt == 2 && !channelAdmin && adminStatusLoaded && (
           <ChannelCreationDashboard />
         )}
         {controlAt == 2 && channelAdmin && adminStatusLoaded && (
-          <ChannelOwnerDashboard
-            epnsReadProvider={epnsReadProvider}
-            epnsCommReadProvider={epnsCommReadProvider}
-            epnsWriteProvider={epnsWriteProvider}
-            epnsCommWriteProvider={epnsCommWriteProvider}
-            channelAccount={!onCoreNetwork ? aliasEthAccount : account}
-          />
+          <ChannelOwnerDashboard />
         )}
         {controlAt == 3 && <Info />}
         {toast && (

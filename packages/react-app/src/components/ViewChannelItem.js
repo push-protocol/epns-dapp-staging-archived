@@ -66,10 +66,19 @@ function ViewChannelItem({ channelObjectProp, isOwner, canVerify }) {
 
   React.useEffect(() => {
     if (!channelObject.addr) return;
-    fetchChannelJson();
-    setIsBlocked(
-      channelObject.channelState === 3 || channelObject.channelState === 2 //dont display channel if blocked //dont display channel if deactivated
-    );
+    if (channelObject.verifiedBy) {
+      // procced as usual
+      fetchChannelJson();
+      setIsBlocked(
+        channelObject.channelState === 3 || channelObject.channelState === 2 //dont display channel if blocked //dont display channel if deactivated
+      );
+    } else {
+      // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
+      epnsReadProvider.channels(channelObject.addr).then((response) => {
+        setChannelObject(response);
+        fetchChannelJson();
+      });
+    }
   }, [account, channelObject, chainId]);
 
   React.useEffect(() => {
