@@ -1,5 +1,5 @@
 import React from "react";
-import { ethers } from "ethers";
+import hex2ascii from "hex2ascii";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
@@ -11,11 +11,6 @@ import {
   NotificationItem,
 } from "@epnsproject/frontend-sdk-staging";
 
-import { ALLOWED_CORE_NETWORK } from "pages/Home";
-import { addresses, abis } from "@project/contracts";
-import ChannelsDataStore from "singletons/ChannelsDataStore";
-
-import NotificationToast from "components/NotificationToast";
 
 const PAGE_COUNT = 6;
 // Create Header
@@ -28,9 +23,7 @@ function Feedbox() {
   // we use this field to note when there are no more notifications to load
   const [finishedFetching, setFinishedFetching] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-  const [toast, showToast] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
-  //define query
 
   const loadNotifications = async (currentPage: any) => {
     setLoading(true);
@@ -55,21 +48,12 @@ function Feedbox() {
     }
   };
 
-  const clearToast = () => showToast(null);
 
   React.useEffect(() => {
     if (epnsCommReadProvider) {
       loadNotifications(currentPage);
-      newNotification(onReceive);
     }
   }, [epnsCommReadProvider, account]);
-
-  //clear toast variable after it is shown
-  React.useEffect(() => {
-    if (toast) {
-      clearToast();
-    }
-  }, [toast]);
 
   //function to query more notifications
   const handlePagination = async () => {
@@ -81,82 +65,7 @@ function Feedbox() {
   };
 
 
-  //handle new notification
-  const onReceive = async (notification) => {
-    showToast(notification);
-    setNotifications((existingNotifications) => [
-      notification,
-      ...existingNotifications,
-    ]);
-    // setNotifications(notifications => [notification].concat(notifications));
-  };
-
-  //subscribe to SendNotification
-  const newNotification = (fn) => {
-    const event = "SendNotification";
-
-    //callback function for listener
-    const cb = async (
-      eventChannelAddress: string,
-      eventUserAddress: string,
-      identityHex: string
-    ) => {
-      alert('herer');
-      return;
-      const userAddress = account;
-      const identity = ""; //(identityHex)
-      const notificationId = identity
-        .concat("+")
-        .concat(eventChannelAddress)
-        .concat("+")
-        .concat(eventUserAddress)
-        .toLocaleLowerCase();
-      const ipfsId = identity.split("+")[1];
-
-      const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
-        eventChannelAddress
-      );
-
-      // Form Gateway URL
-      const url = "https://ipfs.io/ipfs/" + ipfsId;
-      fetch(url)
-        .then((result) => result.json())
-        .then((result) => {
-          const ipfsNotification = { ...result };
-          const notification = {
-            id: notificationId,
-            userAddress: eventUserAddress,
-            channelAddress: eventChannelAddress,
-            indexTimeStamp: Date.now() / 1000, // todo
-            notificationTitle:
-              ipfsNotification.notification.title || channelJson.name,
-            notificationBody: ipfsNotification.notification.body,
-            // ...ipfsNotification.data,
-          };
-          if (ipfsNotification.data.type === "1") {
-            const isSubscribed = epnsCommReadProvider
-              .memberExists(userAddress, eventChannelAddress)
-              .then((isSubscribed) => {
-                if (isSubscribed) {
-                  fn(notification);
-                }
-              });
-          } else if (userAddress === eventUserAddress) {
-            fn(notification);
-          }
-        })
-        .catch((err) => {
-          console.log(
-            "!!!Error, getting new notification data from ipfs --> %o",
-            err
-          );
-        });
-    };
-    epnsCommReadProvider.on(event, cb);
-    // return epnsCommReadProvider.off.bind(epnsCommReadProvider, event, cb);
-  };
-
-  const showWayPoint = (index) => {
+  const showWayPoint = (index: any) => {
     return Number(index) === notifications.length - 1 && !finishedFetching;
   };
 
@@ -190,10 +99,6 @@ function Feedbox() {
         )}
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
-        )}
-
-        {toast && (
-          <NotificationToast notification={toast} clearToast={clearToast} />
         )}
       </Container>
     </>
@@ -230,9 +135,6 @@ const Container = styled.div`
   // min-height: 40vh;
 `;
 
-const ContainerInfo = styled.div`
-  padding: 20px;
-`;
 
 // Export Default
 export default Feedbox;

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import styled, { css } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
-
+import hex2ascii from "hex2ascii";
 import { addresses, abis } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
 
@@ -69,6 +69,68 @@ function Home() {
         "Please connect to the Kovan network to access channels",
     });
   };
+  /**
+   * Event listener for new notifications
+   */
+  const listenFornewNotifications = () => {
+    const event = "SendNotification";
+    //callback function for listener
+    const cb = async (eventChannelAddress, eventUserAddress, identityHex) => {
+      const userAddress = account;
+      const identity = hex2ascii(identityHex);
+      const notificationId = identity
+        .concat("+")
+        .concat(eventChannelAddress)
+        .concat("+")
+        .concat(eventUserAddress)
+        .toLocaleLowerCase();
+      const ipfsId = identity.split("+")[1];
+      const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
+        eventChannelAddress
+      );
+
+      // Form Gateway URL
+      const url = "https://ipfs.io/ipfs/" + ipfsId;
+      fetch(url)
+        .then((result) => result.json())
+        .then(async (result) => {
+          const ipfsNotification = { ...result };
+          const notification = {
+            id: notificationId,
+            icon: channelJson.icon,
+            notificationTitle:
+              "New Notification: " + ipfsNotification.notification.title ||
+              channelJson.name,
+            notificationBody: ipfsNotification.notification.body,
+            ...ipfsNotification.data,
+          };
+
+          if (ipfsNotification.data.type === "1") {
+            const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
+              eventChannelAddress
+            );
+            const isSubscribed = channelSubscribers.find((sub) => {
+              return sub.toLowerCase() === account.toLowerCase();
+            });
+            if (isSubscribed) {
+              alert("here");
+              showToast(notification);
+            }
+          } else if (userAddress === eventUserAddress) {
+            showToast(notification);
+          }
+        })
+        .catch((err) => {
+          console.log(
+            "!!!Error, getting new notification data from ipfs --> %o",
+            err
+          );
+        });
+    };
+    epnsCommReadProvider.on(event, cb);
+    return epnsCommReadProvider.off.bind(epnsCommReadProvider, event, cb);
+  };
+
   //clear toast variable after it is shown
   React.useEffect(() => {
     if (toast) {
@@ -136,7 +198,6 @@ function Home() {
       );
       dispatch(setCommunicatorReadProvider(commContractInstance));
       dispatch(setCoreReadProvider(coreContractInstance));
-
       // initialise the read contract for the communicator function
       if (!!(library && account)) {
         let signer = library.getSigner(account);
@@ -186,6 +247,7 @@ function Home() {
         epnsCommReadProvider
       );
       checkUserForChannelOwnership();
+      listenFornewNotifications();
     }
   }, [epnsReadProvider, epnsCommReadProvider]);
 
@@ -205,7 +267,16 @@ function Home() {
           ownerAccount
         );
         const channelJson = await epnsWriteProvider.channels(ownerAccount);
-        dispatch(setUserChannelDetails({ ...response, ...channelJson }));
+        const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
+          ownerAccount
+        );
+        dispatch(
+          setUserChannelDetails({
+            ...response,
+            ...channelJson,
+            subscribers: channelSubscribers,
+          })
+        );
         setCanVerify(Boolean(verificationStatus));
         setChannelJson(response);
         setChannelAdmin(true);
