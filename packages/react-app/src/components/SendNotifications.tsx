@@ -330,7 +330,7 @@ function SendNotifications() {
 
     console.log("Sending Transaction... ");
     toast.update(notificationToast, {
-      render: "Sending Transaction...",
+      render: "Sending Notification...",
     });
 
     anotherSendTxPromise
@@ -339,7 +339,7 @@ function SendNotifications() {
         console.log("Transaction Sent!");
 
         toast.update(notificationToast, {
-          render: "Transaction Sent",
+          render: "Notification Sent",
           type: toast.TYPE.INFO,
           autoClose: 5000,
         });
