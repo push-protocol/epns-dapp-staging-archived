@@ -1,7 +1,7 @@
 import React from "react";
 
 import styled, { css } from "styled-components";
-import {Section, Content, Item, ItemH, Button} from 'components/SharedStyling';
+import {Section, Item, ItemH, Button} from 'components/SharedStyling';
 
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core'
 import {
@@ -15,10 +15,10 @@ import Bell from 'components/Bell';
 
 
 // Create Header
-function Header({ badgeCount, bellPressedCB }) {
+function Header() {
   const context = useWeb3React<Web3Provider>()
 
-  const { active, error, account, chainId } = useWeb3React();
+  const { active, error } = useWeb3React();
   const { deactivate } = context
 
   const [showLoginControls, setShowLoginControls] = React.useState(false);
@@ -69,7 +69,7 @@ function Header({ badgeCount, bellPressedCB }) {
       >
         {active && !error &&
           <Bell
-            badgeCount={badgeCount}
+            badgeCount={0}
             bellPressedCB={bellPressed}
             width={32}
             height={32}
