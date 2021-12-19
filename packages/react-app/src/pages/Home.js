@@ -44,7 +44,6 @@ function Home() {
     epnsCommReadProvider,
   } = useSelector((state) => state.contracts);
 
-
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
 
@@ -94,12 +93,14 @@ function Home() {
         .then((result) => result.json())
         .then(async (result) => {
           const ipfsNotification = { ...result };
+
           const notification = {
             id: notificationId,
             icon: channelJson.icon,
             notificationTitle:
-              "New Notification: " + ipfsNotification.notification.title ||
-              channelJson.name,
+              ipfsNotification.notification.title !== ""
+                ? ipfsNotification.notification.title
+                : channelJson.name,
             notificationBody: ipfsNotification.notification.body,
             ...ipfsNotification.data,
           };
@@ -112,7 +113,7 @@ function Home() {
               return sub.toLowerCase() === account.toLowerCase();
             });
             if (isSubscribed) {
-              alert("here");
+              console.log("message recieved", notification);
               showToast(notification);
             }
           } else if (userAddress === eventUserAddress) {
