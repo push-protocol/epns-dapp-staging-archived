@@ -18,7 +18,7 @@ const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many ch
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // Create Header
-function ViewChannels({ canVerify }) {
+function ViewChannels() {
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
   const { channels, page } = useSelector((state: any) => state.channels);
@@ -94,8 +94,6 @@ function ViewChannels({ canVerify }) {
                   <div key={channel.addr}>
                     <ViewChannelItem
                       channelObjectProp={channel}
-                      isOwner={channel.addr === account}
-                      canVerify={canVerify}
                     />
                   </div>
                 )}

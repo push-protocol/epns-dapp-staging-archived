@@ -27,7 +27,7 @@ import {
   setCommunicatorWriteProvider,
   setPushAdmin,
 } from "redux/slices/contractSlice";
-import { setUserChannelDetails } from "redux/slices/adminSlice";
+import { setUserChannelDetails, setCanVerify } from "redux/slices/adminSlice";
 
 export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
@@ -42,8 +42,8 @@ function Home() {
     epnsReadProvider,
     epnsWriteProvider,
     epnsCommReadProvider,
-    epnsCommWriteProvider,
   } = useSelector((state) => state.contracts);
+
 
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
@@ -55,7 +55,6 @@ function Home() {
   const [aliasVerified, setAliasVerified] = React.useState(null); // null means error, false means unverified and true means verified
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
-  const [canVerify, setCanVerify] = React.useState(false);
 
   // toast related section
   const [toast, showToast] = React.useState(null);
@@ -277,7 +276,7 @@ function Home() {
             subscribers: channelSubscribers,
           })
         );
-        setCanVerify(Boolean(verificationStatus));
+        dispatch(setCanVerify(Boolean(verificationStatus)));
         setChannelJson(response);
         setChannelAdmin(true);
         setAdminStatusLoaded(true);
@@ -420,7 +419,7 @@ function Home() {
       </Controls>
       <Interface>
         {controlAt == 0 && <Feedbox />}
-        {controlAt == 1 && <ViewChannels canVerify={canVerify} />}
+        {controlAt == 1 && <ViewChannels />}
         {controlAt == 2 && !channelAdmin && adminStatusLoaded && (
           <ChannelCreationDashboard />
         )}

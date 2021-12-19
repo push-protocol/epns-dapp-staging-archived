@@ -15,10 +15,10 @@ import NotificationToast from "components/NotificationToast";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { ALLOWED_CORE_NETWORK } from "pages/Home";
 import { postReq } from "api";
-import { cacheChannelInfo, channelsCache } from "redux/slices/channelSlice";
+import { cacheChannelInfo } from "redux/slices/channelSlice";
 
 // Create Header
-function ViewChannelItem({ channelObjectProp, isOwner, canVerify }) {
+function ViewChannelItem({ channelObjectProp }) {
   const dispatch = useDispatch();
   const {
     epnsReadProvider,
@@ -27,8 +27,13 @@ function ViewChannelItem({ channelObjectProp, isOwner, canVerify }) {
     pushAdminAddress,
     ZERO_ADDRESS,
   } = useSelector((state) => state.contracts);
+  const {
+    canVerify
+  } = useSelector((state) => state.admin);
+
   const { channelsCache } = useSelector((state) => state.channels);
   const { account, library, chainId } = useWeb3React();
+  const isOwner = channelObjectProp.addr === account;
 
   const [channelObject, setChannelObject] = React.useState({});
   const [channelJson, setChannelJson] = React.useState({});
