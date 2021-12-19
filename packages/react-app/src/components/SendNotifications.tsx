@@ -27,11 +27,9 @@ import "react-toastify/dist/ReactToastify.min.css";
 import Switch from "@material-ui/core/Switch";
 import { useWeb3React } from "@web3-react/core";
 
-import { addresses, abis } from "@project/contracts";
 import { CloseIcon } from "assets/icons";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import CryptoHelper from "helpers/CryptoHelper";
-import { ALLOWED_CORE_NETWORK as ETH_COMMUNICATOR_NETWORK } from "pages/Home";
 const ethers = require("ethers");
 
 // Set Notification Form Type | 0 is reserved for protocol storage
@@ -46,7 +44,7 @@ const LIMITER_KEYS = ["Enter", ","];
 // Create Header
 function SendNotifications() {
   const { account } = useWeb3React();
-  const { epnsWriteProvider } = useSelector((state: any) => state.contracts);
+  const { epnsCommWriteProvider } = useSelector((state: any) => state.contracts);
   const { channelDetails } = useSelector((state: any) => state.admin);
   const { CHANNNEL_DEACTIVATED_STATE } = useSelector(
     (state: any) => state.channels
@@ -149,7 +147,7 @@ function SendNotifications() {
     setNFProcessing(1);
 
     // Form signer and contract connection
-    const communicatorContract = epnsWriteProvider;
+    const communicatorContract = epnsCommWriteProvider;
     // define the epns comms contracts
 
     // For payload basic
@@ -184,7 +182,7 @@ function SendNotifications() {
         // get public key from EPNSCoreHelper
         let k = await EPNSCoreHelper.getPublicKey(
           nfRecipient,
-          epnsWriteProvider
+          epnsCommWriteProvider
         );
         if (k == null) {
           // No public key, can't encrypt
@@ -368,7 +366,8 @@ function SendNotifications() {
           type: toast.TYPE.ERROR,
           autoClose: 5000,
         });
-      });
+        setNFProcessing(0);
+      })
   };
 
   const isEmpty = (field: any) => {
