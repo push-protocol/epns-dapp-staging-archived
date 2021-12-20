@@ -1,45 +1,45 @@
 import React from "react";
-import hex2ascii from "hex2ascii";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
 import { useWeb3React } from "@web3-react/core";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   api,
   utils,
   NotificationItem,
 } from "@epnsproject/frontend-sdk-staging";
+import {
+  addPaginatedNotifications,
+  incrementPage,
+  setFinishedFetching,
+} from "redux/slices/notificationSlice";
 
-
-const PAGE_COUNT = 6;
+const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
 function Feedbox() {
+  const dispatch = useDispatch();
   const { account } = useWeb3React();
   const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
+  const { notifications, page, finishedFetching } = useSelector(
+    (state: any) => state.notifications
+  );
 
-  const [notifications, setNotifications] = React.useState([]);
-  // since we dont have how many notifications there are in total
-  // we use this field to note when there are no more notifications to load
-  const [finishedFetching, setFinishedFetching] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [loading, setLoading] = React.useState(false);
 
-  const loadNotifications = async (currentPage: any) => {
+  const loadNotifications = async () => {
+    if (loading || finishedFetching) return;
     setLoading(true);
     try {
       const { count, results } = await api.fetchNotifications(
         account,
-        PAGE_COUNT,
-        currentPage
+        NOTIFICATIONS_PER_PAGE,
+        page
       );
       const parsedResponse = utils.parseApiResponse(results);
-      setNotifications((oldNotifications) => [
-        ...oldNotifications,
-        ...parsedResponse,
-      ]);
+      dispatch(addPaginatedNotifications(parsedResponse));
       if (count === 0) {
-        setFinishedFetching(true);
+        dispatch(setFinishedFetching());
       }
     } catch (err) {
       console.log(err);
@@ -48,22 +48,17 @@ function Feedbox() {
     }
   };
 
-
   React.useEffect(() => {
     if (epnsCommReadProvider) {
-      loadNotifications(currentPage);
+      loadNotifications();
     }
   }, [epnsCommReadProvider, account]);
 
   //function to query more notifications
   const handlePagination = async () => {
-    setCurrentPage((prevPage) => {
-      const newPage = prevPage + 1;
-      loadNotifications(newPage);
-      return newPage;
-    });
+    loadNotifications();
+    dispatch(incrementPage());
   };
-
 
   const showWayPoint = (index: any) => {
     return Number(index) === notifications.length - 1 && !finishedFetching;
@@ -80,7 +75,7 @@ function Feedbox() {
 
               // render the notification item
               return (
-                <>
+                <div key={`${message}+${title}`}>
                   {showWayPoint(index) && (
                     <Waypoint onEnter={() => handlePagination()} />
                   )}
@@ -92,7 +87,7 @@ function Feedbox() {
                     icon={icon}
                     image={image}
                   />
-                </>
+                </div>
               );
             })}
           </Items>
@@ -134,7 +129,6 @@ const Container = styled.div`
   // width: 100%;
   // min-height: 40vh;
 `;
-
 
 // Export Default
 export default Feedbox;

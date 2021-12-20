@@ -28,7 +28,7 @@ import {
   setPushAdmin,
 } from "redux/slices/contractSlice";
 import { setUserChannelDetails, setCanVerify } from "redux/slices/adminSlice";
-
+import { addNewNotification } from "redux/slices/notificationSlice";
 export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
 
@@ -86,23 +86,31 @@ function Home() {
       const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
         eventChannelAddress
       );
-
+      
       // Form Gateway URL
       const url = "https://ipfs.io/ipfs/" + ipfsId;
       fetch(url)
-        .then((result) => result.json())
-        .then(async (result) => {
-          const ipfsNotification = { ...result };
-
-          const notification = {
-            id: notificationId,
+      .then((result) => result.json())
+      .then(async (result) => {
+        const ipfsNotification = { ...result };
+        const notificationTitle = ipfsNotification.notification.title !== ""
+        ? ipfsNotification.notification.title
+        : channelJson.name;
+          const toastMessage = {
+            notificationTitle,
+            notificationBody: ipfsNotification.notification.body
+          }
+          // console.log({
+          //   channelJson,
+          //   result
+          // });
+          const notificationObject = {
+            title: notificationTitle,
+            message: ipfsNotification.data.amsg,
+            cta: ipfsNotification.data.acta,
+            app: channelJson.name,
             icon: channelJson.icon,
-            notificationTitle:
-              ipfsNotification.notification.title !== ""
-                ? ipfsNotification.notification.title
-                : channelJson.name,
-            notificationBody: ipfsNotification.notification.body,
-            ...ipfsNotification.data,
+            image: ipfsNotification.data.aimg
           };
 
           if (ipfsNotification.data.type === "1") {
@@ -113,11 +121,13 @@ function Home() {
               return sub.toLowerCase() === account.toLowerCase();
             });
             if (isSubscribed) {
-              console.log("message recieved", notification);
-              showToast(notification);
+              console.log("message recieved", notificationObject);
+              showToast(toastMessage);
+              dispatch(addNewNotification(notificationObject));
             }
           } else if (userAddress === eventUserAddress) {
-            showToast(notification);
+            showToast(toastMessage);
+            dispatch(addNewNotification(notificationObject));
           }
         })
         .catch((err) => {

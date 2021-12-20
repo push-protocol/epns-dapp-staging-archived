@@ -8,7 +8,7 @@ const initialState = {
   CHANNEL_BLOCKED_STATE: 3,
   CHANNEL_ACTIVE_STATE: 1,
   page: 0,
-  channels: [], // the core contract reader
+  channels: [], // the channels meta-data
   channelsCache: {}, // a mapping of channel address to channel details
 };
 

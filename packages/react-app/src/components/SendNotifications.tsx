@@ -526,44 +526,6 @@ function SendNotifications() {
                   )}
                 </Item>
 
-                {!nfType ? (
-                  <Item padding="0px 20px 30px 20px" />
-                ) : (
-                  <Item
-                    margin="15px 20px 15px 20px"
-                    flex="1"
-                    self="stretch"
-                    align="stretch"
-                  >
-                    <Input
-                      required
-                      placeholder="Enter channel address"
-                      radius="4px"
-                      padding="12px"
-                      border="1px solid #674c9f"
-                      bg="#fff"
-                      value={channelAddress}
-                      onChange={(e) => {
-                        setChannelAddress(e.target.value);
-                      }}
-                    />
-                    {/* {nfRecipient.trim().length == 0 && */}
-                    <Span
-                      padding="4px 10px"
-                      right="0px"
-                      top="0px"
-                      pos="absolute"
-                      color="#fff"
-                      bg="#000"
-                      size="0.7rem"
-                      z="1"
-                    >
-                      Channel Address
-                    </Span>
-                    {/* } */}
-                  </Item>
-                )}
-
                 {(nfType === "2" || nfType === "3") && (
                   <Item
                     margin="15px 20px 15px 20px"

@@ -27,9 +27,7 @@ function ViewChannelItem({ channelObjectProp }) {
     pushAdminAddress,
     ZERO_ADDRESS,
   } = useSelector((state) => state.contracts);
-  const {
-    canVerify
-  } = useSelector((state) => state.admin);
+  const { canVerify } = useSelector((state) => state.admin);
 
   const { channelsCache } = useSelector((state) => state.channels);
   const { account, library, chainId } = useWeb3React();
@@ -47,6 +45,7 @@ function ViewChannelItem({ channelObjectProp }) {
   const [bLoading, setBLoading] = React.useState(false);
   const [txInProgress, setTxInProgress] = React.useState(false);
   const [canUnverify, setCanUnverify] = React.useState(false);
+  const [verifierDetails, setVerifierDetails] = React.useState(null);
 
   // ------ toast related section
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
@@ -90,6 +89,15 @@ function ViewChannelItem({ channelObjectProp }) {
     if (!channelObjectProp) return;
     setChannelObject(channelObjectProp);
   }, [channelObjectProp]);
+
+  React.useEffect(() => {
+    if(!isVerified || !channelObject.verifiedBy) return;
+    ChannelsDataStore.instance.getChannelJsonAsync(
+      channelObject.verifiedBy
+    ).then((verifierDetails) => {
+      setVerifierDetails(verifierDetails);
+    })
+  }, [isVerified, channelObject]);
 
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
@@ -442,6 +450,13 @@ function ViewChannelItem({ channelObjectProp }) {
                 <IoMdPeople size={20} color="#ccc" />
                 <SubscribersCount>{memberCount}</SubscribersCount>
               </Subscribers>
+              {verifierDetails && (
+                  <Subscribers>
+                    <VerifiedBy>VERIFIED BY:</VerifiedBy>
+                    <VerifierIcon src={verifierDetails.icon}/>
+                    <VerifierName>{verifierDetails.name}</VerifierName>
+                  </Subscribers>
+              )}
             </>
           )}
         </ChannelMeta>
@@ -615,6 +630,31 @@ const ChannelTitleLink = styled.a`
     cursor: pointer;
     pointer: hand;
   }
+`;
+
+const VerifiedBy = styled.span`
+  color: #ec008c;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+  display: inline-block;
+  margin-left: 10px;
+`;
+
+const VerifierIcon = styled.img`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: 6px;
+  margin-right: 4px;
+`;
+const VerifierName = styled.span`
+  text-transform: uppercase;
+  font-weight: 600;
+  color: black;
+  font-size: 16px;
+  letter-spacing: 0.1em;
 `;
 
 const ChannelDesc = styled.div`
