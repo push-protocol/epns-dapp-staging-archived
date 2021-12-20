@@ -76,6 +76,7 @@ function ViewChannels() {
     return Number(index) === channels.length - 1;
   };
 
+  // Search Channels Feature
   React.useEffect(()=>{
     setChannelToShow(channels);
   },[])
@@ -85,8 +86,7 @@ function ViewChannels() {
         "query":search,
         "op":"read"
       }).then(data=>{
-        console.log("data2",data);
-        setChannelToShow(data.data);
+        setChannelToShow(data.data.channels);
       })}
       else {
         setChannelToShow(channels);
@@ -106,15 +106,16 @@ function ViewChannels() {
           </ContainerInfo>
         ) : (
           <Items id="scrollstyle-secondary">
-            {!loading && <Faucets />}
+          {!loading && <Faucets />}
             <SearchBar
-        type="search"
-        value={search}
-        onChange={e=>setSearch(e.target.value)}
-        className="input"
-        placeholder="Filter"
-      />
-            {channels.filter(Boolean).map((channel, index) => (
+            type="search"
+            value={search}
+            onChange={e=>setSearch(e.target.value)}
+            className="input"
+            placeholder="Filter"
+          />
+            {
+          !search?channels.filter(Boolean).map((channel, index) => (
               <>
                 {channel.addr !== ZERO_ADDRESS && (
                   <div key={channel.addr}>
@@ -127,7 +128,22 @@ function ViewChannels() {
                   <Waypoint onEnter={updateCurrentPage} />
                 )}
               </>
-            ))}
+            )):channelToShow?.map((channel, index) => (
+              <>
+                {channel.addr !== ZERO_ADDRESS && (
+                  <div key={channel.addr}>
+                    <ViewChannelItem
+                      channelObjectProp={channel}
+                    />
+                  </div>
+                )}
+                {showWayPoint(index) && (
+                  <Waypoint onEnter={updateCurrentPage} />
+                )}
+              </>
+            ))
+              
+            }
 
             {/* display loader if pagination is loading next batch of channelTotalList */}
             {((moreLoading && channels.length) || loading) && (
