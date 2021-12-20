@@ -2,8 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
-import { useDispatch, useSelector } from "react-redux";
-
+import { useDispatch, useSelector, useStore } from "react-redux";
+import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 
 import DisplayNotice from "components/DisplayNotice";
@@ -13,6 +13,7 @@ import Faucets from "components/Faucets";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
+import { cacheChannelInfo } from "redux/slices/channelSlice";
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -22,9 +23,10 @@ function ViewChannels({ canVerify }) {
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
   const { channels, page } = useSelector((state: any) => state.channels);
-
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
+  const [search, setSearch] = React.useState('');
+  const [channelToShow,setChannelToShow]=React.useState([]);
   // const [page, setPage] = React.useState(0);
 
   const channelsVisited = page * CHANNELS_PER_PAGE;
@@ -74,6 +76,24 @@ function ViewChannels({ canVerify }) {
     return Number(index) === channels.length - 1;
   };
 
+  React.useEffect(()=>{
+    setChannelToShow(channels);
+  },[])
+  React.useEffect(()=>{
+      if(search){
+      postReq("/channels/search",{
+        "query":search,
+        "op":"read"
+      }).then(data=>{
+        console.log("data2",data);
+        setChannelToShow(data.data);
+      })}
+      else {
+        setChannelToShow(channels);
+      }
+  },[search]);
+
+  
   return (
     <>
       <Container>
@@ -87,7 +107,13 @@ function ViewChannels({ canVerify }) {
         ) : (
           <Items id="scrollstyle-secondary">
             {!loading && <Faucets />}
-
+            <SearchBar
+        type="search"
+        value={search}
+        onChange={e=>setSearch(e.target.value)}
+        className="input"
+        placeholder="Filter"
+      />
             {channels.filter(Boolean).map((channel, index) => (
               <>
                 {channel.addr !== ZERO_ADDRESS && (
@@ -105,7 +131,7 @@ function ViewChannels({ canVerify }) {
               </>
             ))}
 
-            {/* display loader if pagination is loading next batch of channels */}
+            {/* display loader if pagination is loading next batch of channelTotalList */}
             {((moreLoading && channels.length) || loading) && (
               <CenterContainer>
                 <Loader type="Oval" color="#35c5f3" height={40} width={40} />
@@ -119,6 +145,14 @@ function ViewChannels({ canVerify }) {
 }
 
 // css styles
+const SearchBar=styled.input`
+    border: 1px solid grey;
+    border-radius: 5px;    
+    padding: 2px 23px 2px 30px;
+    outline: 0;
+    background-color: #f5f5f5;
+
+`;
 const Container = styled.div`
   display: flex;
   flex: 1;
