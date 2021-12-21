@@ -2,21 +2,18 @@ import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
-import { useDispatch, useSelector, useStore } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
-import { BsSearch } from "react-icons/bs";
+import searchIcon from "assets/searchicon.svg";
+
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
-
 import ChannelsDataStore from "singletons/ChannelsDataStore";
-
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
-import { cacheChannelInfo } from "redux/slices/channelSlice";
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
 const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for then to finish typing
 
@@ -25,6 +22,8 @@ function ViewChannels() {
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
   const { channels, page } = useSelector((state: any) => state.channels);
+  const { ZERO_ADDRESS } = useSelector((state: any) => state.contracts);
+
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
   const [search, setSearch] = React.useState("");
@@ -81,14 +80,14 @@ function ViewChannels() {
 
   // Search Channels Feature
   React.useEffect(() => {
-    if(!channels.length) return;
+    if (!channels.length) return;
     setChannelToShow(channels);
   }, [channels]);
 
   function searchForChannel() {
-    setLoadingChannel(true);
-    if (loadingChannel) return;
+    if (loadingChannel) return; //if we are already loading, do nothing
     if (search) {
+      setLoadingChannel(true); //begin loading here
       setChannelToShow([]); //maybe remove later
       postReq("/channels/search", {
         query: search,
@@ -109,6 +108,7 @@ function ViewChannels() {
           }
         });
     } else {
+      // if no search item, then set it back to the channels
       setLoadingChannel(false);
       setChannelToShow(channels);
     }
@@ -117,7 +117,7 @@ function ViewChannels() {
   React.useEffect(() => {
     // debounce request
     // this is done so that we only make a request after the user stops typing
-    console.log({channelToShow});
+    console.log({ channelToShow });
     const timeout = setTimeout(searchForChannel, DEBOUNCE_TIMEOUT);
     return () => {
       clearTimeout(timeout);
@@ -136,41 +136,37 @@ function ViewChannels() {
           </ContainerInfo>
         ) : (
           <Items id="scrollstyle-secondary">
-            {!loading && <Faucets />}
-            <div style={{ position: "relative", width: "300px" }}>
-              <SearchBar
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input"
-                placeholder="Search By Name/Address"
-              />
-              <BsSearch
-                style={{
-                  position: "absolute",
-                  background: "#e20880",
-                  padding: "10px",
-                  borderRadius: "25px",
-                  color: "white",
-                  right: "2px",
-                  top: "2px",
-                }}
-              />
-            </div>
+            {!loading && (
+              <Header>
+                <InputWrapper>
+                  <SearchBar
+                    type="search"
+                    value={search}
+                    onChange={(e: any) => setSearch(e.target.value)}
+                    className="input"
+                    placeholder="Search By Name/Address"
+                  />
+                  <SearchIconImage src={searchIcon} alt="" />
+                </InputWrapper>
+                <Faucets />
+              </Header>
+            )}
+
+            {/* render all channels depending on if we are searching or not */}
             {(search ? channelToShow : channels)
-              .filter(Boolean)
+              .filter((channel: any) => channel?.addr !== ZERO_ADDRESS)
               .map((channel: any, index: any) => (
                 <>
-                  {channel.addr !== ZERO_ADDRESS && (
-                    <div key={channel.addr}>
-                      <ViewChannelItem channelObjectProp={channel} />
-                    </div>
-                  )}
+                  <div key={channel.addr}>
+                    <ViewChannelItem channelObjectProp={channel} />
+                  </div>
                   {showWayPoint(index) && (
                     <Waypoint onEnter={updateCurrentPage} />
                   )}
                 </>
               ))}
+            {/* render all channels depending on if we are searching or not */}
+
             {/* if we are in search mode and there are no channels then display error message */}
             {search && !channelToShow?.length && !loadingChannel && (
               <CenteredContainerInfo>
@@ -196,15 +192,40 @@ function ViewChannels() {
 }
 
 // css styles
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+const InputWrapper = styled.div`
+  position: relative;
+  width: 50%;
+`;
+
 const SearchBar = styled.input`
-  border: 1px solid grey;
-  border-radius: 20px;
-  width: 300px;
-  padding: 10px 10px 10px 10px;
-  outline: 0;
-  background-color: #f5f5f5;
+  width: 100%;
+  height: 60px;
+  padding-left: 40px;
+  background: #ffffff;
+  border: 1px solid rgba(169, 169, 169, 0.5);
+  box-sizing: border-box;
+  border-radius: 100px;
+  transition: 500ms;
+  text-transform: capitalize;
+  font-size: 16px;
   input[type="reset"] {
     display: none;
+  }
+  &::placeholder{
+    letter-spacing: 0.15em;
+  }
+  &:hover,
+  &:active,
+  &:focus {
+    outline: none;
+  }
+  &:focus {
+    border: 1px solid #EC008C;
   }
 `;
 const Container = styled.div`
@@ -243,6 +264,13 @@ const Items = styled.div`
   padding: 10px 20px;
   overflow-y: scroll;
   background: #fafafa;
+`;
+
+
+const SearchIconImage = styled.img`
+  position: absolute;
+  right: 4px;
+  top: 4px;
 `;
 
 // Export Default
