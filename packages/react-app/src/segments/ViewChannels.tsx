@@ -5,7 +5,7 @@ import { Waypoint } from "react-waypoint";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
-
+import {BsSearch} from 'react-icons/bs'
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
@@ -107,13 +107,16 @@ function ViewChannels() {
         ) : (
           <Items id="scrollstyle-secondary">
           {!loading && <Faucets />}
+          <div style={{position:"relative",width:"300px"}}>
             <SearchBar
             type="search"
             value={search}
             onChange={e=>setSearch(e.target.value)}
             className="input"
-            placeholder="Filter"
+            placeholder="Search By Name/Address"
           />
+          <BsSearch style={{position:"absolute",background:"#e20880",padding:"10px",borderRadius:"25px",color:"white", right:"2px",top:"2px"}}/>
+          </div>
             {
           !search?channels.filter(Boolean).map((channel, index) => (
               <>
@@ -128,7 +131,7 @@ function ViewChannels() {
                   <Waypoint onEnter={updateCurrentPage} />
                 )}
               </>
-            )):channelToShow?.map((channel, index) => (
+            )):channelToShow?channelToShow.map((channel, index) => (
               <>
                 {channel.addr !== ZERO_ADDRESS && (
                   <div key={channel.addr}>
@@ -141,7 +144,10 @@ function ViewChannels() {
                   <Waypoint onEnter={updateCurrentPage} />
                 )}
               </>
-            ))
+            )):
+            <div style={{padding:"2rem"}}>
+              No Channel Found
+            </div>
               
             }
 
@@ -161,11 +167,15 @@ function ViewChannels() {
 // css styles
 const SearchBar=styled.input`
     border: 1px solid grey;
-    border-radius: 5px;    
-    padding: 2px 23px 2px 30px;
+    border-radius: 20px;    
+    width:300px;
+    padding: 10px 10px 10px 10px;
     outline: 0;
     background-color: #f5f5f5;
-
+    input[type="reset"]
+   {
+     display:none;
+   }
 `;
 const Container = styled.div`
   display: flex;
