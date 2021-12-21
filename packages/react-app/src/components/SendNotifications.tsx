@@ -6,6 +6,9 @@ import Loader from "react-loader-spinner";
 import styled from "styled-components";
 import { BsFillImageFill } from "react-icons/bs";
 import { useSelector } from "react-redux";
+import ChannelsDataStore from "singletons/ChannelsDataStore";
+
+import {useEffect } from 'react';
 
 import {
   Section,
@@ -386,8 +389,70 @@ function SendNotifications() {
     </Toaster>
   );
 
+  // let channelJson;
+  const [verifyingChannel, setVerifyingChannel] = React.useState([]);
+
+  useEffect(() => {
+
+    const fun = async () => {
+      let channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
+        channelDetails.verifiedBy);
+        setVerifyingChannel(channelJson);
+
+    }
+    fun();
+    
+  },[]);
+
+ 
+
   return (
     <>
+
+
+
+{!isChannelDeactivated && (
+        <>
+          <SectionTop>
+          <ImageSection src={channelDetails.icon}>
+          </ImageSection>
+
+          <Details>
+              <ChannelName>{channelDetails.name}<VerifyImage  src="/verify.png"></VerifyImage></ChannelName>
+              <ChannelStatus><h3 style={{top:"3px", padding:"0px", color:"#57C255",height:"18px"}}>ACTIVE</h3><span style={{width:"8px",height:"8px",background:"#57C255", borderRadius:"50%", marginLeft:"6px", marginTop:"auto",marginBottom:"auto"}}></span></ChannelStatus>
+              <Subscribers><img src="/people.svg"></img><p style={{ background: "#35C5F3",marginLeft:"5px",border:"2px solid #35C5F3",height:"15px",borderRadius:"20%",color: "#FFFFFF"}}>585</p></Subscribers>
+          </Details>
+          
+          <Settings src='/Settings.svg' alt="">
+
+          </Settings>
+      </SectionTop>
+
+<SectionDes>
+{channelDetails.info}
+</SectionDes>
+
+<SectionDate>
+
+  <Verified>
+  <span style={{color:"#EC008C" ,fontSize:"1em",fontWeight:"bolder"}}>verified by:</span>
+  
+  <VerifyingIcon src={verifyingChannel.icon}></VerifyingIcon>
+  <VerifyingName>{verifyingChannel.name}</VerifyingName>
+  </Verified>
+
+<Date><span>created on:</span>
+<span style={{marginLeft:"10px"}}>DD/MM/YY</span></Date>
+
+</SectionDate>
+
+<SectionLine>
+  <hr></hr>
+</SectionLine>
+</>   
+      
+        )}
+
       <Section>
         <Content padding="10px 20px 20px">
           <Item align="flex-start">
@@ -913,6 +978,169 @@ const DropdownStyled = styled(Dropdown)`
     color: #fff;
   }
 `;
+
+
+
+
+const SectionTop= styled.div`
+  display:flex;
+  flex-direction:row;
+  width: 1250px;
+height: 200px;
+padding: 10px;
+`;
+const Settings= styled.img`
+width: 40px;
+height: 40px;
+// right: 30px;
+margin-left: auto;
+margin-right: 30px;
+  
+`;
+const ImageSection= styled.img`
+width: 157px;
+height: 142px;
+left: 50px;
+top: 27px;
+border: 1px #000000;
+border-radius: 50%;
+
+
+`;
+const VerifyImage= styled.img`
+width: 20px;
+height: 25px;
+margin-top: auto;
+margin-bottom: auto;
+margin-left: 8px;
+
+
+`;
+
+const VerifyingIcon= styled.img`
+height: 20px;
+width: 20px;
+border-radius: 50%;
+margin-left: 6px;
+margin-right: 5px;
+
+
+
+`;
+
+const VerifyingName = styled.div`
+`;
+
+
+
+
+const ChannelStatus = styled.div`
+  display: flex;
+  flex-direction: row;
+  position: relative;
+
+`;
+
+const Subscribers = styled.div`
+  display: flex;
+  flex-direction: row;
+  position: relative;
+
+
+`;
+
+
+const Details= styled.div`
+  display:flex;
+  flex-direction:column;
+  margin-left: 20px;
+  padding: 0px;
+  margin-top: 10px;
+  
+
+`;
+const SectionLine= styled.div`
+  
+  margin-left: 30px;
+  margin-right: 30px;
+ 
+
+`;
+
+
+
+const Date= styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 240px;
+  color: #674C9F;
+`;
+
+const Verified= styled.div`
+  display: flex;
+  flex-direction: row;
+  
+`;
+
+
+const ChannelName= styled.div`
+display:flex;
+flex-direction: row;
+  
+position: relative;
+height: 43px;
+
+
+font-family: Source Sans Pro;
+font-style: normal;
+font-weight: normal;
+font-size: 30px;
+line-height: 38px;
+ 
+
+`;
+
+const SectionDate= styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+  font-family: Source Sans Pro;
+font-style: normal;
+font-weight: 600;
+font-size: 16px;
+line-height: 25px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+margin-left: 30px;
+margin-right: 30px;
+
+margin-bottom: 30px;
+ 
+
+`;
+
+
+
+const SectionDes= styled.div`
+width: 1120px;
+margin-left: 30px;
+margin-right: 90px;
+margin-bottom: 40px;
+
+
+font-family: Source Sans Pro;
+font-style: normal;
+font-weight: 300;
+font-size: 24px;
+line-height: 30px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+
+color: #000000;
+
+
+`;
+
 
 // Export Default
 export default SendNotifications;
