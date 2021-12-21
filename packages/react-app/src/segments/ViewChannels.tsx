@@ -75,7 +75,7 @@ function ViewChannels() {
   // conditionally display the waymore bar which loads more information
   // load more channels when we are at the bottom of the page
   const showWayPoint = (index: any) => {
-    return Number(index) === channels.length - 1;
+    return Number(index) === channels.length - 1 && !search;
   };
 
   // Search Channels Feature
@@ -204,6 +204,7 @@ const InputWrapper = styled.div`
 
 const SearchBar = styled.input`
   width: 100%;
+  padding-right: 50px;
   height: 60px;
   padding-left: 40px;
   background: #ffffff;
@@ -243,7 +244,6 @@ const Container = styled.div`
 
 const ContainerInfo = styled.div`
   padding: 20px;
-  padding-top: 100px;
 `;
 
 const CenteredContainerInfo = styled.div`
