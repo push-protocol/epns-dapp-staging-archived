@@ -72,7 +72,7 @@ function ViewChannelItem({ channelObjectProp }) {
     if (!channelObject.addr) return;
     if (channelObject.verifiedBy) {
       // procced as usual
-      fetchChannelJson();
+      fetchChannelJson().catch(err => alert(err.message));
       setIsBlocked(
         channelObject.channelState === 3 || channelObject.channelState === 2 //dont display channel if blocked //dont display channel if deactivated
       );
@@ -106,34 +106,41 @@ function ViewChannelItem({ channelObjectProp }) {
   };
   // to fetch channels
   const fetchChannelJson = async () => {
-    let channelJson = {};
-    if (channelsCache[channelObject.addr]) {
-      channelJson = channelsCache[channelObject.addr];
-    } else {
-      channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
+    try{
+      let channelJson = {};
+      if (channelsCache[channelObject.addr]) {
+        channelJson = channelsCache[channelObject.addr];
+      } else {
+        channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
+          channelObject.addr
+        );
+        console.log({
+          channelJson,
+        });
+        dispatch(
+          cacheChannelInfo({
+            address: channelObject.addr,
+            meta: channelJson,
+          })
+        );
+      }
+      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
         channelObject.addr
       );
-      dispatch(
-        cacheChannelInfo({
-          address: channelObject.addr,
-          meta: channelJson,
-        })
-      );
+      const subscribed = channelSubscribers.find((sub) => {
+        return sub.toLowerCase() === account.toLowerCase();
+      });
+  
+      setIsPushAdmin(pushAdminAddress === account);
+      setMemberCount(channelSubscribers.length);
+      setSubscribed(subscribed);
+      setIsVerified(Boolean(channelObject.verifiedBy !== ZERO_ADDRESS));
+      setCanUnverify(channelObject.verifiedBy == account);
+      setChannelJson(channelJson);
+      setLoading(false);
+    }catch(err){
+      setIsBlocked(true)
     }
-    const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-      channelObject.addr
-    );
-    const subscribed = channelSubscribers.find((sub) => {
-      return sub.toLowerCase() === account.toLowerCase();
-    });
-
-    setIsPushAdmin(pushAdminAddress === account);
-    setMemberCount(channelSubscribers.length);
-    setSubscribed(subscribed);
-    setIsVerified(Boolean(channelObject.verifiedBy !== ZERO_ADDRESS));
-    setCanUnverify(channelObject.verifiedBy == account);
-    setChannelJson(channelJson);
-    setLoading(false);
   };
 
   // toast customize

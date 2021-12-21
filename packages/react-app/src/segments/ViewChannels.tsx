@@ -3,29 +3,33 @@ import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
 import { useDispatch, useSelector } from "react-redux";
-
+import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
+import searchIcon from "assets/searchicon.svg";
 
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
-
 import ChannelsDataStore from "singletons/ChannelsDataStore";
-
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
+const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for then to finish typing
 
 // Create Header
 function ViewChannels() {
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
   const { channels, page } = useSelector((state: any) => state.channels);
+  const { ZERO_ADDRESS } = useSelector((state: any) => state.contracts);
 
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
-  // const [page, setPage] = React.useState(0);
+  const [search, setSearch] = React.useState("");
+  const [channelToShow, setChannelToShow] = React.useState([]);
+  const [loadingChannel, setLoadingChannel] = React.useState(false);
+  const [trialCount, setTrialCount] = React.useState(0);
 
   const channelsVisited = page * CHANNELS_PER_PAGE;
 
@@ -71,8 +75,54 @@ function ViewChannels() {
   // conditionally display the waymore bar which loads more information
   // load more channels when we are at the bottom of the page
   const showWayPoint = (index: any) => {
-    return Number(index) === channels.length - 1;
+    return Number(index) === channels.length - 1 && !search;
   };
+
+  // Search Channels Feature
+  React.useEffect(() => {
+    if (!channels.length) return;
+    setChannelToShow(channels);
+  }, [channels]);
+
+  function searchForChannel() {
+    if (loadingChannel) return; //if we are already loading, do nothing
+    if (search) {
+      setLoadingChannel(true); //begin loading here
+      setChannelToShow([]); //maybe remove later
+      postReq("/channels/search", {
+        query: search,
+        op: "read",
+      })
+        .then((data) => {
+          setChannelToShow(data.data.channels || []);
+          setLoadingChannel(false);
+        })
+        .catch(() => {
+          // if there's an error search for three times before giving up and displaying the normal channels
+          if (trialCount < SEARCH_TRIAL_LIMIT) {
+            setTrialCount((t) => t + 1);
+            searchForChannel(); //if theres an error, recursively search
+          } else {
+            setChannelToShow(channels);
+            setLoadingChannel(false);
+          }
+        });
+    } else {
+      // if no search item, then set it back to the channels
+      setLoadingChannel(false);
+      setChannelToShow(channels);
+    }
+  }
+
+  React.useEffect(() => {
+    // debounce request
+    // this is done so that we only make a request after the user stops typing
+    console.log({ channelToShow });
+    const timeout = setTimeout(searchForChannel, DEBOUNCE_TIMEOUT);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [search]);
 
   return (
     <>
@@ -86,25 +136,50 @@ function ViewChannels() {
           </ContainerInfo>
         ) : (
           <Items id="scrollstyle-secondary">
-            {!loading && <Faucets />}
+            {!loading && (
+              <Header>
+                <InputWrapper>
+                  <SearchBar
+                    type="search"
+                    value={search}
+                    onChange={(e: any) => setSearch(e.target.value)}
+                    className="input"
+                    placeholder="Search By Name/Address"
+                  />
+                  <SearchIconImage src={searchIcon} alt="" />
+                </InputWrapper>
+                <Faucets />
+              </Header>
+            )}
 
-            {channels.filter(Boolean).map((channel, index) => (
-              <>
-                {channel.addr !== ZERO_ADDRESS && (
+            {/* render all channels depending on if we are searching or not */}
+            {(search ? channelToShow : channels)
+              .filter((channel: any) => channel?.addr !== ZERO_ADDRESS)
+              .map((channel: any, index: any) => (
+                <>
                   <div key={channel.addr}>
-                    <ViewChannelItem
-                      channelObjectProp={channel}
-                    />
+                    <ViewChannelItem channelObjectProp={channel} />
                   </div>
-                )}
-                {showWayPoint(index) && (
-                  <Waypoint onEnter={updateCurrentPage} />
-                )}
-              </>
-            ))}
+                  {showWayPoint(index) && (
+                    <Waypoint onEnter={updateCurrentPage} />
+                  )}
+                </>
+              ))}
+            {/* render all channels depending on if we are searching or not */}
 
-            {/* display loader if pagination is loading next batch of channels */}
-            {((moreLoading && channels.length) || loading) && (
+            {/* if we are in search mode and there are no channels then display error message */}
+            {search && !channelToShow?.length && !loadingChannel && (
+              <CenteredContainerInfo>
+                <DisplayNotice
+                  title="No channels match your query, please search for another name/address"
+                  theme="third"
+                />
+              </CenteredContainerInfo>
+            )}
+            {/* display loader if pagination is loading next batch of channelTotalList */}
+            {((moreLoading && channels.length) ||
+              loading ||
+              loadingChannel) && (
               <CenterContainer>
                 <Loader type="Oval" color="#35c5f3" height={40} width={40} />
               </CenterContainer>
@@ -117,6 +192,43 @@ function ViewChannels() {
 }
 
 // css styles
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+const InputWrapper = styled.div`
+  position: relative;
+  width: 50%;
+`;
+
+const SearchBar = styled.input`
+  width: 100%;
+  padding-right: 50px;
+  height: 60px;
+  padding-left: 40px;
+  background: #ffffff;
+  border: 1px solid rgba(169, 169, 169, 0.5);
+  box-sizing: border-box;
+  border-radius: 100px;
+  transition: 500ms;
+  text-transform: capitalize;
+  font-size: 16px;
+  input[type="reset"] {
+    display: none;
+  }
+  &::placeholder{
+    letter-spacing: 0.15em;
+  }
+  &:hover,
+  &:active,
+  &:focus {
+    outline: none;
+  }
+  &:focus {
+    border: 1px solid #EC008C;
+  }
+`;
 const Container = styled.div`
   display: flex;
   flex: 1;
@@ -134,6 +246,13 @@ const ContainerInfo = styled.div`
   padding: 20px;
 `;
 
+const CenteredContainerInfo = styled.div`
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const CenterContainer = styled(ContainerInfo)`
   width: fit-content;
   margin: auto;
@@ -145,6 +264,13 @@ const Items = styled.div`
   padding: 10px 20px;
   overflow-y: scroll;
   background: #fafafa;
+`;
+
+
+const SearchIconImage = styled.img`
+  position: absolute;
+  right: 4px;
+  top: 4px;
 `;
 
 // Export Default
