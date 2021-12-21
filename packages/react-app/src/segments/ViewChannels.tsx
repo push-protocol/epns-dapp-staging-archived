@@ -5,7 +5,7 @@ import { Waypoint } from "react-waypoint";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
-import {BsSearch} from 'react-icons/bs'
+import { BsSearch } from "react-icons/bs";
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
@@ -17,6 +17,8 @@ import { cacheChannelInfo } from "redux/slices/channelSlice";
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
+const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for then to finish typing
 
 // Create Header
 function ViewChannels() {
@@ -25,9 +27,10 @@ function ViewChannels() {
   const { channels, page } = useSelector((state: any) => state.channels);
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
-  const [search, setSearch] = React.useState('');
-  const [channelToShow,setChannelToShow]=React.useState([]);
-  // const [page, setPage] = React.useState(0);
+  const [search, setSearch] = React.useState("");
+  const [channelToShow, setChannelToShow] = React.useState([]);
+  const [loadingChannel, setLoadingChannel] = React.useState(false);
+  const [trialCount, setTrialCount] = React.useState(0);
 
   const channelsVisited = page * CHANNELS_PER_PAGE;
 
@@ -77,23 +80,50 @@ function ViewChannels() {
   };
 
   // Search Channels Feature
-  React.useEffect(()=>{
+  React.useEffect(() => {
+    if(!channels.length) return;
     setChannelToShow(channels);
-  },[])
-  React.useEffect(()=>{
-      if(search){
-      postReq("/channels/search",{
-        "query":search,
-        "op":"read"
-      }).then(data=>{
-        setChannelToShow(data.data.channels);
-      })}
-      else {
-        setChannelToShow(channels);
-      }
-  },[search]);
+  }, [channels]);
 
-  
+  function searchForChannel() {
+    setLoadingChannel(true);
+    if (loadingChannel) return;
+    if (search) {
+      setChannelToShow([]); //maybe remove later
+      postReq("/channels/search", {
+        query: search,
+        op: "read",
+      })
+        .then((data) => {
+          setChannelToShow(data.data.channels || []);
+          setLoadingChannel(false);
+        })
+        .catch(() => {
+          // if there's an error search for three times before giving up and displaying the normal channels
+          if (trialCount < SEARCH_TRIAL_LIMIT) {
+            setTrialCount((t) => t + 1);
+            searchForChannel(); //if theres an error, recursively search
+          } else {
+            setChannelToShow(channels);
+            setLoadingChannel(false);
+          }
+        });
+    } else {
+      setLoadingChannel(false);
+      setChannelToShow(channels);
+    }
+  }
+
+  React.useEffect(() => {
+    // debounce request
+    // this is done so that we only make a request after the user stops typing
+    console.log({channelToShow});
+    const timeout = setTimeout(searchForChannel, DEBOUNCE_TIMEOUT);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [search]);
+
   return (
     <>
       <Container>
@@ -106,53 +136,54 @@ function ViewChannels() {
           </ContainerInfo>
         ) : (
           <Items id="scrollstyle-secondary">
-          {!loading && <Faucets />}
-          <div style={{position:"relative",width:"300px"}}>
-            <SearchBar
-            type="search"
-            value={search}
-            onChange={e=>setSearch(e.target.value)}
-            className="input"
-            placeholder="Search By Name/Address"
-          />
-          <BsSearch style={{position:"absolute",background:"#e20880",padding:"10px",borderRadius:"25px",color:"white", right:"2px",top:"2px"}}/>
-          </div>
-            {
-          !search?channels.filter(Boolean).map((channel, index) => (
-              <>
-                {channel.addr !== ZERO_ADDRESS && (
-                  <div key={channel.addr}>
-                    <ViewChannelItem
-                      channelObjectProp={channel}
-                    />
-                  </div>
-                )}
-                {showWayPoint(index) && (
-                  <Waypoint onEnter={updateCurrentPage} />
-                )}
-              </>
-            )):channelToShow?channelToShow.map((channel, index) => (
-              <>
-                {channel.addr !== ZERO_ADDRESS && (
-                  <div key={channel.addr}>
-                    <ViewChannelItem
-                      channelObjectProp={channel}
-                    />
-                  </div>
-                )}
-                {showWayPoint(index) && (
-                  <Waypoint onEnter={updateCurrentPage} />
-                )}
-              </>
-            )):
-            <div style={{padding:"2rem"}}>
-              No Channel Found
+            {!loading && <Faucets />}
+            <div style={{ position: "relative", width: "300px" }}>
+              <SearchBar
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input"
+                placeholder="Search By Name/Address"
+              />
+              <BsSearch
+                style={{
+                  position: "absolute",
+                  background: "#e20880",
+                  padding: "10px",
+                  borderRadius: "25px",
+                  color: "white",
+                  right: "2px",
+                  top: "2px",
+                }}
+              />
             </div>
-              
-            }
-
+            {(search ? channelToShow : channels)
+              .filter(Boolean)
+              .map((channel: any, index: any) => (
+                <>
+                  {channel.addr !== ZERO_ADDRESS && (
+                    <div key={channel.addr}>
+                      <ViewChannelItem channelObjectProp={channel} />
+                    </div>
+                  )}
+                  {showWayPoint(index) && (
+                    <Waypoint onEnter={updateCurrentPage} />
+                  )}
+                </>
+              ))}
+            {/* if we are in search mode and there are no channels then display error message */}
+            {search && !channelToShow?.length && !loadingChannel && (
+              <CenteredContainerInfo>
+                <DisplayNotice
+                  title="No channels match your query, please search for another name/address"
+                  theme="third"
+                />
+              </CenteredContainerInfo>
+            )}
             {/* display loader if pagination is loading next batch of channelTotalList */}
-            {((moreLoading && channels.length) || loading) && (
+            {((moreLoading && channels.length) ||
+              loading ||
+              loadingChannel) && (
               <CenterContainer>
                 <Loader type="Oval" color="#35c5f3" height={40} width={40} />
               </CenterContainer>
@@ -165,17 +196,16 @@ function ViewChannels() {
 }
 
 // css styles
-const SearchBar=styled.input`
-    border: 1px solid grey;
-    border-radius: 20px;    
-    width:300px;
-    padding: 10px 10px 10px 10px;
-    outline: 0;
-    background-color: #f5f5f5;
-    input[type="reset"]
-   {
-     display:none;
-   }
+const SearchBar = styled.input`
+  border: 1px solid grey;
+  border-radius: 20px;
+  width: 300px;
+  padding: 10px 10px 10px 10px;
+  outline: 0;
+  background-color: #f5f5f5;
+  input[type="reset"] {
+    display: none;
+  }
 `;
 const Container = styled.div`
   display: flex;
@@ -192,6 +222,14 @@ const Container = styled.div`
 
 const ContainerInfo = styled.div`
   padding: 20px;
+  padding-top: 100px;
+`;
+
+const CenteredContainerInfo = styled.div`
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const CenterContainer = styled(ContainerInfo)`
