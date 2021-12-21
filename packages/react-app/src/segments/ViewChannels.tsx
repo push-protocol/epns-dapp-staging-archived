@@ -140,7 +140,7 @@ function ViewChannels() {
               <Header>
                 <InputWrapper>
                   <SearchBar
-                    type="search"
+                    type="text"
                     value={search}
                     onChange={(e: any) => setSearch(e.target.value)}
                     className="input"
