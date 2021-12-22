@@ -72,14 +72,14 @@ function ViewChannelItem({ channelObjectProp }) {
     if (!channelObject.addr) return;
     if (channelObject.verifiedBy) {
       // procced as usual
-      fetchChannelJson().catch(err => alert(err.message));
+      fetchChannelJson().catch((err) => alert(err.message));
       setIsBlocked(
         channelObject.channelState === 3 || channelObject.channelState === 2 //dont display channel if blocked //dont display channel if deactivated
       );
     } else {
       // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
       epnsReadProvider.channels(channelObject.addr).then((response) => {
-        setChannelObject(response);
+        setChannelObject({ ...response, addr: channelObject.addr });
         fetchChannelJson();
       });
     }
@@ -91,12 +91,12 @@ function ViewChannelItem({ channelObjectProp }) {
   }, [channelObjectProp]);
 
   React.useEffect(() => {
-    if(!isVerified || !channelObject.verifiedBy) return;
-    ChannelsDataStore.instance.getChannelJsonAsync(
-      channelObject.verifiedBy
-    ).then((verifierDetails) => {
-      setVerifierDetails(verifierDetails);
-    })
+    if (!isVerified || !channelObject.verifiedBy) return;
+    ChannelsDataStore.instance
+      .getChannelJsonAsync(channelObject.verifiedBy)
+      .then((verifierDetails) => {
+        setVerifierDetails(verifierDetails);
+      });
   }, [isVerified, channelObject]);
 
   const EPNS_DOMAIN = {
@@ -106,7 +106,7 @@ function ViewChannelItem({ channelObjectProp }) {
   };
   // to fetch channels
   const fetchChannelJson = async () => {
-    try{
+    try {
       let channelJson = {};
       if (channelsCache[channelObject.addr]) {
         channelJson = channelsCache[channelObject.addr];
@@ -130,16 +130,16 @@ function ViewChannelItem({ channelObjectProp }) {
       const subscribed = channelSubscribers.find((sub) => {
         return sub.toLowerCase() === account.toLowerCase();
       });
-  
+
       setIsPushAdmin(pushAdminAddress === account);
       setMemberCount(channelSubscribers.length);
       setSubscribed(subscribed);
       setIsVerified(Boolean(channelObject.verifiedBy !== ZERO_ADDRESS));
       setCanUnverify(channelObject.verifiedBy == account);
-      setChannelJson(channelJson);
+      setChannelJson({ ...channelJson, addr: channelObject.addr });
       setLoading(false);
-    }catch(err){
-      setIsBlocked(true)
+    } catch (err) {
+      setIsBlocked(true);
     }
   };
 
@@ -262,44 +262,44 @@ function ViewChannelItem({ channelObjectProp }) {
 
   const subscribeAction = async () => {
     setTxInProgress(true);
-    const type = {
-      Subscribe: [
-        { name: "channel", type: "address" },
-        { name: "subscriber", type: "address" },
-        { name: "action", type: "string" },
-      ],
-    };
-    const message = {
-      channel: channelObject.addr,
-      subscriber: account,
-      action: "Subscribe",
-    };
+    let txToast;
+    try {
+      const type = {
+        Subscribe: [
+          { name: "channel", type: "address" },
+          { name: "subscriber", type: "address" },
+          { name: "action", type: "string" },
+        ],
+      };
+      const message = {
+        channel: channelObject.addr,
+        subscriber: account,
+        action: "Subscribe",
+      };
 
-    const signature = await library
-      .getSigner(account)
-      ._signTypedData(EPNS_DOMAIN, type, message);
+      const signature = await library
+        .getSigner(account)
+        ._signTypedData(EPNS_DOMAIN, type, message);
+      txToast = toaster.dark(
+        <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
+        {
+          position: "bottom-right",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
 
-    let txToast = toaster.dark(
-      <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
-      {
-        position: "bottom-right",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      }
-    );
-
-    postReq("/channels/subscribe_offchain", {
-      signature,
-      message,
-      op: "write",
-      chainId,
-      contractAddress: epnsCommReadProvider.address,
-    })
-      .then((res) => {
+      postReq("/channels/subscribe_offchain", {
+        signature,
+        message,
+        op: "write",
+        chainId,
+        contractAddress: epnsCommReadProvider.address,
+      }).then((res) => {
         setSubscribed(true);
         setMemberCount(memberCount + 1);
         toaster.update(txToast, {
@@ -308,83 +308,84 @@ function ViewChannelItem({ channelObjectProp }) {
           autoClose: 5000,
         });
         console.log(res);
-      })
-      .catch((err) => {
-        toaster.update(txToast, {
-          render:
-            "There was an error opting into channel (" + err.message + ")",
-          type: toaster.TYPE.ERROR,
-          autoClose: 5000,
-        });
-        console.log(err);
-      })
-      .finally(() => {
         setTxInProgress(false);
       });
+    } catch (err) {
+      toaster.update(txToast, {
+        render: "There was an error opting into channel (" + err.message + ")",
+        type: toaster.TYPE.ERROR,
+        autoClose: 5000,
+      });
+      console.log(err);
+    } finally {
+      setTxInProgress(false);
+    }
   };
 
   const unsubscribeAction = async () => {
-    if (!onCoreNetwork) {
-      return showNetworkToast();
+    let txToast;
+    try {
+      const type = {
+        Unsubscribe: [
+          { name: "channel", type: "address" },
+          { name: "unsubscriber", type: "address" },
+          { name: "action", type: "string" },
+        ],
+      };
+      const message = {
+        channel: channelObject.addr,
+        unsubscriber: account,
+        action: "Unsubscribe",
+      };
+      const signature = await library
+        .getSigner(account)
+        ._signTypedData(EPNS_DOMAIN, type, message);
+
+      txToast = toaster.dark(
+        <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
+        {
+          position: "bottom-right",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+
+      postReq("/channels/unsubscribe_offchain", {
+        signature,
+        message,
+        op: "write",
+        chainId,
+        contractAddress: epnsCommReadProvider.address,
+      })
+        .then((res) => {
+          setSubscribed(false);
+          setMemberCount(memberCount + 1);
+          toaster.update(txToast, {
+            render: "Sucesfully opted out of channel !",
+            type: toaster.TYPE.SUCCESS,
+            autoClose: 5000,
+          });
+          console.log(res);
+        })
+        .catch((err) => {
+          toaster.update(txToast, {
+            render:
+              "There was an error opting into channel (" + err.message + ")",
+            type: toaster.TYPE.ERROR,
+            autoClose: 5000,
+          });
+          console.log(err);
+        })
+        .finally(() => {
+          setTxInProgress(false);
+        });
+    } finally {
+      setTxInProgress(false);
     }
-    const type = {
-      Unsubscribe: [
-        { name: "channel", type: "address" },
-        { name: "unsubscriber", type: "address" },
-        { name: "action", type: "string" },
-      ],
-    };
-    const message = {
-      channel: channelObject.addr,
-      unsubscriber: account,
-      action: "Unsubscribe",
-    };
-    const signature = await library
-      .getSigner(account)
-      ._signTypedData(EPNS_DOMAIN, type, message);
-
-    let txToast = toaster.dark(
-      <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
-      {
-        position: "bottom-right",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      }
-    );
-
-    postReq("/channels/unsubscribe_offchain", {
-      signature,
-      message,
-      op: "write",
-      chainId,
-      contractAddress: epnsCommReadProvider.address,
-    })
-      .then((res) => {
-        setSubscribed(false);
-        setMemberCount(memberCount + 1);
-        toaster.update(txToast, {
-          render: "Sucesfully opted out of channel !",
-          type: toaster.TYPE.SUCCESS,
-          autoClose: 5000,
-        });
-        console.log(res);
-      })
-      .catch((err) => {
-        toaster.update(txToast, {
-          render:
-            "There was an error opting into channel (" + err.message + ")",
-          type: toaster.TYPE.ERROR,
-          autoClose: 5000,
-        });
-        console.log(err);
-      })
-      .finally(() => {
-        setTxInProgress(false);
-      });
   };
 
   if (isBlocked) return <></>;
@@ -458,11 +459,11 @@ function ViewChannelItem({ channelObjectProp }) {
                 <SubscribersCount>{memberCount}</SubscribersCount>
               </Subscribers>
               {verifierDetails && (
-                  <Subscribers>
-                    <VerifiedBy>VERIFIED BY:</VerifiedBy>
-                    <VerifierIcon src={verifierDetails.icon}/>
-                    <VerifierName>{verifierDetails.name}</VerifierName>
-                  </Subscribers>
+                <Subscribers>
+                  <VerifiedBy>VERIFIED BY:</VerifiedBy>
+                  <VerifierIcon src={verifierDetails.icon} />
+                  <VerifierName>{verifierDetails.name}</VerifierName>
+                </Subscribers>
               )}
             </>
           )}
@@ -657,7 +658,6 @@ const VerifierIcon = styled.img`
   margin-right: 4px;
 `;
 const VerifierName = styled.span`
-  text-transform: uppercase;
   font-weight: 600;
   color: black;
   font-size: 16px;
