@@ -201,10 +201,19 @@ const Header = styled.div`
   top:0px;
   z-index:2;
   background:#fafafa;
+
+  @media(max-width:600px){
+    flex-direction:column;
+}
 `;
 const InputWrapper = styled.div`
   width: 50%;
   position:relative;
+
+  @media(max-width:600px){
+    width:100%;
+    margin:2rem 0;
+  }
 `;
 
 const SearchBar = styled.input`
@@ -220,6 +229,7 @@ const SearchBar = styled.input`
   transition: 500ms;
   text-transform: capitalize;
   font-size: 16px;
+ 
   input[type="reset"] {
     display: none;
   }

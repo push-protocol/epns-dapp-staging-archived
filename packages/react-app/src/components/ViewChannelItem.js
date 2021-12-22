@@ -813,10 +813,12 @@ const SkeletonButton = styled.div`
 
 const SubscribeButton = styled(ChannelActionButton)`
   background: #e20880;
+  min-width:80px;
 `;
 
 const UnsubscribeButton = styled(ChannelActionButton)`
   background: #674c9f;
+  min-width:80px;
 `;
 
 const OwnerButton = styled(ChannelActionButton)`
