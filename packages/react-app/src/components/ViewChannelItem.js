@@ -687,6 +687,7 @@ const ChannelDescLabel = styled.label`
 
 const ChannelMeta = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   font-size: 13px;
 `;
@@ -702,6 +703,7 @@ const ChannelMetaBox = styled.label`
 
 const Subscribers = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
 `;
