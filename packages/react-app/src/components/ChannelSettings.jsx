@@ -1,10 +1,17 @@
 import React from "react";
+import { useClickAway } from "react-use";
 import styled from "styled-components";
 import ChannelSettingsDropdown from "./ChannelSettingsDropdown";
 
 export default function ChannelSettings() {
   const [active, setActive] = React.useState(false);
-  const toggleActive = () => setActive((a) => !a);
+  const modalRef = React.useRef(null);
+  const toggleActive = () => {
+    setActive((a) => !a);
+  };
+
+  useClickAway(modalRef, () => active && setActive(false));
+
   return (
     <SettingsWrapper>
       <Settings
@@ -13,7 +20,7 @@ export default function ChannelSettings() {
         src="/Settings.svg"
         alt=""
       ></Settings>
-      {active && <ChannelSettingsDropdown />}
+      {active && <div ref={modalRef} ><ChannelSettingsDropdown /></div>}
     </SettingsWrapper>
   );
 }
@@ -30,6 +37,6 @@ const Settings = styled.img`
   margin-left: auto;
   margin-right: 30px;
   cursor: pointer;
-  transition: 500ms;
+  transition: 400ms;
   transform: ${(props) => (props.active ? "rotateZ(35deg)" : "none")};
 `;

@@ -122,14 +122,14 @@ function ChannelSettings() {
         console.log("Transaction Sent!");
 
         toaster.update(notificationToast(), {
-          render: "Transaction sent",
+          render: "Reactivating Channel",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
         });
 
         await tx.wait(1);
         toaster.update(notificationToast(), {
-          render: "Channel Recreated",
+          render: "Channel Reactivated",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
         });
@@ -172,8 +172,8 @@ function ChannelSettings() {
     const amountsOut = pushValue * Math.pow(10, 18);
 
     await epnsWriteProvider
-      // .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
-      .deactivateChannel(Math.floor(pushValue)) //use this to remove trailing zeros 1232323200000000 -> 12323232
+      .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
+      // .deactivateChannel(Math.floor(pushValue)) //use this to remove trailing zeros 1232323200000000 -> 12323232
       .then(async (tx: any) => {
         console.log(tx);
         console.log("Transaction Sent!");
@@ -232,15 +232,13 @@ function ChannelSettings() {
   return (
     <div>
       <DropdownWrapper>
-        <ChannelActionButton
+        <DeactivateButton
+          isChannelDeactivated={isChannelDeactivated}
           onClick={toggleChannelActivationState}
-          style={{
-            background: "#e20880",
-          }}
         >
           <ActionTitle>
             {loading ? (
-              <Loader type="Oval" color="#FFF" height={16} width={16} />
+              "Loading ..."
             ) : isChannelBlocked ? (
               "Channel Blocked"
             ) : isChannelDeactivated ? (
@@ -249,7 +247,7 @@ function ChannelSettings() {
               "Deactivate Channel"
             )}
           </ActionTitle>
-        </ChannelActionButton>
+        </DeactivateButton>
         <ActiveChannelWrapper>
           <ChannelActionButton
             disabled={channelInactive}
@@ -368,6 +366,15 @@ const ActionTitle = styled.span`
 
 const ToasterMsg = styled.div`
   margin: 0px 10px;
+`;
+
+const DeactivateButton = styled.div`
+  text-decoration: underline;
+  color: ${(props) => (props.isChannelDeactivated ? "#674C9F" : "#e20880")};
+  text-align: center;
+  font-size: 16px;
+  line-height: 20px;
+  cursor: pointer;
 `;
 
 const ChannelActionButton = styled.button`
