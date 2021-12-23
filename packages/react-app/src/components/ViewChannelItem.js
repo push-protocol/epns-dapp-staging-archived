@@ -467,11 +467,11 @@ function ViewChannelItem({ channelObjectProp }) {
                 <SubscribersCount>{memberCount}</SubscribersCount>
               </Subscribers>
               {verifierDetails && (
-                <Subscribers>
-                  <VerifiedBy>VERIFIED BY:</VerifiedBy>
-                  <VerifierIcon src={verifierDetails.icon} />
-                  <VerifierName>{verifierDetails.name}</VerifierName>
-                </Subscribers>
+                  <Subscribers>
+                    <VerifiedBy>Verified by:</VerifiedBy>
+                    <VerifierIcon src={verifierDetails.icon}/>
+                    <VerifierName>{verifierDetails.name}</VerifierName>
+                  </Subscribers>
               )}
             </>
           )}
@@ -653,7 +653,7 @@ const VerifiedBy = styled.span`
   font-size: 16px;
   line-height: 20px;
   letter-spacing: 0.05em;
-  font-weight: 400;
+  font-weight: 600;
   display: inline-block;
   margin-left: 10px;
 `;
@@ -666,10 +666,10 @@ const VerifierIcon = styled.img`
   margin-right: 4px;
 `;
 const VerifierName = styled.span`
-  font-weight: 600;
+  font-weight: 400;
   color: black;
   font-size: 16px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0em;
 `;
 
 const ChannelDesc = styled.div`

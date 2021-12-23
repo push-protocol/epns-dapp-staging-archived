@@ -126,7 +126,7 @@ function ViewChannels() {
 
   return (
     <>
-      <Container>
+      <Container >
         {!loading && channels.length == 0 ? (
           <ContainerInfo>
             <DisplayNotice
@@ -135,7 +135,7 @@ function ViewChannels() {
             />
           </ContainerInfo>
         ) : (
-          <Items id="scrollstyle-secondary">
+          <Items id="scrollstyle-secondary" style={{position:"relative",padding:"0 1rem"}}>
             {!loading && (
               <Header>
                 <InputWrapper>
@@ -196,10 +196,15 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position:-webkit-sticky; 
+  position:sticky;
+  top:0px;
+  z-index:2;
+  background:#fafafa;
 `;
 const InputWrapper = styled.div`
-  position: relative;
   width: 50%;
+  position:relative;
 `;
 
 const SearchBar = styled.input`
@@ -207,10 +212,11 @@ const SearchBar = styled.input`
   padding-right: 50px;
   height: 60px;
   padding-left: 40px;
-  background: #ffffff;
+ 
+  background: rgb(255,255,255);
   border: 1px solid rgba(169, 169, 169, 0.5);
   box-sizing: border-box;
-  border-radius: 100px;
+  border-radius: 10px;
   transition: 500ms;
   text-transform: capitalize;
   font-size: 16px;
