@@ -1,0 +1,35 @@
+import React from "react";
+import styled from "styled-components";
+import ChannelSettingsDropdown from "./ChannelSettingsDropdown";
+
+export default function ChannelSettings() {
+  const [active, setActive] = React.useState(false);
+  const toggleActive = () => setActive((a) => !a);
+  return (
+    <SettingsWrapper>
+      <Settings
+        active={active}
+        onClick={toggleActive}
+        src="/Settings.svg"
+        alt=""
+      ></Settings>
+      {active && <ChannelSettingsDropdown />}
+    </SettingsWrapper>
+  );
+}
+
+const SettingsWrapper = styled.div`
+  position: absolute;
+  top: 30px;
+  right: 30px;
+`;
+
+const Settings = styled.img`
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  margin-right: 30px;
+  cursor: pointer;
+  transition: 500ms;
+  transform: ${(props) => (props.active ? "rotateZ(35deg)" : "none")};
+`;

@@ -10,9 +10,12 @@ function ChannelOwnerDashboard() {
   return (
     <>
       <Section>
-        <Content padding="0px">
+        <Content
+          style={{ position: "relative" }}
+          padding="0px"
+        >
           {/* display the channel settings */}
-          {/* <ChannelSettings />  */}
+          <ChannelSettings />
           {/* display the channel settings */}
           {/* display the details about the profile of the channel */}
           <ChannelDetails />

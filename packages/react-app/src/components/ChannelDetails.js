@@ -48,7 +48,6 @@ export default function ChannelDetails() {
           </Subscribers>
         </Details>
 
-        {/* <Settings src="/Settings.svg" alt=""></Settings> */}
       </SectionTop>
 
       <SectionDes>{channelDetails.info}</SectionDes>
@@ -85,13 +84,7 @@ const SectionTop = styled.div`
   align-items: center;
   margin-bottom: 30px;
 `;
-const Settings = styled.img`
-  width: 40px;
-  height: 40px;
-  // right: 30px;
-  margin-left: auto;
-  margin-right: 30px;
-`;
+
 const ImageSection = styled.img`
   width: 120px;
   height: 120px;
@@ -211,7 +204,7 @@ const ChannelName = styled.div`
   font-size: 30px;
   line-height: 38px;
   margin-right: 8px;
-
+  text-transform: capitalize;
   color: #e20880;
 `;
 
