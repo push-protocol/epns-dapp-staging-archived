@@ -154,7 +154,7 @@ function ViewChannels() {
 
             {/* render all channels depending on if we are searching or not */}
             {(search ? channelToShow : channels)
-              .filter((channel: any) => channel?.addr !== ZERO_ADDRESS)
+              .filter((channel: any) => channel && channel.addr !== ZERO_ADDRESS)
               .map((channel: any, index: any) => (
                 <>
                   <div key={channel.addr}>

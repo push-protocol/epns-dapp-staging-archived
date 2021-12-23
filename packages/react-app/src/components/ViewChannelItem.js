@@ -28,7 +28,6 @@ function ViewChannelItem({ channelObjectProp }) {
     ZERO_ADDRESS,
   } = useSelector((state) => state.contracts);
   const { canVerify } = useSelector((state) => state.admin);
-
   const { channelsCache } = useSelector((state) => state.channels);
   const { account, library, chainId } = useWeb3React();
   const isOwner = channelObjectProp.addr === account;
@@ -91,12 +90,16 @@ function ViewChannelItem({ channelObjectProp }) {
   }, [channelObjectProp]);
 
   React.useEffect(() => {
-    if (!isVerified || !channelObject.verifiedBy) return;
+    if (!isVerified || channelObject?.verifiedBy === ZERO_ADDRESS) return;
     ChannelsDataStore.instance
       .getChannelJsonAsync(channelObject.verifiedBy)
       .then((verifierDetails) => {
         setVerifierDetails(verifierDetails);
+      })
+      .catch((err) => {
+        console.log(channelObject.verifiedBy, err);
       });
+  
   }, [isVerified, channelObject]);
 
   const EPNS_DOMAIN = {
@@ -134,7 +137,12 @@ function ViewChannelItem({ channelObjectProp }) {
       setIsPushAdmin(pushAdminAddress === account);
       setMemberCount(channelSubscribers.length);
       setSubscribed(subscribed);
-      setIsVerified(Boolean(channelObject.verifiedBy !== ZERO_ADDRESS));
+      setIsVerified(
+        Boolean(
+          channelObject.verifiedBy !== ZERO_ADDRESS ||
+            channelObject.addr === pushAdminAddress
+        )
+      );
       setCanUnverify(channelObject.verifiedBy == account);
       setChannelJson({ ...channelJson, addr: channelObject.addr });
       setLoading(false);

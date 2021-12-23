@@ -77,6 +77,7 @@ function ChannelSettings() {
 
   const isChannelDeactivated = channelState === CHANNNEL_DEACTIVATED_STATE;
   const isChannelBlocked = channelState === CHANNEL_BLOCKED_STATE;
+  const channelInactive = isChannelBlocked || isChannelDeactivated;
 
   React.useEffect(() => {
     // To set channel info from a channel details
@@ -121,14 +122,14 @@ function ChannelSettings() {
         console.log("Transaction Sent!");
 
         toaster.update(notificationToast(), {
-          render: "Transaction sent",
+          render: "Reactivating Channel",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
         });
 
         await tx.wait(1);
         toaster.update(notificationToast(), {
-          render: "Channel Recreated",
+          render: "Channel Reactivated",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
         });
@@ -157,7 +158,7 @@ function ChannelSettings() {
    * Function to deactivate a channel that has been deactivated
    */
   const deactivateChannel = async () => {
-    // setLoading(true);
+    setLoading(true);
     if (!poolContrib) return;
 
     const amountToBeConverted = parseInt("" + poolContrib) - 10;
@@ -171,8 +172,8 @@ function ChannelSettings() {
     const amountsOut = pushValue * Math.pow(10, 18);
 
     await epnsWriteProvider
-      // .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
-      .deactivateChannel(Math.floor(pushValue)) //use this to remove trailing zeros 1232323200000000 -> 12323232
+      .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
+      // .deactivateChannel(Math.floor(pushValue)) //use this to remove trailing zeros 1232323200000000 -> 12323232
       .then(async (tx: any) => {
         console.log(tx);
         console.log("Transaction Sent!");
@@ -211,18 +212,16 @@ function ChannelSettings() {
 
   const addDelegate = async (walletAddress: string) => {
     setAddDelegateLoading(true);
-    return epnsCommWriteProvider.addDelegate(walletAddress)
-      .finally(() => {
-        setAddDelegateLoading(false);
-      });
+    return epnsCommWriteProvider.addDelegate(walletAddress).finally(() => {
+      setAddDelegateLoading(false);
+    });
   };
 
   const removeDelegate = (walletAddress: string) => {
     setRemoveDelegateLoading(true);
-    return epnsCommWriteProvider.removeDelegate(walletAddress)
-      .finally(() => {
-        setRemoveDelegateLoading(false);
-      });
+    return epnsCommWriteProvider.removeDelegate(walletAddress).finally(() => {
+      setRemoveDelegateLoading(false);
+    });
   };
 
   if (!onCoreNetwork) {
@@ -231,113 +230,125 @@ function ChannelSettings() {
   }
 
   return (
-    <>
-      <Section>
-        <Content padding="10px 10px">
-          <Item
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-            }}
-            align="flex-end"
+    <div>
+      <DropdownWrapper>
+        <DeactivateButton
+          isChannelDeactivated={isChannelDeactivated}
+          onClick={toggleChannelActivationState}
+        >
+          <ActionTitle>
+            {loading ? (
+              "Loading ..."
+            ) : isChannelBlocked ? (
+              "Channel Blocked"
+            ) : isChannelDeactivated ? (
+              "Activate Channel"
+            ) : (
+              "Deactivate Channel"
+            )}
+          </ActionTitle>
+        </DeactivateButton>
+        <ActiveChannelWrapper>
+          <ChannelActionButton
+            disabled={channelInactive}
+            onClick={() => !channelInactive && setAddModalOpen(true)}
           >
-            <ChannelActionButton
-              onClick={toggleChannelActivationState}
-              style={{
-                background: "#e20880",
-              }}
-            >
-              <ActionTitle>
-                {loading ? (
-                  <Loader type="Oval" color="#FFF" height={16} width={16} />
-                ) : isChannelBlocked ? (
-                  "Channel Blocked"
-                ) : isChannelDeactivated ? (
-                  "Activate Channel"
-                ) : (
-                  "Deactivate Channel"
-                )}
-              </ActionTitle>
-            </ChannelActionButton>
-            <div
-              style={{
-                display:
-                  isChannelBlocked || isChannelDeactivated ? "none" : "flex",
-              }}
-            >
-              <ChannelActionButton onClick={() => setAddModalOpen(true)}>
-                <ActionTitle>
-                  {addDelegateLoading ? (
-                    <Loader type="Oval" color="#FFF" height={16} width={16} />
-                  ) : (
-                    "Add Delegate"
-                  )}
-                </ActionTitle>
-              </ChannelActionButton>
+            <ActionTitle>
+              {addDelegateLoading ? (
+                <Loader type="Oval" color="#FFF" height={16} width={16} />
+              ) : (
+                "Add Delegate"
+              )}
+            </ActionTitle>
+          </ChannelActionButton>
 
-              <ChannelActionButton onClick={() => setRemoveModalOpen(true)}>
-                <ActionTitle>
-                  {removeDelegateLoading ? (
-                    <Loader type="Oval" color="#FFF" height={16} width={16} />
-                  ) : (
-                    "Remove Delegate"
-                  )}
-                </ActionTitle>
-              </ChannelActionButton>
-            </div>
-          </Item>
-        </Content>
-        {/* modal to display the activate channel popup */}
-        {showActivateChannelPopup && (
-          <ActivateChannelModal
-            onClose={() => {
-              if (showActivateChannelPopup) {
-                setShowActivateChannelPopup(false);
-              }
-            }}
-            activateChannel={activateChannel}
-            loading={loading}
-            setChannelStakeFees={setChannelStakeFees}
-            channelStakeFees={channelStakeFees}
-          />
-        )}
-        {/* modal to add a delegate */}
-        {addModalOpen && (
-          <AddDelegateModal
-            onClose={() => setAddModalOpen(false)}
-            onSuccess={() => {
-              toaster.update(notificationToast(), {
-                render: "Delegate Added",
-                type: toaster.TYPE.INFO,
-                autoClose: 5000,
-              });
-            }}
-            addDelegate={addDelegate}
-          />
-        )}
-        {/* modal to remove a delegate */}
-        {removeModalOpen && (
-          <RemoveDelegateModal
-            onClose={() => {
-              setRemoveModalOpen(false);
-            }}
-            onSuccess={() => {
-              toaster.update(notificationToast(), {
-                render: "Delegate Removed",
-                type: toaster.TYPE.INFO,
-                autoClose: 5000,
-              });
-            }}
-            removeDelegate={removeDelegate}
-          />
-        )}
-      </Section>
-    </>
+          <ChannelActionButton
+            disabled={channelInactive}
+            onClick={() => !channelInactive && setRemoveModalOpen(true)}
+          >
+            <ActionTitle>
+              {removeDelegateLoading ? (
+                <Loader type="Oval" color="#FFF" height={16} width={16} />
+              ) : (
+                "Remove Delegate"
+              )}
+            </ActionTitle>
+          </ChannelActionButton>
+        </ActiveChannelWrapper>
+      </DropdownWrapper>
+      {/* modal to display the activate channel popup */}
+      {showActivateChannelPopup && (
+        <ActivateChannelModal
+          onClose={() => {
+            if (showActivateChannelPopup) {
+              setShowActivateChannelPopup(false);
+            }
+          }}
+          activateChannel={activateChannel}
+          loading={loading}
+          setChannelStakeFees={setChannelStakeFees}
+          channelStakeFees={channelStakeFees}
+        />
+      )}
+      {/* modal to add a delegate */}
+      {addModalOpen && (
+        <AddDelegateModal
+          onClose={() => setAddModalOpen(false)}
+          onSuccess={() => {
+            toaster.update(notificationToast(), {
+              render: "Delegate Added",
+              type: toaster.TYPE.INFO,
+              autoClose: 5000,
+            });
+          }}
+          addDelegate={addDelegate}
+        />
+      )}
+      {/* modal to remove a delegate */}
+      {removeModalOpen && (
+        <RemoveDelegateModal
+          onClose={() => {
+            setRemoveModalOpen(false);
+          }}
+          onSuccess={() => {
+            toaster.update(notificationToast(), {
+              render: "Delegate Removed",
+              type: toaster.TYPE.INFO,
+              autoClose: 5000,
+            });
+          }}
+          removeDelegate={removeDelegate}
+        />
+      )}
+    </div>
   );
 }
 
 // css styles
+const DropdownWrapper = styled.div`
+  position: absolute;
+  right: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  width: 220px;
+  height: 230px;
+  padding: 20px;
+  padding-top: 30px;
+
+  background: #ffffff;
+  border: 1px solid #a9a9a9;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  justify-content: space-between;
+`;
+
+const ActiveChannelWrapper = styled.div`
+  flex-direction: column;
+  gap: 20px;
+  display: ${(props) => (props.inactive ? "none" : "flex")};
+`;
+
 const Toaster = styled.div`
   display: flex;
   flex-direction: row;
@@ -357,6 +368,15 @@ const ToasterMsg = styled.div`
   margin: 0px 10px;
 `;
 
+const DeactivateButton = styled.div`
+  text-decoration: underline;
+  color: ${(props) => (props.isChannelDeactivated ? "#674C9F" : "#e20880")};
+  text-align: center;
+  font-size: 16px;
+  line-height: 20px;
+  cursor: pointer;
+`;
+
 const ChannelActionButton = styled.button`
   border: 0;
   outline: 0;
@@ -364,7 +384,6 @@ const ChannelActionButton = styled.button`
   align-items: center;
   justify-content: center;
   padding: 8px 15px;
-  margin: 10px;
   color: #fff;
   border-radius: 5px;
   font-size: 14px;
@@ -372,15 +391,23 @@ const ChannelActionButton = styled.button`
   position: relative;
   background-color: #674c9f;
   &:hover {
-    opacity: 0.9;
-    cursor: pointer;
+    opacity: ${(props) => (props.disabled ? 0.5 : 0.9)};
+    cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
     pointer: hand;
   }
   &:active {
-    opacity: 0.75;
-    cursor: pointer;
+    opacity: ${(props) => (props.disabled ? 0.5 : 0.75)};
+    cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
     pointer: hand;
   }
+  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
+`;
+
+const Settings = styled.img`
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  margin-right: 30px;
 `;
 
 // Export Default
