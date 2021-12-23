@@ -3,18 +3,23 @@ import { Section, Content } from "components/SharedStyling";
 
 import SendNotifications from "components/SendNotifications";
 import ChannelSettings from "components/ChannelSettings";
+import ChannelDetails from "components/ChannelDetails";
 
 // CREATE CHANNEL OWNER DASHBOARD
 function ChannelOwnerDashboard() {
-  React.useEffect(() => {});
-
-  // RRENDER
   return (
     <>
       <Section>
         <Content padding="0px">
-          <ChannelSettings />
+          {/* display the channel settings */}
+          {/* <ChannelSettings />  */}
+          {/* display the channel settings */}
+          {/* display the details about the profile of the channel */}
+          <ChannelDetails />
+          {/* display the details about the profile of the channel */}
+          {/* display the notifications settings */}
           <SendNotifications />
+          {/* display the notifications settings */}
         </Content>
       </Section>
     </>
