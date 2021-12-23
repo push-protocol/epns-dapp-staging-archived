@@ -91,7 +91,7 @@ function ViewChannelItem({ channelObjectProp }) {
   }, [channelObjectProp]);
 
   React.useEffect(() => {
-    if (!isVerified || !channelObject.verifiedBy) return;
+    if (!isVerified || channelObject?.verifiedBy === ZERO_ADDRESS) return;
     ChannelsDataStore.instance
       .getChannelJsonAsync(channelObject.verifiedBy)
       .then((verifierDetails) => {
