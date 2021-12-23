@@ -255,7 +255,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
 
-  max-height: 90vh;
+  max-height: 92vh;
 `;
 
 const ContainerInfo = styled.div`
