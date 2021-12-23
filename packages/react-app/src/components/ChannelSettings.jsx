@@ -13,14 +13,14 @@ export default function ChannelSettings() {
   useClickAway(modalRef, () => active && setActive(false));
 
   return (
-    <SettingsWrapper>
+    <SettingsWrapper ref={modalRef}>
       <Settings
         active={active}
         onClick={toggleActive}
         src="/Settings.svg"
         alt=""
       ></Settings>
-      {active && <div ref={modalRef} ><ChannelSettingsDropdown /></div>}
+      {active && <ChannelSettingsDropdown />}
     </SettingsWrapper>
   );
 }

@@ -467,11 +467,11 @@ function ViewChannelItem({ channelObjectProp }) {
                 <SubscribersCount>{memberCount}</SubscribersCount>
               </Subscribers>
               {verifierDetails && (
-                <Subscribers>
-                  <VerifiedBy>VERIFIED BY:</VerifiedBy>
-                  <VerifierIcon src={verifierDetails.icon} />
-                  <VerifierName>{verifierDetails.name}</VerifierName>
-                </Subscribers>
+                  <Subscribers>
+                    <VerifiedBy>Verified by:</VerifiedBy>
+                    <VerifierIcon src={verifierDetails.icon}/>
+                    <VerifierName>{verifierDetails.name}</VerifierName>
+                  </Subscribers>
               )}
             </>
           )}
@@ -653,7 +653,7 @@ const VerifiedBy = styled.span`
   font-size: 16px;
   line-height: 20px;
   letter-spacing: 0.05em;
-  font-weight: 400;
+  font-weight: 600;
   display: inline-block;
   margin-left: 10px;
 `;
@@ -666,10 +666,10 @@ const VerifierIcon = styled.img`
   margin-right: 4px;
 `;
 const VerifierName = styled.span`
-  font-weight: 600;
+  font-weight: 400;
   color: black;
   font-size: 16px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0em;
 `;
 
 const ChannelDesc = styled.div`
@@ -687,6 +687,7 @@ const ChannelDescLabel = styled.label`
 
 const ChannelMeta = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   font-size: 13px;
 `;
@@ -702,6 +703,7 @@ const ChannelMetaBox = styled.label`
 
 const Subscribers = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
 `;
@@ -813,10 +815,12 @@ const SkeletonButton = styled.div`
 
 const SubscribeButton = styled(ChannelActionButton)`
   background: #e20880;
+  min-width:80px;
 `;
 
 const UnsubscribeButton = styled(ChannelActionButton)`
   background: #674c9f;
+  min-width:80px;
 `;
 
 const OwnerButton = styled(ChannelActionButton)`
