@@ -172,8 +172,8 @@ function ChannelSettings() {
     const amountsOut = pushValue * Math.pow(10, 18);
 
     await epnsWriteProvider
-      .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
-      // .deactivateChannel(Math.floor(pushValue)) //use this to remove trailing zeros 1232323200000000 -> 12323232
+      // .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
+      .deactivateChannel(Math.floor(pushValue)) 
       .then(async (tx: any) => {
         console.log(tx);
         console.log("Transaction Sent!");
