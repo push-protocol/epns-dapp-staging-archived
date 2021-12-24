@@ -27,7 +27,7 @@ import {
   setCommunicatorWriteProvider,
   setPushAdmin,
 } from "redux/slices/contractSlice";
-import { setUserChannelDetails, setCanVerify } from "redux/slices/adminSlice";
+import { setUserChannelDetails, setCanVerify, setDelegatees } from "redux/slices/adminSlice";
 import { addNewNotification } from "redux/slices/notificationSlice";
 export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
@@ -86,20 +86,21 @@ function Home() {
       const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
         eventChannelAddress
       );
-      
+
       // Form Gateway URL
       const url = "https://ipfs.io/ipfs/" + ipfsId;
       fetch(url)
-      .then((result) => result.json())
-      .then(async (result) => {
-        const ipfsNotification = { ...result };
-        const notificationTitle = ipfsNotification.notification.title !== ""
-        ? ipfsNotification.notification.title
-        : channelJson.name;
+        .then((result) => result.json())
+        .then(async (result) => {
+          const ipfsNotification = { ...result };
+          const notificationTitle =
+            ipfsNotification.notification.title !== ""
+              ? ipfsNotification.notification.title
+              : channelJson.name;
           const toastMessage = {
             notificationTitle,
-            notificationBody: ipfsNotification.notification.body
-          }
+            notificationBody: ipfsNotification.notification.body,
+          };
           // console.log({
           //   channelJson,
           //   result
@@ -110,7 +111,7 @@ function Home() {
             cta: ipfsNotification.data.acta,
             app: channelJson.name,
             icon: channelJson.icon,
-            image: ipfsNotification.data.aimg
+            image: ipfsNotification.data.aimg,
           };
 
           if (ipfsNotification.data.type === "1") {
@@ -258,12 +259,37 @@ function Home() {
       );
       checkUserForChannelOwnership();
       listenFornewNotifications();
+      fetchDelegators();
     }
   }, [epnsReadProvider, epnsCommReadProvider]);
 
   // handle user action at control center
   const userClickedAt = (controlIndex) => {
     setControlAt(controlIndex);
+  };
+
+  // fetch all the channels who have delegated to this account
+  const fetchDelegators = () => {
+    postReq("/channels/delegatee/get_channels", {
+      delegateAddress: account,
+      op: "read",
+    })
+      .then(async ({ data: delegators }) => {
+        if (delegators && delegators.channelOwners) {
+          const channelInformationPromise = delegators.channelOwners.map(
+            (channelAddress) =>
+              ChannelsDataStore.instance.getChannelJsonAsync(channelAddress)
+          );
+          const channelInformation = await Promise.all(
+            channelInformationPromise
+          );
+          dispatch(setDelegatees(channelInformation));
+          // fetch the json information about this delegatee channel and add to global state
+        }
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
   };
 
   // Check if a user is a channel or not

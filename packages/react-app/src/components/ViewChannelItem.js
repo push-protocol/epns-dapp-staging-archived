@@ -117,9 +117,6 @@ function ViewChannelItem({ channelObjectProp }) {
         channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
           channelObject.addr
         );
-        console.log({
-          channelJson,
-        });
         dispatch(
           cacheChannelInfo({
             address: channelObject.addr,
