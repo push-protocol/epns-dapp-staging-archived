@@ -326,6 +326,7 @@ function ViewChannelItem({ channelObjectProp }) {
     }
   };
 
+  
   const unsubscribeAction = async () => {
     let txToast;
     try {
