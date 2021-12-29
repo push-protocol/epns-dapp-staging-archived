@@ -47,7 +47,9 @@ function SendNotifications() {
   const { epnsCommWriteProvider } = useSelector(
     (state: any) => state.contracts
   );
-  const { channelDetails } = useSelector((state: any) => state.admin);
+  const { channelDetails, delegatees } = useSelector(
+    (state: any) => state.admin
+  );
   const { CHANNNEL_DEACTIVATED_STATE } = useSelector(
     (state: any) => state.channels
   );
@@ -66,14 +68,33 @@ function SendNotifications() {
   const [nfMedia, setNFMedia] = React.useState("");
   const [nfMediaEnabled, setNFMediaEnabled] = React.useState(false);
   const [nfInfo, setNFInfo] = React.useState("");
+  const [delegateeOptions, setDelegateeOptions] = React.useState([]);
 
   const isChannelDeactivated =
     channelDetails.channelState === CHANNNEL_DEACTIVATED_STATE;
 
-  // fetch basic channel information
+  // construct a list of channel delegators
   React.useEffect(() => {
-    setChannelAddress(account);
-  }, [account, channelDetails]);
+    if (!account) return;
+    if (!delegatees || !delegatees.length) {
+      setChannelAddress(account);
+    } else {
+      setDelegateeOptions(
+        delegatees.map((oneDelegatee: any) => ({
+          value: oneDelegatee.address,
+          label: (
+            <CustomDropdownItem>
+              <img src={oneDelegatee.icon} alt="" />
+              <div>{oneDelegatee.name}</div>
+            </CustomDropdownItem>
+          ),
+        }))
+      );
+      // default the channel address to the first one on the list which should be that of the user if they have a channel
+      setChannelAddress(delegatees[0].address);
+    }
+  }, [delegatees, account]);
+  console.log(delegateeOptions);
 
   // on change for the subset type notifications input
   const handleSubsetInputChange = (e: any) => {
@@ -436,12 +457,13 @@ function SendNotifications() {
                         SEND NOTIFICATION ON BEHALF OF
                       </DropdownHeader>
                       <DropdownStyledWhite
-                        options={NFTypes}
-                        onChange={(option) => {
-                          setNFType(option.value);
-                          console.log(option);
+                        options={delegateeOptions}
+                        onChange={(option: any) => {
+                          setChannelAddress(option.value);
                         }}
-                        value={nfType}
+                        value={delegateeOptions.find(
+                          (d) => d.value == channelAddress
+                        )}
                       />
                     </DropdownStyledParentWhite>
                   </Item>
@@ -905,6 +927,7 @@ const DropdownHeader = styled.div`
   color: black;
   padding: 10px;
   letter-spacing: 3px;
+  font-size: 14px;
 `;
 
 const DropdownStyled = styled(Dropdown)`
@@ -964,13 +987,44 @@ const DropdownStyledWhite = styled(DropdownStyled)`
   }
   .Dropdown-arrow {
     border-color: #000 transparent transparent;
+    top: 30px;
+  }
+  .Dropdown-menu {
+    border: 0px;
+    background-color: #fafafa;
+  }
+  .Dropdown-option {
+    background-color: #fafafa;
+    color: black;
+    transition: 300ms;
+  }
+  .Dropdown-option:hover {
+    background-color: #e7e6e6;
+  }
+  .Dropdown-option.is-selected {
+    background-color: #f1efef;
   }
 `;
 
 const DropdownStyledParentWhite = styled(DropdownStyledParent)`
   margin-bottom: 20px;
   border: 1px solid rgba(169, 169, 169, 0.5);
+`;
 
+const CustomDropdownItem = styled.div`
+  display: flex;
+  align-items: center;
+  img {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  div {
+    color: black;
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
 `;
 
 // Export Default

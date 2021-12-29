@@ -27,7 +27,11 @@ import {
   setCommunicatorWriteProvider,
   setPushAdmin,
 } from "redux/slices/contractSlice";
-import { setUserChannelDetails, setCanVerify, setDelegatees } from "redux/slices/adminSlice";
+import {
+  setUserChannelDetails,
+  setCanVerify,
+  setDelegatees,
+} from "redux/slices/adminSlice";
 import { addNewNotification } from "redux/slices/notificationSlice";
 export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
@@ -278,9 +282,12 @@ function Home() {
         // if there are actual delegators
         // fetch basic information abouot the channels and store it to state
         if (delegators && delegators.channelOwners) {
-          const channelInformationPromise = delegators.channelOwners.map(
-            (channelAddress) =>
-              ChannelsDataStore.instance.getChannelJsonAsync(channelAddress)
+          // const channelInformationPromise = delegators.channelOwners.map(
+          const channelInformationPromise = [
+            "0xD8634C39BBFd4033c0d3289C4515275102423681",
+            "0xB0F3DCc1A431a8Dd9bf77068c8b1CCdAd181233f",
+          ].map((channelAddress) =>
+            ChannelsDataStore.instance.getChannelJsonAsync(channelAddress)
           );
           const channelInformation = await Promise.all(
             channelInformationPromise
@@ -289,8 +296,21 @@ function Home() {
           // fetch the json information about this delegatee channel and add to global state
         }
       })
-      .catch((err) => {
+      .catch(async (err) => {
         console.log({ err });
+        const channelInformationPromise = [
+          account,
+          "0xD8634C39BBFd4033c0d3289C4515275102423681",
+          "0xB0F3DCc1A431a8Dd9bf77068c8b1CCdAd181233f",
+        ].map((channelAddress) =>
+          ChannelsDataStore.instance
+            .getChannelJsonAsync(channelAddress)
+            .then((res) => ({ ...res, address: channelAddress }))
+            .catch(() => false)
+        );
+        const channelInformation = await Promise.all(channelInformationPromise);
+        dispatch(setDelegatees(channelInformation.filter(Boolean)));
+        // fetch the json information about this delegatee channel and add to global state
       });
   };
 
