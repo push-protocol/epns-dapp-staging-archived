@@ -275,6 +275,8 @@ function Home() {
       op: "read",
     })
       .then(async ({ data: delegators }) => {
+        // if there are actual delegators
+        // fetch basic information abouot the channels and store it to state
         if (delegators && delegators.channelOwners) {
           const channelInformationPromise = delegators.channelOwners.map(
             (channelAddress) =>

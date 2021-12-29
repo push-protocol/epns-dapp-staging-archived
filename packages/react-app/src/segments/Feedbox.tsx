@@ -14,6 +14,7 @@ import {
   incrementPage,
   setFinishedFetching,
 } from "redux/slices/notificationSlice";
+import DisplayNotice from "components/DisplayNotice";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -95,10 +96,23 @@ function Feedbox() {
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
+        {!loading && !notifications.length && (
+          <EmptyWrapper>
+            <DisplayNotice
+              title="You currently have no notifications... you can try subscribing to some more channels"
+              theme="primary"
+            />
+          </EmptyWrapper>
+        )}
       </Container>
     </>
   );
 }
+
+const EmptyWrapper = styled.div`
+  padding-top: 50px;
+  padding-bottom: 50px;
+`;
 
 const Items = styled.div`
   display: block;
