@@ -44,7 +44,9 @@ const LIMITER_KEYS = ["Enter", ","];
 // Create Header
 function SendNotifications() {
   const { account } = useWeb3React();
-  const { epnsCommWriteProvider } = useSelector((state: any) => state.contracts);
+  const { epnsCommWriteProvider } = useSelector(
+    (state: any) => state.contracts
+  );
   const { channelDetails } = useSelector((state: any) => state.admin);
   const { CHANNNEL_DEACTIVATED_STATE } = useSelector(
     (state: any) => state.channels
@@ -367,7 +369,7 @@ function SendNotifications() {
           autoClose: 5000,
         });
         setNFProcessing(0);
-      })
+      });
   };
 
   const isEmpty = (field: any) => {
@@ -385,7 +387,6 @@ function SendNotifications() {
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
   );
-
 
   return (
     <>
@@ -413,7 +414,7 @@ function SendNotifications() {
 
       {!isChannelDeactivated && (
         <Section>
-          <Content>
+          <ModifiedContent>
             <Item align="stretch">
               <FormSubmision
                 flex="1"
@@ -424,6 +425,34 @@ function SendNotifications() {
                 onSubmit={handleSendMessage}
               >
                 <Item margin="0px 20px" flex="1" self="stretch" align="stretch">
+                  <Item
+                    flex="5"
+                    justify="flex-start"
+                    align="stretch"
+                    minWidth="280px"
+                  >
+                    <DropdownStyledParentWhite>
+                      <DropdownHeader>
+                        SEND NOTIFICATION ON BEHALF OF
+                      </DropdownHeader>
+                      <DropdownStyledWhite
+                        options={NFTypes}
+                        onChange={(option) => {
+                          setNFType(option.value);
+                          console.log(option);
+                        }}
+                        value={nfType}
+                      />
+                    </DropdownStyledParentWhite>
+                  </Item>
+                  <Input
+                    display="none"
+                    value={nfType}
+                    onChange={(e) => {
+                      setNFType(e.target.value);
+                    }}
+                  />
+
                   <Item
                     flex="5"
                     justify="flex-start"
@@ -820,7 +849,7 @@ function SendNotifications() {
                 )}
               </FormSubmision>
             </Item>
-          </Content>
+          </ModifiedContent>
         </Section>
       )}
     </>
@@ -867,6 +896,17 @@ const MultiRecipientsContainer = styled.div`
   }
 `;
 
+const ModifiedContent = styled(Content)`
+  padding-top: 20px;
+  font-weight: 400;
+`;
+
+const DropdownHeader = styled.div`
+  color: black;
+  padding: 10px;
+  letter-spacing: 3px;
+`;
+
 const DropdownStyled = styled(Dropdown)`
   .Dropdown-control {
     background-color: #000;
@@ -894,7 +934,7 @@ const DropdownStyled = styled(Dropdown)`
     box-shadow: none;
     background-color: #000;
     border-radius: 0px;
-    margin-top: -3px;
+    margin-top: -2px;
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
   }
@@ -913,6 +953,24 @@ const DropdownStyled = styled(Dropdown)`
     background-color: #000000;
     color: #fff;
   }
+`;
+
+const DropdownStyledWhite = styled(DropdownStyled)`
+  .Dropdown-control {
+    color: #000;
+    background: #fafafa;
+    border: 0px;
+    padding: 15px 52px 15px 10px;
+  }
+  .Dropdown-arrow {
+    border-color: #000 transparent transparent;
+  }
+`;
+
+const DropdownStyledParentWhite = styled(DropdownStyledParent)`
+  margin-bottom: 20px;
+  border: 1px solid rgba(169, 169, 169, 0.5);
+
 `;
 
 // Export Default
