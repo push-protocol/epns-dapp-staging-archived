@@ -13,6 +13,7 @@ import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import NotificationToast from "components/NotificationToast";
 import AliasVerificationodal from "components/AliasVerificationModal";
 import Info from "segments/Info";
+import SpamBox from "segments/spam";
 import Feedbox from "segments/Feedbox";
 import ViewChannels from "segments/ViewChannels";
 import ChannelOwnerDashboard from "segments/ChannelOwnerDashboard";
@@ -463,12 +464,27 @@ function Home() {
             Receive Notifs
           </ControlText>
         </ControlButton>
+
+        <ControlButton
+          index={4}
+          active={controlAt == 4 ? 1 : 0}
+          border="#e20880"
+          onClick={() => {
+            userClickedAt(4);
+          }}
+        >
+          <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
+          <ControlText active={controlAt == 3 ? 1 : 0}>
+            Spam Notifs
+          </ControlText>
+        </ControlButton>
       </Controls>
       <Interface>
         {controlAt == 0 && <Feedbox />}
         {controlAt == 1 && <ViewChannels />}
         {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
         {controlAt == 3 && <Info />}
+        {controlAt == 4 && <SpamBox />}
         {toast && (
           <NotificationToast notification={toast} clearToast={clearToast} />
         )}

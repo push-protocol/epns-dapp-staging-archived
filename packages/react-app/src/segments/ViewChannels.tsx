@@ -1,3 +1,4 @@
+
 import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
@@ -7,6 +8,7 @@ import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 import searchIcon from "assets/searchicon.svg";
 import { envConfig } from "@project/contracts";
+
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
