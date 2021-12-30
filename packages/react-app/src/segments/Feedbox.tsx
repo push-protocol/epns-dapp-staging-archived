@@ -13,6 +13,7 @@ import {
   addPaginatedNotifications,
   incrementPage,
   setFinishedFetching,
+  resetState
 } from "redux/slices/notificationSlice";
 import DisplayNotice from "components/DisplayNotice";
 
@@ -50,10 +51,13 @@ function Feedbox() {
   };
 
   React.useEffect(() => {
-    if (epnsCommReadProvider) {
+    if (account) {
       loadNotifications();
+      return () => {
+        dispatch(resetState());
+      }
     }
-  }, [epnsCommReadProvider, account]);
+  }, [account]);
 
   //function to query more notifications
   const handlePagination = async () => {

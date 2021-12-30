@@ -105,10 +105,6 @@ function Home() {
             notificationTitle,
             notificationBody: ipfsNotification.notification.body,
           };
-          // console.log({
-          //   channelJson,
-          //   result
-          // });
           const notificationObject = {
             title: notificationTitle,
             message: ipfsNotification.data.amsg,
@@ -240,6 +236,7 @@ function Home() {
     if (!epnsReadProvider || !epnsCommReadProvider) return;
     // Reset when account refreshes
     setChannelAdmin(false);
+    dispatch(setUserChannelDetails(null));
     setAdminStatusLoaded(false);
     userClickedAt(INITIAL_OPEN_TAB);
     setChannelJson([]);
@@ -282,35 +279,26 @@ function Home() {
         // if there are actual delegators
         // fetch basic information abouot the channels and store it to state
         if (delegators && delegators.channelOwners) {
-          // const channelInformationPromise = delegators.channelOwners.map(
           const channelInformationPromise = [
-            "0xD8634C39BBFd4033c0d3289C4515275102423681",
-            "0xB0F3DCc1A431a8Dd9bf77068c8b1CCdAd181233f",
+            account,
+            ...delegators.channelOwners,
           ].map((channelAddress) =>
-            ChannelsDataStore.instance.getChannelJsonAsync(channelAddress)
+            ChannelsDataStore.instance
+              .getChannelJsonAsync(channelAddress)
+              .then((res) => ({ ...res, address: channelAddress }))
+              .catch(() => false)
           );
           const channelInformation = await Promise.all(
             channelInformationPromise
           );
-          dispatch(setDelegatees(channelInformation));
+          dispatch(setDelegatees(channelInformation.filter(Boolean)));
           // fetch the json information about this delegatee channel and add to global state
+        } else {
+          dispatch(setDelegatees([]));
         }
       })
       .catch(async (err) => {
         console.log({ err });
-        const channelInformationPromise = [
-          account,
-          "0xD8634C39BBFd4033c0d3289C4515275102423681",
-          "0xB0F3DCc1A431a8Dd9bf77068c8b1CCdAd181233f",
-        ].map((channelAddress) =>
-          ChannelsDataStore.instance
-            .getChannelJsonAsync(channelAddress)
-            .then((res) => ({ ...res, address: channelAddress }))
-            .catch(() => false)
-        );
-        const channelInformation = await Promise.all(channelInformationPromise);
-        dispatch(setDelegatees(channelInformation.filter(Boolean)));
-        // fetch the json information about this delegatee channel and add to global state
       });
   };
 
@@ -479,10 +467,13 @@ function Home() {
       <Interface>
         {controlAt == 0 && <Feedbox />}
         {controlAt == 1 && <ViewChannels />}
-        {controlAt == 2 && !channelAdmin && adminStatusLoaded && (
+        {/* {controlAt == 2 && !channelAdmin && adminStatusLoaded && (
           <ChannelCreationDashboard />
         )}
         {controlAt == 2 && channelAdmin && adminStatusLoaded && (
+          <ChannelOwnerDashboard />
+        )} */}
+        {controlAt == 2 && adminStatusLoaded && (
           <ChannelOwnerDashboard />
         )}
         {controlAt == 3 && <Info />}

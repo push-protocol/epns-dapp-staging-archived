@@ -13,6 +13,11 @@ export const contractSlice = createSlice({
     name: "notifications",
     initialState,
     reducers: {
+        resetState: (state) => {
+            state.page = initialState.page;
+            state.notifications = initialState.notifications;
+            state.finishedFetching = initialState.finishedFetching;
+        },
         addPaginatedNotifications: (state, action) => {
             state.notifications = [ ...state.notifications, ...action.payload ];
             state.page += 1;
@@ -33,7 +38,8 @@ export const {
     addPaginatedNotifications,
     incrementPage,
     addNewNotification,
-    setFinishedFetching
+    setFinishedFetching,
+    resetState
 } = contractSlice.actions;
 
 export default contractSlice.reducer;

@@ -70,9 +70,12 @@ function SendNotifications() {
   const [nfInfo, setNFInfo] = React.useState("");
   const [delegateeOptions, setDelegateeOptions] = React.useState([]);
 
-  const isChannelDeactivated =
-    channelDetails.channelState === CHANNNEL_DEACTIVATED_STATE;
-
+  const isChannelDeactivated = channelDetails
+    ? channelDetails.channelState === CHANNNEL_DEACTIVATED_STATE
+    : false;
+  const cannotDisplayDelegatees =
+    (delegatees.length === 1 && delegatees[0].address === account) ||
+    !delegatees.length; //do not display delegatees dropdown if you are the only delegatee to yourself or there are no delegatess
   // construct a list of channel delegators
   React.useEffect(() => {
     if (!account) return;
@@ -446,27 +449,30 @@ function SendNotifications() {
                 onSubmit={handleSendMessage}
               >
                 <Item margin="0px 20px" flex="1" self="stretch" align="stretch">
-                  <Item
-                    flex="5"
-                    justify="flex-start"
-                    align="stretch"
-                    minWidth="280px"
-                  >
-                    <DropdownStyledParentWhite>
-                      <DropdownHeader>
-                        SEND NOTIFICATION ON BEHALF OF
-                      </DropdownHeader>
-                      <DropdownStyledWhite
-                        options={delegateeOptions}
-                        onChange={(option: any) => {
-                          setChannelAddress(option.value);
-                        }}
-                        value={delegateeOptions.find(
-                          (d) => d.value == channelAddress
-                        )}
-                      />
-                    </DropdownStyledParentWhite>
-                  </Item>
+                  {!cannotDisplayDelegatees && (
+                    <Item
+                      flex="5"
+                      justify="flex-start"
+                      align="stretch"
+                      minWidth="280px"
+                    >
+                      <DropdownStyledParentWhite>
+                        <DropdownHeader>
+                          SEND NOTIFICATION ON BEHALF OF
+                        </DropdownHeader>
+                        <DropdownStyledWhite
+                          options={delegateeOptions}
+                          onChange={(option: any) => {
+                            setChannelAddress(option.value);
+                          }}
+                          value={delegateeOptions.find(
+                            (d) => d.value == channelAddress
+                          )}
+                        />
+                      </DropdownStyledParentWhite>
+                    </Item>
+                  )}
+
                   <Input
                     display="none"
                     value={nfType}
