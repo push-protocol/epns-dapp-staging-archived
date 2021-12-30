@@ -2,50 +2,92 @@ import React, { useState } from "react";
 import styled, { css } from 'styled-components';
 import Loader from 'react-loader-spinner'
 import axios from "axios";
-import { toast as toaster } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import ChannelsDataStore from "singletons/ChannelsDataStore";
-import { useWeb3React } from '@web3-react/core'
-import SpamNotificationItem from '../components/SpamNotificationItem';
-import {
-  NotificationItem,
-} from "@epnsproject/frontend-sdk-staging";
 import { postReq } from "api";
-
+import { useWeb3React } from '@web3-react/core'
+import { useDispatch, useSelector } from "react-redux";
+import { toast as toaster } from "react-toastify";
+import ChannelsDataStore from "singletons/ChannelsDataStore";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-// Other Information section
-function SpamBox() {
+const SpamNotificationItem=({channelBody,ChannelTitle,ChannelIcon,channelAddress})=>{
   const { account ,library,chainId} = useWeb3React();
-  const { epnsWriteProvider,epnsCommReadProvider, epnsCommWriteProvider } = useSelector(
-    (state: any) => state.contracts
-  );
-  const [controlAt, setControlAt] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
-  const [spamNotification,setSpamNotification]=React.useState([]);
   const [txInProgress, setTxInProgress] = React.useState(false);
-  const [subscribed, setSubscribed] = React.useState(false);
+  const [subscribed, setSubscribed] = React.useState();
   const [memberCount, setMemberCount] = React.useState(0);
+ 
+  const {
+    epnsReadProvider,
+    epnsWriteProvider,
+    epnsCommReadProvider,
+    pushAdminAddress,
+    ZERO_ADDRESS,
+  } = useSelector((state) => state.contracts);
+  React.useEffect(() => {
+    if (!channelAddress) return;
+    if (true) {
+      // procced as usual
+      fetchChannelJson().catch((err) => alert(err.message));
+      
+    } else {
+      // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
+      epnsReadProvider.channels(channelAddress).then((response) => {
+        fetchChannelJson();
+      });
+    }
+  }, [account, chainId]);
+  const fetchChannelJson = async () => {
+    try {
+      
+      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
+        channelAddress
+      );
+      const subscribed = channelSubscribers.find((sub) => {
+        return sub.toLowerCase() === account.toLowerCase();
+      });
 
+     
+      setSubscribed(subscribed);
+     
+     
+      setLoading(false);
+    } catch (err) {
+    }
+  };
+  // React.useEffect(() => {
+  //   const fetchChannelJson = async () => {
+  //     try {
+  //       let channelJson = {};
+        
+  //       const channelSubscribers = []
+  //       // await ChannelsDataStore.instance.getChannelSubscribers(
+  //       //   channelAddress
+  //       // );
+  //       const subscribed = channelSubscribers.find((sub) => {
+  //         return sub.toLowerCase() === account.toLowerCase();
+  //       });
   
-  React.useEffect(()=>{
-    axios.post("https://backend-kovan.epns.io/apis/feeds/get_spam_feeds",{
-      "user":account,
-    "page":1,
-    "pageSize":10,
-    "op":"read"
-    }).then(data=>{
-      setSpamNotification(data.data.results);
-    })
-  },[account]);
+  //       setSubscribed(subscribed);
+        
+  //       setLoading(false);
+  //     } catch (err) {
+  //       alert(err);
+  //     }
+  //   };
+    
+      
+  //       fetchChannelJson().catch((err) => alert(err.message));
+     
+  // }, [account]);
+  
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
     chainId: chainId,
     verifyingContract: epnsCommReadProvider.address,
   };
 
-  const subscribe = async (channelAddress) => {
+  const subscribe = async () => {
     subscribeAction(channelAddress);
   };
 
@@ -182,44 +224,52 @@ function SpamBox() {
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
   );
-
-  return (
-    <Container>
-      {loading &&
-        <ContainerInfo>
-          <Loader
-           type="Oval"
-           color="#35c5f3"
-           height={40}
-           width={40}
-          />
-        </ContainerInfo>
-      }
-
-      {!loading && controlAt == 0 && 
-      <>
-        <SpamBoxContainer>
-          {
-            spamNotification.map( (eachNotification)=>{
-            
-              return(
-                <SpamNotificationItem 
-                channelBody={eachNotification.payload.notification.body}
-                channelAddress={eachNotification.channel}
-                ChannelIcon={eachNotification.payload.data.icon}
-                ChannelTitle={eachNotification.payload.notification.title}
-                />        
-              )
-            })
-          }
-        </SpamBoxContainer>
-      </>
-      }
-    </Container>
-  );
+    return(
+        <SpamCard>
+                 <div className="cardHeader">
+                   <img src={ChannelIcon} alt="" className="icon" />
+                   {ChannelTitle}
+                 </div>
+                 <div className="cardBody">
+                   {channelBody}
+                 </div>
+                 {!loading && !subscribed && (
+                 <button style={{background:"#e22780"}} className="Button" onClick={e=>subscribe()} disabled={txInProgress}>
+                {txInProgress && (
+                  <ActionLoader>
+                    <Loader type="Oval" color="#FFF" height={16} width={16} />
+                  </ActionLoader>
+                )}
+                <ActionTitle hideit={txInProgress}>Opt-In</ActionTitle>
+              </button >)}
+              {!loading && subscribed && (
+              <>
+               
+                  <button className="Button"
+                    onClick={e=>unsubscribeAction(channelAddress)}
+                    
+                    disabled={txInProgress}
+                  >
+                    {txInProgress && (
+                      <ActionLoader>
+                        <Loader
+                          type="Oval"
+                          color="#FFF"
+                          height={16}
+                          width={16}
+                        />
+                      </ActionLoader>
+                    )}
+                    <ActionTitle hideit={txInProgress}>Opt-Out</ActionTitle>
+                  </button>
+                
+              </>
+             )} 
+               </SpamCard>
+    )
 }
 
-// css styles
+
 
 const SpamCard=styled.div`
   display:flex;
@@ -313,5 +363,4 @@ const ActionLoader = styled.div`
 const ToasterMsg = styled.div`
   margin: 0px 10px;
 `;
-// Export Default
-export default SpamBox;
+export default SpamNotificationItem;
