@@ -13,7 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import NotificationToast from "components/NotificationToast";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
-import { ALLOWED_CORE_NETWORK } from "pages/Home";
 import { postReq } from "api";
 import { cacheChannelInfo } from "redux/slices/channelSlice";
 
@@ -28,7 +27,7 @@ function ViewChannelItem({ channelObjectProp }) {
     ZERO_ADDRESS,
   } = useSelector((state) => state.contracts);
   const { canVerify } = useSelector((state) => state.admin);
-  const { channelsCache } = useSelector((state) => state.channels);
+  const { channelsCache, CHANNEL_BLACKLIST } = useSelector((state) => state.channels);
   const { account, library, chainId } = useWeb3React();
   const isOwner = channelObjectProp.addr === account;
 
@@ -47,18 +46,10 @@ function ViewChannelItem({ channelObjectProp }) {
   const [verifierDetails, setVerifierDetails] = React.useState(null);
 
   // ------ toast related section
-  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
+  const isChannelBlacklisted = CHANNEL_BLACKLIST.includes(channelObject.addr);
   const [toast, showToast] = React.useState(null);
   const clearToast = () => showToast(null);
-  const showNetworkToast = () => {
-    showToast({
-      notificationTitle: (
-        <span style={{ color: "#e20880" }}> Invalid Network </span>
-      ),
-      notificationBody:
-        "Please connect to the Kovan network to opt-in/opt-out of channels",
-    });
-  };
+
   //clear toast variable after it is shown
   React.useEffect(() => {
     if (toast) {
@@ -394,6 +385,7 @@ function ViewChannelItem({ channelObjectProp }) {
   };
 
   if (isBlocked) return <></>;
+  if(isChannelBlacklisted) return <></>;
 
   // render
   return (
