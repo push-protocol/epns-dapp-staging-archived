@@ -280,8 +280,7 @@ function Home() {
         // fetch basic information abouot the channels and store it to state
         if (delegators && delegators.channelOwners) {
           const channelInformationPromise = [
-            account,
-            ...delegators.channelOwners,
+            ...new Set([account, ...delegators.channelOwners])//make the accounts unique
           ].map((channelAddress) =>
             ChannelsDataStore.instance
               .getChannelJsonAsync(channelAddress)
@@ -473,9 +472,7 @@ function Home() {
         {controlAt == 2 && channelAdmin && adminStatusLoaded && (
           <ChannelOwnerDashboard />
         )} */}
-        {controlAt == 2 && adminStatusLoaded && (
-          <ChannelOwnerDashboard />
-        )}
+        {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
         {controlAt == 3 && <Info />}
         {toast && (
           <NotificationToast notification={toast} clearToast={clearToast} />
