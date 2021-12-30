@@ -1,4 +1,5 @@
 import React from "react";
+import styled from "styled-components";
 import { Section, Content } from "components/SharedStyling";
 
 import SendNotifications from "components/SendNotifications";
@@ -13,7 +14,7 @@ function ChannelOwnerDashboard() {
   return (
     <>
       <Section>
-        <Content style={{ position: "relative" }} padding="0px">
+        <ModifiedContent>
           {/* display the create channel page if there are no details */}
           {!channelDetails ? <CreateChannel /> : ""}
           {/* display the create channel page if there are no details */}
@@ -24,15 +25,19 @@ function ChannelOwnerDashboard() {
           {channelDetails ? <ChannelDetails /> : ""}
           {/* display the details about the profile of the channel */}
           {/* display the notifications settings */}
-          {(channelDetails || delegatees?.length) ? <SendNotifications /> : ""}
+          {channelDetails || delegatees?.length ? <SendNotifications /> : ""}
           {/* display the notifications settings */}
-        </Content>
+        </ModifiedContent>
       </Section>
     </>
   );
 }
 
 // css styles
+const ModifiedContent = styled(Content)`
+  padding: 0;
+  position: relative;
+`;
 
 // Export Default
 export default ChannelOwnerDashboard;

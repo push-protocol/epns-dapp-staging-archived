@@ -139,7 +139,7 @@ function Home() {
         });
     };
     epnsCommReadProvider.on(event, cb);
-    return epnsCommReadProvider.off.bind(epnsCommReadProvider, event, cb);
+    return () => epnsCommReadProvider.off.bind(epnsCommReadProvider, event, cb); //when we unmount we remove the listener
   };
 
   //clear toast variable after it is shown
@@ -466,12 +466,6 @@ function Home() {
       <Interface>
         {controlAt == 0 && <Feedbox />}
         {controlAt == 1 && <ViewChannels />}
-        {/* {controlAt == 2 && !channelAdmin && adminStatusLoaded && (
-          <ChannelCreationDashboard />
-        )}
-        {controlAt == 2 && channelAdmin && adminStatusLoaded && (
-          <ChannelOwnerDashboard />
-        )} */}
         {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
         {controlAt == 3 && <Info />}
         {toast && (
