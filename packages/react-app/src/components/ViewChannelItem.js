@@ -104,6 +104,7 @@ function ViewChannelItem({ channelObjectProp }) {
   };
   // to fetch channels
   const fetchChannelJson = async () => {
+     
     try {
       let channelJson = {};
       setCopyText(channelObject.addr)
@@ -120,9 +121,19 @@ function ViewChannelItem({ channelObjectProp }) {
           })
         );
       }
-      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-        channelObject.addr
-      );
+        const channelSubscribers = await postReq("/channels/get_subscribers", {
+          channel: channelObject.addr,
+          op: "read",
+        })
+          .then(({ data }) => {
+            const subs = data.subscribers;
+  
+            return subs
+          })
+          .catch((err) => {
+            console.log(`getChannelSubscribers => ${err.message}`);
+            return [];
+          });
       const subscribed = channelSubscribers.find((sub) => {
         return sub.toLowerCase() === account.toLowerCase();
       });

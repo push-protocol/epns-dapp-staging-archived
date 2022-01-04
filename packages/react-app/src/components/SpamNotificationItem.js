@@ -14,7 +14,7 @@ const SpamNotificationItem=({channelBody,ChannelTitle,ChannelIcon,channelAddress
   const { account ,library,chainId} = useWeb3React();
   const [loading, setLoading] = React.useState(false);
   const [txInProgress, setTxInProgress] = React.useState(false);
-  const [subscribed, setSubscribed] = React.useState();
+  const [subscribed, setSubscribed] = React.useState(false);
   const [memberCount, setMemberCount] = React.useState(0);
  
   const {
@@ -25,6 +25,7 @@ const SpamNotificationItem=({channelBody,ChannelTitle,ChannelIcon,channelAddress
     ZERO_ADDRESS,
   } = useSelector((state) => state.contracts);
   React.useEffect(() => {
+    fetchChannelJson();
     if (!channelAddress) return;
     if (true) {
       // procced as usual
@@ -36,20 +37,30 @@ const SpamNotificationItem=({channelBody,ChannelTitle,ChannelIcon,channelAddress
         fetchChannelJson();
       });
     }
-  }, [account, chainId]);
+  }, []);
   const fetchChannelJson = async () => {
     try {
       
-      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-        channelAddress
-      );
+      const channelSubscribers = await postReq("/channels/get_subscribers", {
+        channel: channelAddress,
+        op: "read",
+      })
+        .then(({ data }) => {
+          const subs = data.subscribers;
+
+          return subs
+        })
+        .catch((err) => {
+          console.log(`getChannelSubscribers => ${err.message}`);
+          return [];
+        });
       const subscribed = channelSubscribers.find((sub) => {
         return sub.toLowerCase() === account.toLowerCase();
       });
 
-     
+      if(subscribed)
       setSubscribed(subscribed);
-     
+      else setSubscribed(false);
      
       setLoading(false);
     } catch (err) {
@@ -224,6 +235,8 @@ const SpamNotificationItem=({channelBody,ChannelTitle,ChannelIcon,channelAddress
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
   );
+  // To hide the notification which are subscribed
+  // if(subscribed)return null;
     return(
         <SpamCard>
                  <div className="cardHeader">
@@ -233,6 +246,9 @@ const SpamNotificationItem=({channelBody,ChannelTitle,ChannelIcon,channelAddress
                  <div className="cardBody">
                    {channelBody}
                  </div>
+                 {loading ? (
+              <Skeleton color="#eee" width="100%" height="100%" />
+            ):null}
                  {!loading && !subscribed && (
                  <button style={{background:"#e22780"}} className="Button" onClick={e=>subscribe()} disabled={txInProgress}>
                 {txInProgress && (
