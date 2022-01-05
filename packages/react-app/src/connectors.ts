@@ -54,7 +54,7 @@ export const trezor = new TrezorConnector({
 //
 // export const fortmatic = new FortmaticConnector({ apiKey: process.env.FORTMATIC_API_KEY as string, chainId: 4 })
 
-export const portis = new PortisConnector({ dAppId: 'cfefa032-9afd-4833-bfb4-2b0cb7ec3413' as string, networks: SUPPORTED_CHAIN_IDS })
+export const portis = new PortisConnector({ dAppId: 'cfefa032-9afd-4833-bfb4-2b0cb7ec3413' as string, networks: [CORE_CHAIN_ID] })
 
 // export const squarelink = new SquarelinkConnector({
 //   clientId: process.env.SQUARELINK_CLIENT_ID as string,
