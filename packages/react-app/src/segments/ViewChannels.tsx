@@ -146,6 +146,7 @@ function ViewChannels() {
           >
             {!loading && (
               <Header style={{ minHeight: "140px" }}>
+                  {/* if on mainnet then occupy full width*/}
                 <InputWrapper style={{width: isMainnet ? "100%" : "50%"}}>
                   <SearchBar
                     type="text"
@@ -156,7 +157,8 @@ function ViewChannels() {
                   />
                   <SearchIconImage src={searchIcon} alt="" />
                 </InputWrapper>
-                {!isMainnet && <Faucets />}
+                {!isMainnet && <Faucets />} 
+                {/* only display faucets on mainnet */}
               </Header>
             )}
 
