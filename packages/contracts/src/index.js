@@ -27,4 +27,5 @@ export const abis = {
   distributor: MerkleDistributorAbi,
 };
 
+export { default as envConfig } from "./config";
 export { default as addresses } from "./addresses";

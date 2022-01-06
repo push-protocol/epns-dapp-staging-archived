@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 import searchIcon from "assets/searchicon.svg";
-
+import { envConfig } from "@project/contracts";
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
@@ -21,7 +21,9 @@ const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for th
 function ViewChannels() {
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
-  const { channels, page, ZERO_ADDRESS } = useSelector((state: any) => state.channels);
+  const { channels, page, ZERO_ADDRESS } = useSelector(
+    (state: any) => state.channels
+  );
 
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
@@ -31,6 +33,7 @@ function ViewChannels() {
   const [trialCount, setTrialCount] = React.useState(0);
 
   const channelsVisited = page * CHANNELS_PER_PAGE;
+  const isMainnet = chainId == 1;
 
   // fetch channel data if we are just getting to this pae
   React.useEffect(() => {
@@ -125,7 +128,7 @@ function ViewChannels() {
       clearTimeout(timeout);
     };
   }, [search]);
-
+  
   return (
     <>
       <Container>
@@ -143,7 +146,8 @@ function ViewChannels() {
           >
             {!loading && (
               <Header style={{ minHeight: "140px" }}>
-                <InputWrapper>
+                  {/* if on mainnet then occupy full width*/}
+                <InputWrapper style={{width: isMainnet ? "100%" : "50%"}}>
                   <SearchBar
                     type="text"
                     value={search}
@@ -153,7 +157,8 @@ function ViewChannels() {
                   />
                   <SearchIconImage src={searchIcon} alt="" />
                 </InputWrapper>
-                <Faucets />
+                {!isMainnet && <Faucets />} 
+                {/* only display faucets on mainnet */}
               </Header>
             )}
 
