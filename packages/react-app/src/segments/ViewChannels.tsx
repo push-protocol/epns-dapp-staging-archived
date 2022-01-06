@@ -33,6 +33,7 @@ function ViewChannels() {
   const [trialCount, setTrialCount] = React.useState(0);
 
   const channelsVisited = page * CHANNELS_PER_PAGE;
+  const isMainnet = chainId == 1;
 
   // fetch channel data if we are just getting to this pae
   React.useEffect(() => {
@@ -145,7 +146,7 @@ function ViewChannels() {
           >
             {!loading && (
               <Header style={{ minHeight: "140px" }}>
-                <InputWrapper style={{width: envConfig.production ? "100%" : "50%"}}>
+                <InputWrapper style={{width: isMainnet ? "100%" : "50%"}}>
                   <SearchBar
                     type="text"
                     value={search}
@@ -155,7 +156,7 @@ function ViewChannels() {
                   />
                   <SearchIconImage src={searchIcon} alt="" />
                 </InputWrapper>
-                {!envConfig.production && <Faucets />}
+                {!isMainnet && <Faucets />}
               </Header>
             )}
 
