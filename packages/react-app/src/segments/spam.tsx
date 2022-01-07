@@ -1,129 +1,185 @@
-import React, { useState } from "react";
-import styled, { css } from 'styled-components';
-import Loader from 'react-loader-spinner'
-import axios from "axios";
-import { toast as toaster } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import ChannelsDataStore from "singletons/ChannelsDataStore";
-import { useWeb3React } from '@web3-react/core'
-import SpamNotificationItem from '../components/SpamNotificationItem';
+import React from "react";
+import styled from "styled-components";
+import Loader from "react-loader-spinner";
+import { Waypoint } from "react-waypoint";
+import { useWeb3React } from "@web3-react/core";
+import { useSelector, useDispatch } from "react-redux";
 import {
+  api,
+  utils,
   NotificationItem,
 } from "@epnsproject/frontend-sdk-staging";
+import {
+  addPaginatedNotifications,
+  incrementPage,
+  setFinishedFetching,
+} from "redux/slices/notificationSlice";
 import { postReq } from "api";
 
-import * as dotenv from "dotenv";
-dotenv.config();
-
-// Other Information section
+const NOTIFICATIONS_PER_PAGE = 10;
+// Create Header
 function SpamBox() {
-  const { account ,library,chainId} = useWeb3React();
-  const { epnsWriteProvider,epnsCommReadProvider, epnsCommWriteProvider } = useSelector(
-    (state: any) => state.contracts
-  );
-  const [controlAt, setControlAt] = React.useState(0);
+  const dispatch = useDispatch();
+  const { account, chainId, library } = useWeb3React();
+  const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
+  const [spams, setSpams] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const [finishedFetching, setFinishedFetching] = React.useState(false);
+  const { notifications } = useSelector((state: any) => state.notifications);
+  const EPNS_DOMAIN = {
+    name: "EPNS COMM V1",
+    chainId: chainId,
+    verifyingContract: epnsCommReadProvider.address,
+  };
+
   const [loading, setLoading] = React.useState(false);
-  const [spamNotification,setSpamNotification]=React.useState([]);
-  const [txInProgress, setTxInProgress] = React.useState(false);
-  const [subscribed, setSubscribed] = React.useState(false);
-  const [memberCount, setMemberCount] = React.useState(0);
 
-  
-  React.useEffect(()=>{
-    axios.post("https://backend-kovan.epns.io/apis/feeds/get_spam_feeds",{
-      "user":account,
-    "page":1,
-    "pageSize":10,
-    "op":"read"
-    }).then(data=>{
-      setSpamNotification(data.data.results);
+  const loadNotifications = async () => {
+    if (loading || finishedFetching) return;
+    setLoading(true);
+    try {
+      const { count, results } = await api.fetchSpamNotifications(
+        account,
+        NOTIFICATIONS_PER_PAGE,
+        page,
+        "https://backend-kovan.epns.io/apis/"
+      );
+      const parsedResponse = utils
+        .parseApiResponse(results)
+        .map((elem: any, i: any) => {
+          elem.channel = results[i].channel;
+          return { ...elem };
+        });
+      setSpams((s) => [...s, ...parsedResponse]);
+      if (count === 0) {
+        setFinishedFetching(true);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (epnsCommReadProvider) {
+      loadNotifications();
+    }
+  }, [epnsCommReadProvider, account]);
+
+  //function to query more notifications
+  const handlePagination = async () => {
+    loadNotifications();
+    setPage((p) => p + 1);
+  };
+
+  const showWayPoint = (index: any) => {
+    return Number(index) === notifications.length - 1 && !finishedFetching;
+  };
+
+  const onSubscribeToChannel = async (channelAddress) => {
+    let txToast;
+    const type = {
+      Subscribe: [
+        { name: "channel", type: "address" },
+        { name: "subscriber", type: "address" },
+        { name: "action", type: "string" },
+      ],
+    };
+    const message = {
+      channel: channelAddress,
+      subscriber: account,
+      action: "Subscribe",
+    };
+
+    const signature = await library
+      .getSigner(account)
+      ._signTypedData(EPNS_DOMAIN, type, message);
+
+    return postReq("/channels/subscribe_offchain", {
+      signature,
+      message,
+      op: "write",
+      chainId,
+      contractAddress: epnsCommReadProvider.address,
+    });
+  };
+
+  const isSubscribedFn = async (channelAddr: any) => {
+    return await postReq("/channels/get_subscribers", {
+      channel: channelAddr,
+      op: "read",
     })
-  },[account]);
-  
+      .then(({ data }) => {
+        const subs = data.subscribers;
+        console.log({
+          sub: data.subscribers,
+          account,
+          inc: subs.includes(account),
+        });
+        return subs.includes(account);
+      })
+      .catch((err) => {
+        console.log(`getChannelSubscribers => ${err.message}`);
+        return [];
+      });
+  };
 
+  // Render
   return (
-    <Container>
-      {loading &&
-        <ContainerInfo>
-          <Loader
-           type="Oval"
-           color="#35c5f3"
-           height={40}
-           width={40}
-          />
-        </ContainerInfo>
-      }
-
-      {!loading && controlAt == 0 && 
-      <>
-        <SpamBoxContainer>
-          {
-            spamNotification.map( (eachNotification)=>{
-            
-              return(
-                <SpamNotificationItem 
-                channelBody={eachNotification.payload.notification.body}
-                channelAddress={eachNotification.channel}
-                ChannelIcon={eachNotification.payload.data.icon}
-                ChannelTitle={eachNotification.payload.notification.title}
-                />        
-              )
-            })
-          }
-        </SpamBoxContainer>
-      </>
-      }
-    </Container>
+    <>
+      <Container>
+        {spams && (
+          <Items id="scrollstyle-secondary">
+            {spams.map((oneNotification, index) => {
+              const {
+                cta,
+                title,
+                message,
+                app,
+                icon,
+                image,
+                channel,
+              } = oneNotification;
+              console.log({ channel });
+              // render the notification item
+              return (
+                <div key={`${message}+${title}`}>
+                  {showWayPoint(index) && (
+                    <Waypoint onEnter={() => handlePagination()} />
+                  )}
+                  <NotificationItem
+                    notificationTitle={title}
+                    notificationBody={message}
+                    cta={cta}
+                    app={app}
+                    icon={icon}
+                    image={image}
+                    subscribeFn={() => onSubscribeToChannel(channel)}
+                    isSpam
+                    isSubscribedFn={async () => isSubscribedFn(channel)}
+                  />
+                </div>
+              );
+            })}
+          </Items>
+        )}
+        {loading && (
+          <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+        )}
+      </Container>
+    </>
   );
 }
 
+const Items = styled.div`
+  display: block;
+  align-self: stretch;
+  padding: 10px 20px;
+  overflow-y: scroll;
+  background: #fafafa;
+`;
 // css styles
-
-const SpamCard=styled.div`
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  background:#f2f2f2;
-  min-height:150px;
-  border-radius:14px;
-  margin:1rem 0;
-  position:relative;
-
-  .Button{
-    position:absolute;
-    background:#674c9f;
-    top:10px;
-    right:10px;
-    padding:5px 10px;
-    border-radius:10px;
-
-  }
-  .icon{
-    height:50px;
-    width:50px;
-  }
-
-  .cardHeader{
-    display:flex;
-    flex-direction:column;
-    flex:1;
-    justify-content:space-between;
-    height:100px;
-    align-Items:center;
-  }
-  .cardBody{
-    flex:3;
-  }
-`;
-
-const ActionTitle = styled.span`
-  ${(props) =>
-    props.hideit &&
-    css`
-      visibility: hidden;
-    `};
-`;
-
 const Container = styled.div`
   display: flex;
   flex: 1;
@@ -133,43 +189,18 @@ const Container = styled.div`
   align-content: center;
   align-items: center;
   justify-content: center;
+  max-height: 100vh;
 
-  max-height: 80vh;
-`
-
-const ContainerInfo = styled.div`
-  padding: 20px;
-`
-const SpamBoxContainer = styled.div`
-  padding: 10px 20px;
-  display: block;
-  align-self: stretch;
-  background: #fafafa;
-  overflow:scroll;
-  
-`
-
-const Toaster = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 0px 10px;
+  // padding: 20px;
+  // font-size: 16px;
+  // display: flex;
+  // font-weight: 200;
+  // align-content: center;
+  // align-items: center;
+  // justify-content: center;
+  // width: 100%;
+  // min-height: 40vh;
 `;
 
-const ActionLoader = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-
-const ToasterMsg = styled.div`
-  margin: 0px 10px;
-`;
 // Export Default
 export default SpamBox;
