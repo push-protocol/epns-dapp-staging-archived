@@ -115,8 +115,8 @@ function SpamBox() {
       .then(({ data }) => {
         const subs = data.subscribers;
         const subscribed = subs.includes(account);
-        if(!subscribed){
-          setCounter(c=>c+1)
+        if (!subscribed) {
+          setCounter((c) => c + 1);
         }
         return subscribed;
       })
@@ -167,13 +167,13 @@ function SpamBox() {
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
-        {!loading && (!counter || !spams.length) &&(
-               <CenteredContainerInfo>
-               <DisplayNotice
-                 title="You currently have no notifications, try subscribing to some channels."
-                 theme="third"
-               />
-             </CenteredContainerInfo>     
+        {!loading && (!counter || !spams.length) && (
+          <CenteredContainerInfo>
+            <DisplayNotice
+              title="You currently have no spam notifications."
+              theme="third"
+            />
+          </CenteredContainerInfo>
         )}
       </Container>
     </>
