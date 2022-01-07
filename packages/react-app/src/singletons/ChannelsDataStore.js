@@ -311,7 +311,12 @@ export default class ChannelsDataStore {
         });
     });
   };
-
+  getChannelFromApi = async(startIndex, pageCount) => {
+    return  postReq("/channels/fetch_channels")
+    .then(response => {
+      console.log(response)
+    })
+  }
   // CHANNELS META FUNCTIONS
   // To get channels meta
   // get channels meta in a paginated format

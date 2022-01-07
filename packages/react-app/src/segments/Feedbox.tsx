@@ -4,6 +4,7 @@ import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
 import { useWeb3React } from "@web3-react/core";
 import { useSelector, useDispatch } from "react-redux";
+import DisplayNotice from "components/DisplayNotice";
 import {
   api,
   utils,
@@ -15,7 +16,6 @@ import {
   setFinishedFetching,
   resetState
 } from "redux/slices/notificationSlice";
-import DisplayNotice from "components/DisplayNotice";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -100,13 +100,13 @@ function Feedbox() {
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
-        {!loading && !notifications.length && (
-          <EmptyWrapper>
+        {!notifications.length && !loading && (
+          <CenteredContainerInfo>
             <DisplayNotice
-              title="You currently have no notifications... you can try subscribing to some more channels"
-              theme="primary"
+              title="You currently have no notifications, try subscribing to some channels."
+              theme="third"
             />
-          </EmptyWrapper>
+          </CenteredContainerInfo>
         )}
       </Container>
     </>
@@ -116,6 +116,12 @@ function Feedbox() {
 const EmptyWrapper = styled.div`
   padding-top: 50px;
   padding-bottom: 50px;
+`;
+const CenteredContainerInfo = styled.div`
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Items = styled.div`

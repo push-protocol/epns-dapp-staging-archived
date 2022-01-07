@@ -15,6 +15,7 @@ import {
   setFinishedFetching,
 } from "redux/slices/notificationSlice";
 import { postReq } from "api";
+import DisplayNotice from "components/DisplayNotice";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -26,6 +27,7 @@ function SpamBox() {
   const [page, setPage] = React.useState(1);
   const [finishedFetching, setFinishedFetching] = React.useState(false);
   const { notifications } = useSelector((state: any) => state.notifications);
+  const [counter, setCounter] = React.useState(0);
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
     chainId: chainId,
@@ -112,12 +114,11 @@ function SpamBox() {
     })
       .then(({ data }) => {
         const subs = data.subscribers;
-        console.log({
-          sub: data.subscribers,
-          account,
-          inc: subs.includes(account),
-        });
-        return subs.includes(account);
+        const subscribed = subs.includes(account);
+        if(!subscribed){
+          setCounter(c=>c+1)
+        }
+        return subscribed;
       })
       .catch((err) => {
         console.log(`getChannelSubscribers => ${err.message}`);
@@ -141,7 +142,6 @@ function SpamBox() {
                 image,
                 channel,
               } = oneNotification;
-              console.log({ channel });
               // render the notification item
               return (
                 <div key={`${message}+${title}`}>
@@ -167,10 +167,25 @@ function SpamBox() {
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
+        {!loading && (!counter || !spams.length) &&(
+               <CenteredContainerInfo>
+               <DisplayNotice
+                 title="You currently have no notifications, try subscribing to some channels."
+                 theme="third"
+               />
+             </CenteredContainerInfo>     
+        )}
       </Container>
     </>
   );
 }
+
+const CenteredContainerInfo = styled.div`
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Items = styled.div`
   display: block;
