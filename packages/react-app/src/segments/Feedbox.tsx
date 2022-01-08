@@ -4,6 +4,7 @@ import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
 import { useWeb3React } from "@web3-react/core";
 import { useSelector, useDispatch } from "react-redux";
+import { envConfig } from "@project/contracts";
 import DisplayNotice from "components/DisplayNotice";
 import {
   api,
@@ -36,7 +37,8 @@ function Feedbox() {
       const { count, results } = await api.fetchNotifications(
         account,
         NOTIFICATIONS_PER_PAGE,
-        page
+        page,
+        envConfig.apiUrl
       );
       const parsedResponse = utils.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
