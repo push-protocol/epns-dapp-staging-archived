@@ -5,13 +5,13 @@ import { Waypoint } from "react-waypoint";
 import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
-import searchIcon from "assets/searchicon.svg";
 import { envConfig } from "@project/contracts";
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
+
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
@@ -155,7 +155,7 @@ function ViewChannels() {
                     className="input"
                     placeholder="Search By Name/Address"
                   />
-                  <SearchIconImage src={searchIcon} alt="" />
+                  <SearchIconImage src='/searchicon.svg' alt="" />
                 </InputWrapper>
                 {!isMainnet && <Faucets />} 
                 {/* only display faucets on mainnet */}

@@ -10,7 +10,7 @@ import Home from "pages/Home";
 import Header from "segments/Header";
 import styled from "styled-components";
 import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
-
+import UnderProgressModal from './components/UnderProgressModal';
 import "react-toastify/dist/ReactToastify.min.css";
 
 import * as dotenv from "dotenv";
@@ -56,19 +56,24 @@ export default function App() {
 
   return (
     <>
+    
       <HeaderContainer>
         <Header/>
       </HeaderContainer>
 
       <ParentContainer>
+        
         {active && !error && (
           <HomeContainer>
+
             <Home />
           </HomeContainer>
         )}
 
         {!active && (
           <Item>
+            <UnderProgressModal/>
+
             <ProviderLogo
               src="./epnshomelogo.png"
               srcSet={"./epnshomelogo@2x.png 2x, ./epnshomelogo@2x.png 3x"}
