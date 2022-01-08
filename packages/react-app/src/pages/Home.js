@@ -475,7 +475,7 @@ function Home() {
         >
           <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
           <ControlText active={controlAt == 3 ? 1 : 0}>
-            Spam Notifs
+            Spam Notifications
           </ControlText>
         </ControlButton>
       </Controls>

@@ -44,7 +44,7 @@ function SpamBox() {
         account,
         NOTIFICATIONS_PER_PAGE,
         page,
-        "https://backend-kovan.epns.io/apis/"
+        "https://backend-kovan.epns.io/apis"
       );
       const parsedResponse = utils
         .parseApiResponse(results)
