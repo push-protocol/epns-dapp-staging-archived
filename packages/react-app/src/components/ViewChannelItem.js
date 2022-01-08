@@ -337,6 +337,19 @@ function ViewChannelItem({ channelObjectProp }) {
     }
   };
 
+  const copyToClipboard = (url) => {
+    // fallback for non navigator browser support
+    if (navigator && navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+    } else {
+        const el = document.createElement("textarea");
+        el.value = url;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+    }
+};
   
   const unsubscribeAction = async () => {
     let txToast;
@@ -482,7 +495,7 @@ function ViewChannelItem({ channelObjectProp }) {
                 <FaRegAddressCard size={20} color="#ccc" />
                 <SubscribersCount
                   onClick={() => {
-                    navigator.clipboard.writeText(channelJson.addr);
+                    copyToClipboard(channelJson.addr);
                     setCopyText("copied");
                   }}
                   onMouseEnter={() => {
