@@ -1,3 +1,4 @@
+
 import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
@@ -6,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 import { envConfig } from "@project/contracts";
+
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
@@ -53,7 +55,7 @@ function ViewChannels() {
   // to fetch initial channels and logged in user data
   const fetchInitialsChannelMeta = async () => {
     // fetch the meta of the first `CHANNELS_PER_PAGE` channels
-    const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(
+    const channelsMeta = await ChannelsDataStore.instance.getChannelFromApi(
       channelsVisited,
       CHANNELS_PER_PAGE
     );
@@ -66,7 +68,7 @@ function ViewChannels() {
   // load more channels when we get to the bottom of the page
   const loadMoreChannelMeta = async (newPageNumber: any) => {
     const startingPoint = newPageNumber * CHANNELS_PER_PAGE;
-    const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(
+    const moreChannels = await ChannelsDataStore.instance.getChannelFromApi(
       startingPoint,
       CHANNELS_PER_PAGE
     );

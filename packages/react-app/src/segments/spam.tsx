@@ -5,7 +5,6 @@ import { Waypoint } from "react-waypoint";
 import { useWeb3React } from "@web3-react/core";
 import { useSelector, useDispatch } from "react-redux";
 import { envConfig } from "@project/contracts";
-import DisplayNotice from "components/DisplayNotice";
 import {
   api,
   utils,
@@ -15,18 +14,26 @@ import {
   addPaginatedNotifications,
   incrementPage,
   setFinishedFetching,
-  resetState
 } from "redux/slices/notificationSlice";
+import { postReq } from "api";
+import DisplayNotice from "components/DisplayNotice";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
-function Feedbox() {
+function SpamBox() {
   const dispatch = useDispatch();
-  const { account } = useWeb3React();
+  const { account, chainId, library } = useWeb3React();
   const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
-  const { notifications, page, finishedFetching } = useSelector(
-    (state: any) => state.notifications
-  );
+  const [spams, setSpams] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const [finishedFetching, setFinishedFetching] = React.useState(false);
+  const { notifications } = useSelector((state: any) => state.notifications);
+  const [counter, setCounter] = React.useState(0);
+  const EPNS_DOMAIN = {
+    name: "EPNS COMM V1",
+    chainId: chainId,
+    verifyingContract: epnsCommReadProvider.address,
+  };
 
   const [loading, setLoading] = React.useState(false);
 
@@ -34,16 +41,21 @@ function Feedbox() {
     if (loading || finishedFetching) return;
     setLoading(true);
     try {
-      const { count, results } = await api.fetchNotifications(
+      const { count, results } = await api.fetchSpamNotifications(
         account,
         NOTIFICATIONS_PER_PAGE,
         page,
         envConfig.apiUrl
       );
-      const parsedResponse = utils.parseApiResponse(results);
-      dispatch(addPaginatedNotifications(parsedResponse));
+      const parsedResponse = utils
+        .parseApiResponse(results)
+        .map((elem: any, i: any) => {
+          elem.channel = results[i].channel;
+          return { ...elem };
+        });
+      setSpams((s) => [...s, ...parsedResponse]);
       if (count === 0) {
-        dispatch(setFinishedFetching());
+        setFinishedFetching(true);
       }
     } catch (err) {
       console.log(err);
@@ -53,33 +65,84 @@ function Feedbox() {
   };
 
   React.useEffect(() => {
-    if (account) {
+    if (epnsCommReadProvider) {
       loadNotifications();
-      return () => {
-        dispatch(resetState());
-      }
     }
-  }, [account]);
+  }, [epnsCommReadProvider, account]);
 
   //function to query more notifications
   const handlePagination = async () => {
     loadNotifications();
-    dispatch(incrementPage());
+    setPage((p) => p + 1);
   };
 
   const showWayPoint = (index: any) => {
     return Number(index) === notifications.length - 1 && !finishedFetching;
   };
 
+  const onSubscribeToChannel = async (channelAddress) => {
+    let txToast;
+    const type = {
+      Subscribe: [
+        { name: "channel", type: "address" },
+        { name: "subscriber", type: "address" },
+        { name: "action", type: "string" },
+      ],
+    };
+    const message = {
+      channel: channelAddress,
+      subscriber: account,
+      action: "Subscribe",
+    };
+
+    const signature = await library
+      .getSigner(account)
+      ._signTypedData(EPNS_DOMAIN, type, message);
+
+    return postReq("/channels/subscribe_offchain", {
+      signature,
+      message,
+      op: "write",
+      chainId,
+      contractAddress: epnsCommReadProvider.address,
+    });
+  };
+
+  const isSubscribedFn = async (channelAddr: any) => {
+    return await postReq("/channels/get_subscribers", {
+      channel: channelAddr,
+      op: "read",
+    })
+      .then(({ data }) => {
+        const subs = data.subscribers;
+        const subscribed = subs.includes(account);
+        if (!subscribed) {
+          setCounter((c) => c + 1);
+        }
+        return subscribed;
+      })
+      .catch((err) => {
+        console.log(`getChannelSubscribers => ${err.message}`);
+        return [];
+      });
+  };
+
   // Render
   return (
     <>
       <Container>
-        {notifications && (
+        {spams && (
           <Items id="scrollstyle-secondary">
-            {notifications.map((oneNotification, index) => {
-              const { cta, title, message, app, icon, image } = oneNotification;
-
+            {spams.map((oneNotification, index) => {
+              const {
+                cta,
+                title,
+                message,
+                app,
+                icon,
+                image,
+                channel,
+              } = oneNotification;
               // render the notification item
               return (
                 <div key={`${message}+${title}`}>
@@ -93,6 +156,9 @@ function Feedbox() {
                     app={app}
                     icon={icon}
                     image={image}
+                    subscribeFn={() => onSubscribeToChannel(channel)}
+                    isSpam
+                    isSubscribedFn={async () => isSubscribedFn(channel)}
                   />
                 </div>
               );
@@ -102,10 +168,10 @@ function Feedbox() {
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
-        {!notifications.length && !loading && (
+        {!loading && (!counter || !spams.length) && (
           <CenteredContainerInfo>
             <DisplayNotice
-              title="You currently have no notifications, try subscribing to some channels."
+              title="You currently have no spam notifications."
               theme="third"
             />
           </CenteredContainerInfo>
@@ -115,10 +181,6 @@ function Feedbox() {
   );
 }
 
-const EmptyWrapper = styled.div`
-  padding-top: 50px;
-  padding-bottom: 50px;
-`;
 const CenteredContainerInfo = styled.div`
   padding: 20px;
   display: flex;
@@ -157,4 +219,4 @@ const Container = styled.div`
 `;
 
 // Export Default
-export default Feedbox;
+export default SpamBox;

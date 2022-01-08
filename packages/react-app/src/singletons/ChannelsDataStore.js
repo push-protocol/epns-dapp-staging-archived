@@ -311,12 +311,28 @@ export default class ChannelsDataStore {
         });
     });
   };
-
+  /**
+   * Get paginated channel information
+   * @param {Number} startIndex the number of channels viewed so far e.g 50
+   * @param {Number} pageCount the number of items per page we want
+   * @returns 
+   */
+  getChannelFromApi = async (startIndex, pageCount) => {
+    return postReq("/channels/fetch_channels", {
+      page: Math.ceil(startIndex / pageCount) || 1,
+      pageSize: pageCount,
+      op: "write",
+    }).then((response) => {
+      const output = response.data.results.map(({channel}) => ({addr: channel}));
+      return output;
+    });
+  };
   // CHANNELS META FUNCTIONS
   // To get channels meta
   // get channels meta in a paginated format
   // by passing in the starting index and the number of items per page
   getChannelsMetaAsync = async (startIndex, pageCount) => {
+    this.getChannelFromApi(startIndex, pageCount)
     return new Promise(async (resolve, reject) => {
       // get total number of channels
       const channelsCount = await this.getChannelsCountAsync();
@@ -439,7 +455,7 @@ export default class ChannelsDataStore {
       .then(({ data }) => {
         const subs = data.subscribers;
         this.state.subscribers[channelAddress] = subs;
-        return subs
+        return subs;
       })
       .catch((err) => {
         console.log(`getChannelSubscribers => ${err.message}`);
