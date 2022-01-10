@@ -72,7 +72,7 @@ export default function App() {
 
         {!active && (
           <Item>
-            <UnderProgressModal/>
+            {/* <UnderProgressModal/> */}
 
             <ProviderLogo
               src="./epnshomelogo.png"
