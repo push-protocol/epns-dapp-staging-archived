@@ -608,7 +608,7 @@ function SendNotifications() {
             </H2>
             {!isChannelDeactivated ? (
               <H3>
-                EPNS supports four types of notifications (for now!).{" "}
+                EPNS supports three types of notifications (for now!).{" "}
                 <b>Groups</b>, <b>Secrets</b>, and <b>Targetted</b>
                  {/* and{" "} <b>Subsets</b>. */}
               </H3>
