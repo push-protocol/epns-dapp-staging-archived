@@ -116,8 +116,8 @@ function Feedbox() {
   return (
     <FullWidth>
       <Wrapper>
-        <Button onClick={() => setCurrentTab("inbox")}>view inbox</Button>
-        <Button onClick={() => setCurrentTab("spambox")} spam>
+        <Button active={currentTab == "inbox"} onClick={() => setCurrentTab("inbox")}>view inbox</Button>
+        <Button active={currentTab == "spambox"} onClick={() => setCurrentTab("spambox")} spam>
           view spambox
         </Button>
       </Wrapper>
@@ -211,12 +211,14 @@ const Button = styled.div`
   font-size: 14px;
   font-weight: 400;
   position: relative;
-  background: ${(props) => (props.spam ? "#e20880" : "#674C9F")};
+  background: ${(props: any) => (props.spam ? "#e20880" : "#674C9F")};
   min-width: 100px;
   width: 45%;
+  cursor: ${(props: any) => (props.active ? "not-allowed" : "pointer")};
+  opacity: ${(props: any) => (props.active ? 0.5 : 1)};
 
   &:hover {
-    opacity: 0.8;
+    opacity: ${(props: any) => (props.active ? 0.5 : 0.8)};
   }
 `;
 
