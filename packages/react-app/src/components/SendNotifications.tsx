@@ -330,7 +330,7 @@ function SendNotifications() {
 
       console.log("Uploding to IPFS...");
       toast.update(notificationToast, {
-        render: "Uploding to IPFS...",
+        render: "Preparing Payload for upload",
       });
 
       const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
@@ -343,9 +343,6 @@ function SendNotifications() {
       }
 
       console.log("IPFS cid: %o", storagePointer);
-      toast.update(notificationToast, {
-        render: "IPFS HASH: " + storagePointer,
-      });
     }
     if (nfType === "1" || nfType === "2" || nfType === "3" || nfType === "4") {
       // Prepare Identity and send notification
