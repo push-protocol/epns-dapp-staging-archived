@@ -6,6 +6,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useSelector, useDispatch } from "react-redux";
 import { envConfig } from "@project/contracts";
 import DisplayNotice from "components/DisplayNotice";
+import SpamBox from "./spam";
 import {
   api,
   utils,
@@ -31,6 +32,7 @@ function Feedbox() {
 
   const [bgUpdateLoading, setBgUpdateLoading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [currentTab, setCurrentTab] = React.useState("inbox");
 
   const loadNotifications = async () => {
     if (loading || finishedFetching) return;
@@ -87,10 +89,10 @@ function Feedbox() {
   };
 
   React.useEffect(() => {
-    if (account) {
+    if (account && currentTab === "inbox") {
       fetchLatestNotifications();
     }
-  }, [account]);
+  }, [account, currentTab]);
 
   React.useEffect(() => {
     fetchLatestNotifications();
@@ -112,52 +114,111 @@ function Feedbox() {
 
   // Render
   return (
-    <>
-      <Container>
-        {bgUpdateLoading && (
-          <div style={{marginTop: "10px"}}>
-            <Loader type="Oval" color="#35c5f3" height={40} width={40} />
-          </div>
-        )}
-        {notifications && (
-          <Items id="scrollstyle-secondary">
-            {notifications.map((oneNotification, index) => {
-              const { cta, title, message, app, icon, image } = oneNotification;
+    <FullWidth>
+      <Wrapper>
+        <Button onClick={() => setCurrentTab("inbox")}>view inbox</Button>
+        <Button onClick={() => setCurrentTab("spambox")} spam>
+          view spambox
+        </Button>
+      </Wrapper>
+      {currentTab == "spambox" ? (
+        <SpamBox />
+      ) : (
+        <Container>
+          {bgUpdateLoading && (
+            <div style={{ marginTop: "10px" }}>
+              <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+            </div>
+          )}
+          {notifications && (
+            <Items id="scrollstyle-secondary">
+              {notifications.map((oneNotification, index) => {
+                const {
+                  cta,
+                  title,
+                  message,
+                  app,
+                  icon,
+                  image,
+                } = oneNotification;
 
-              // render the notification item
-              return (
-                <div key={`${message}+${title}`}>
-                  {showWayPoint(index) && (
-                    <Waypoint onEnter={() => handlePagination()} />
-                  )}
-                  <NotificationItem
-                    notificationTitle={title}
-                    notificationBody={message}
-                    cta={cta}
-                    app={app}
-                    icon={icon}
-                    image={image}
-                  />
-                </div>
-              );
-            })}
-          </Items>
-        )}
-        {loading && !bgUpdateLoading && (
-          <Loader type="Oval" color="#35c5f3" height={40} width={40} />
-        )}
-        {!notifications.length && !loading && (
-          <CenteredContainerInfo>
-            <DisplayNotice
-              title="You currently have no notifications, try subscribing to some channels."
-              theme="third"
-            />
-          </CenteredContainerInfo>
-        )}
-      </Container>
-    </>
+                // render the notification item
+                return (
+                  <div key={`${message}+${title}`}>
+                    {showWayPoint(index) && (
+                      <Waypoint onEnter={() => handlePagination()} />
+                    )}
+                    <NotificationItem
+                      notificationTitle={title}
+                      notificationBody={message}
+                      cta={cta}
+                      app={app}
+                      icon={icon}
+                      image={image}
+                    />
+                  </div>
+                );
+              })}
+            </Items>
+          )}
+          {loading && !bgUpdateLoading && (
+            <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+          )}
+          {!notifications.length && !loading && (
+            <CenteredContainerInfo>
+              <DisplayNotice
+                title="You currently have no notifications, try subscribing to some channels."
+                theme="third"
+              />
+            </CenteredContainerInfo>
+          )}
+        </Container>
+      )}
+    </FullWidth>
   );
 }
+
+const FullWidth = styled.div`
+  width: 100%;
+`;
+const Wrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  justify-content: space-between;
+`;
+
+const Button = styled.div`
+  border: 0;
+  outline: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding: 8px 15px;
+  margin: 10px;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 400;
+  position: relative;
+  background: ${(props) => (props.spam ? "#e20880" : "#674C9F")};
+  min-width: 100px;
+  width: 45%;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
 
 const EmptyWrapper = styled.div`
   padding-top: 50px;

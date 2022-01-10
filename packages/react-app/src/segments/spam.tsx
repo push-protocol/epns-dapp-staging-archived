@@ -32,7 +32,7 @@ function SpamBox() {
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
     chainId: chainId,
-    verifyingContract: epnsCommReadProvider.address,
+    verifyingContract: epnsCommReadProvider?.address,
   };
 
   const [loading, setLoading] = React.useState(false);
