@@ -15,7 +15,8 @@ import {
   addPaginatedNotifications,
   incrementPage,
   setFinishedFetching,
-  resetState
+  resetState,
+  updateTopNotifications,
 } from "redux/slices/notificationSlice";
 
 const NOTIFICATIONS_PER_PAGE = 10;
@@ -24,10 +25,11 @@ function Feedbox() {
   const dispatch = useDispatch();
   const { account } = useWeb3React();
   const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
-  const { notifications, page, finishedFetching } = useSelector(
+  const { notifications, page, finishedFetching, toggle } = useSelector(
     (state: any) => state.notifications
   );
 
+  const [bgUpdateLoading, setBgUpdateLoading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const loadNotifications = async () => {
@@ -51,15 +53,48 @@ function Feedbox() {
       setLoading(false);
     }
   };
+  const fetchLatestNotifications = async () => {
+    if (loading || bgUpdateLoading) return;
+    setBgUpdateLoading(true);
+    setLoading(true);
+    try {
+      const { count, results } = await api.fetchNotifications(
+        account,
+        NOTIFICATIONS_PER_PAGE,
+        1,
+        envConfig.apiUrl
+      );
+      if(!notifications.length){
+        dispatch(incrementPage())
+      }
+      const parsedResponse = utils.parseApiResponse(results);
+      // replace the first 20 notifications with these
+      dispatch(
+        updateTopNotifications({
+          notifs: parsedResponse,
+          pageSize: NOTIFICATIONS_PER_PAGE,
+        })
+      );
+      if (count === 0) {
+        dispatch(setFinishedFetching());
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setBgUpdateLoading(false);
+      setLoading(false);
+    }
+  };
 
   React.useEffect(() => {
     if (account) {
-      loadNotifications();
-      return () => {
-        dispatch(resetState());
-      }
+      fetchLatestNotifications();
     }
   }, [account]);
+
+  React.useEffect(() => {
+    fetchLatestNotifications();
+  }, [toggle])
 
   //function to query more notifications
   const handlePagination = async () => {
@@ -68,13 +103,16 @@ function Feedbox() {
   };
 
   const showWayPoint = (index: any) => {
-    return Number(index) === notifications.length - 1 && !finishedFetching;
+    return Number(index) === notifications.length - 1 && !finishedFetching && !bgUpdateLoading;
   };
 
   // Render
   return (
     <>
       <Container>
+      {bgUpdateLoading && !loading && (
+          <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+        )}
         {notifications && (
           <Items id="scrollstyle-secondary">
             {notifications.map((oneNotification, index) => {

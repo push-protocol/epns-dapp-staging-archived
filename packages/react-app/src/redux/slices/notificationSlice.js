@@ -6,13 +6,17 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     page: 1, //the current page
     notifications: [],// the actual notifications
-    finishedFetching: false
+    finishedFetching: false,
+    toggler: false
 }
 
 export const contractSlice = createSlice({
     name: "notifications",
     initialState,
     reducers: {
+        toggleToggler: (state) => {
+            state.toggler = !state.toggler;
+        },
         resetState: (state) => {
             state.page = initialState.page;
             state.notifications = initialState.notifications;
@@ -30,16 +34,23 @@ export const contractSlice = createSlice({
         },
         setFinishedFetching: (state) => {
             state.finishedFetching = true;
+        },
+        updateTopNotifications: (state, action) => {
+            console.log({pp: action.payload});
+            state.notifications = [...action.payload.notifs, ...state.notifications.slice(action.payload.pageSize)];
+            console.log({sn: state.notifications});
         }
     }
 });
 
 export const {
+    toggleToggler,
     addPaginatedNotifications,
     incrementPage,
     addNewNotification,
     setFinishedFetching,
-    resetState
+    resetState,
+    updateTopNotifications
 } = contractSlice.actions;
 
 export default contractSlice.reducer;

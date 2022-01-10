@@ -47,12 +47,22 @@ function SpamBox() {
         page,
         envConfig.apiUrl
       );
-      const parsedResponse = utils
+      const parsedResponsePromise = utils
         .parseApiResponse(results)
-        .map((elem: any, i: any) => {
+        .map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
+          const {
+            data: { subscribers },
+          } = await postReq("/channels/get_subscribers", {
+            channel: results[i].channel,
+            op: "read",
+          });
+          elem.subscribers = subscribers;
           return { ...elem };
         });
+      const parsedResponse = await Promise.all(parsedResponsePromise);
+      // get all the subsc
+      console.log(parsedResponse);
       setSpams((s) => [...s, ...parsedResponse]);
       if (count === 0) {
         setFinishedFetching(true);
@@ -72,7 +82,7 @@ function SpamBox() {
 
   //function to query more notifications
   const handlePagination = async () => {
-    loadNotifications();
+    // loadNotifications();
     setPage((p) => p + 1);
   };
 
@@ -108,23 +118,8 @@ function SpamBox() {
     });
   };
 
-  const isSubscribedFn = async (channelAddr: any) => {
-    return await postReq("/channels/get_subscribers", {
-      channel: channelAddr,
-      op: "read",
-    })
-      .then(({ data }) => {
-        const subs = data.subscribers;
-        const subscribed = subs.includes(account);
-        if (!subscribed) {
-          setCounter((c) => c + 1);
-        }
-        return subscribed;
-      })
-      .catch((err) => {
-        console.log(`getChannelSubscribers => ${err.message}`);
-        return [];
-      });
+  const isSubscribedFn = async (subscribers: any) => {
+    return subscribers.map(a => a .toLowerCase).includes(account.toLowerCase());
   };
 
   // Render
@@ -142,13 +137,13 @@ function SpamBox() {
                 icon,
                 image,
                 channel,
+                subscribers
               } = oneNotification;
               // render the notification item
               return (
                 <div key={`${message}+${title}`}>
-                  {showWayPoint(index) && (
-                    <Waypoint onEnter={() => handlePagination()} />
-                  )}
+                  {showWayPoint(index) &&
+                    !loading && <Waypoint onEnter={() => handlePagination()} />}
                   <NotificationItem
                     notificationTitle={title}
                     notificationBody={message}
@@ -156,9 +151,12 @@ function SpamBox() {
                     app={app}
                     icon={icon}
                     image={image}
-                    subscribeFn={() => onSubscribeToChannel(channel)}
+                    subscribeFn={(e) => {
+                      e?.stopPropagation();
+                      onSubscribeToChannel(channel)
+                    }}
                     isSpam
-                    isSubscribedFn={async () => isSubscribedFn(channel)}
+                    isSubscribedFn={async () => isSubscribedFn(subscribers)}
                   />
                 </div>
               );
@@ -168,7 +166,7 @@ function SpamBox() {
         {loading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
-        {!loading && (!counter || !spams.length) && (
+        {(!loading && !spams.length) && (
           <CenteredContainerInfo>
             <DisplayNotice
               title="You currently have no spam notifications."
