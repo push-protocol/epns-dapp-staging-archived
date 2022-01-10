@@ -122,7 +122,7 @@ function Feedbox() {
         </Button>
       </Wrapper>
       {currentTab == "spambox" ? (
-        <SpamBox />
+        <SpamBox currentTab={currentTab} />
       ) : (
         <Container>
           {bgUpdateLoading && (
