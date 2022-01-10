@@ -64,8 +64,8 @@ function Feedbox() {
         1,
         envConfig.apiUrl
       );
-      if(!notifications.length){
-        dispatch(incrementPage())
+      if (!notifications.length) {
+        dispatch(incrementPage());
       }
       const parsedResponse = utils.parseApiResponse(results);
       // replace the first 20 notifications with these
@@ -94,7 +94,7 @@ function Feedbox() {
 
   React.useEffect(() => {
     fetchLatestNotifications();
-  }, [toggle])
+  }, [toggle]);
 
   //function to query more notifications
   const handlePagination = async () => {
@@ -103,15 +103,21 @@ function Feedbox() {
   };
 
   const showWayPoint = (index: any) => {
-    return Number(index) === notifications.length - 1 && !finishedFetching && !bgUpdateLoading;
+    return (
+      Number(index) === notifications.length - 1 &&
+      !finishedFetching &&
+      !bgUpdateLoading
+    );
   };
 
   // Render
   return (
     <>
       <Container>
-      {bgUpdateLoading && !loading && (
-          <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+        {bgUpdateLoading && (
+          <div style={{marginTop: "10px"}}>
+            <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+          </div>
         )}
         {notifications && (
           <Items id="scrollstyle-secondary">
@@ -137,7 +143,7 @@ function Feedbox() {
             })}
           </Items>
         )}
-        {loading && (
+        {loading && !bgUpdateLoading && (
           <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         )}
         {!notifications.length && !loading && (
