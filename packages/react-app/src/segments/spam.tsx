@@ -27,7 +27,6 @@ function SpamBox({ currentTab }) {
   const { epnsCommReadProvider } = useSelector(
     (state: any) => state.contracts
   );
-  const [spams, setSpams] = React.useState([]);
 
   const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
   const { toggle } = useSelector(
@@ -67,7 +66,6 @@ function SpamBox({ currentTab }) {
         });
       const parsedResponse = await Promise.all(parsedResponsePromise);
       // get all the subsc
-      setSpams((s) => [...s, ...parsedResponse]);
       dispatch(addPaginatedNotifications(parsedResponse));
       if (count === 0) {
         dispatch(setFinishedFetching());
@@ -181,7 +179,7 @@ function SpamBox({ currentTab }) {
 
   const isSubscribedFn = async (subscribers: any) => {
     return subscribers
-      .map((a) => a.toLowerCase)
+      .map((a) => a.toLowerCase())
       .includes(account.toLowerCase());
   };
 
