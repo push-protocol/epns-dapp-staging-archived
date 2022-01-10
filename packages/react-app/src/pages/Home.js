@@ -407,8 +407,8 @@ function Home() {
             userClickedAt(4);
           }}
         >
-          <ControlImage src="./svg/feedbox.svg" active={controlAt == 3 ? 1 : 0} />
-          <ControlText active={controlAt == 3 ? 1 : 0}>
+          <ControlImage src="./svg/feedbox.svg" active={controlAt == 4 ? 1 : 0} />
+          <ControlText active={controlAt == 4 ? 1 : 0}>
             Spam Notifications
           </ControlText>
         </ControlButton>
