@@ -98,7 +98,7 @@ function SendNotifications() {
       setChannelAddress(delegatees[0].address);
     }
   }, [delegatees, account]);
-  console.log(delegateeOptions);
+
 
   // on change for the subset type notifications input
   const handleSubsetInputChange = (e: any) => {
@@ -394,7 +394,7 @@ function SendNotifications() {
           signature,
           op: "write",
           chainId: chainId.toString(),
-          channel: account,
+          channel: channelAddress,
           recipient: nfRecipient,
           deployedContract: epnsCommReadProvider.address,
           payload: payload,
@@ -539,7 +539,7 @@ function SendNotifications() {
           signature,
           op: "write",
           chainId: chainId.toString(),
-          channel: account,
+          channel: channelAddress,
           recipient: nfRecipient,
           deployedContract: epnsCommReadProvider.address,
           payload: payload,
