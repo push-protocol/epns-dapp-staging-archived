@@ -240,7 +240,12 @@ function CreateChannel() {
         console.log("Check: " + account);
         await library.waitForTransaction(tx.hash);
         setProcessing(3);
-        setProcessingInfo("Channel Created");
+        setProcessingInfo("Channel Created! Reloading...");
+
+        setTimeout(() => {
+          window.location.reload();
+
+        }, 2000);
       })
       .catch((err) => {
         console.log("Error --> %o", err);
