@@ -172,7 +172,9 @@ function ViewChannels() {
                       <ViewChannelItem channelObjectProp={channel} />
                     </div>
                     {showWayPoint(index) && (
-                      <Waypoint onEnter={updateCurrentPage} />
+                      <div style={{width: "100%", height: "40px"}}>
+                        <Waypoint onEnter={updateCurrentPage} />
+                      </div>
                     )}
                   </>
                 )
@@ -267,7 +269,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
 
-  max-height: 92vh;
+  max-height: 94vh;
 `;
 
 const ContainerInfo = styled.div`
