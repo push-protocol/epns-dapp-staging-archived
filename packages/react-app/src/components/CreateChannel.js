@@ -210,7 +210,8 @@ function CreateChannel() {
 
     var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
     const tx = await sendTransactionPromise;
-
+   
+    
     console.log(tx);
     console.log("waiting for tx to finish");
     setProcessingInfo("Waiting for Approval TX to finish...");
@@ -230,9 +231,11 @@ function CreateChannel() {
     var anotherSendTxPromise = contract.createChannelWithFees(
       channelType,
       identityBytes,
-      fees
-    );
-
+      fees,
+      {
+        gasLimit: 1000000
+      }
+     );
     setProcessingInfo("Creating Channel TX in progress");
     anotherSendTxPromise
       .then(async function(tx) {
@@ -240,7 +243,12 @@ function CreateChannel() {
         console.log("Check: " + account);
         await library.waitForTransaction(tx.hash);
         setProcessing(3);
-        setProcessingInfo("Channel Created");
+        setProcessingInfo("Channel Created! Reloading...");
+
+        setTimeout(() => {
+          window.location.reload();
+
+        }, 2000);
       })
       .catch((err) => {
         console.log("Error --> %o", err);
