@@ -11,6 +11,7 @@ import * as dotenv from "dotenv";
 import App from "./App";
 import store from "./redux/store";
 import "./index.css";
+import './firebase';
 
 // enable environmental variables across the entire application
 dotenv.config();

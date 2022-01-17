@@ -7,6 +7,10 @@ import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
 import { addresses, abis } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
+import {Button} from "components/SharedStyling";
+
+
+import { onMessageListener, getToken } from '../firebase';
 
 import config from "config";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
@@ -56,6 +60,75 @@ function Home() {
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
   const [canVerify, setCanVerify] = React.useState(false);
+
+
+  // firebase token
+
+
+
+
+
+  
+  const [show, setShow] = React.useState(false);
+  const [Notification, setNotification]=React.useState({title:"",body:""});
+  
+  const [isTokenFound, setTokenFound] = React.useState(false);
+  async function sendToken(Token,Account){
+    await postReq("apis/pushtokens/register_no_auth", {
+      "op": "register",
+      "wallet": Account,
+      "device_token": Token, 
+      "platform": "dapp"
+    }).then(({ data }) => {
+      console.log(data);
+    }).catch((err) => {
+      console.error(err);
+    })
+    console.log(`fcm token is sent to push node token: ${Token} for wallet ${Account}`);
+  }
+
+  
+  React.useEffect(async () => {
+                    
+  console.log("Token found", isTokenFound);
+    let data;
+    async function tokenFunc() {
+      data = await getToken();
+      setTokenFound(true);
+      if (data) {
+        
+        console.log(account);
+        
+        console.log("Token is", data);
+        
+        await sendToken(data,account);
+      }
+      return data;
+    }
+    await tokenFunc();
+  }, []);
+
+  
+  
+  
+  onMessageListener()
+     .then((payload) => {
+        setShow(true);
+        setNotification({
+          title: payload.notification.title,
+          body: payload.notification.body,
+        });
+        console.log(payload);
+     })
+  .catch((err) => console.log("failed: ", err));
+  
+  
+
+
+
+
+  // firebase token
+
 
   // toast related section
   const [toast, showToast] = React.useState(null);
@@ -113,7 +186,13 @@ function Home() {
               return sub.toLowerCase() === account.toLowerCase();
             });
             if (isSubscribed) {
-              alert("here");
+              // alert("here");
+              // setNotification(notification)
+              // return window.self.registration.showNotification(
+              //   notification.notificationTitle,
+              //   notification.notificationBody
+              // );
+              // console.log(notification);
               showToast(notification);
             }
           } else if (userAddress === eventUserAddress) {
@@ -418,6 +497,8 @@ function Home() {
           </ControlText>
         </ControlButton>
       </Controls>
+      {/* <Button onClick={()=>{console.log(window.self)}}>receiveNotification</Button> */}
+      
       <Interface>
         {controlAt == 0 && <Feedbox />}
         {controlAt == 1 && <ViewChannels canVerify={canVerify} />}

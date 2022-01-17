@@ -13,6 +13,8 @@ import { Web3Provider } from 'ethers/providers'
 import Profile from 'components/Profile';
 import Bell from 'components/Bell';
 
+import {messaging} from '../firebase';
+
 
 // Create Header
 function Header() {
@@ -44,6 +46,8 @@ function Header() {
 
   const disconnect = () => {
     setShowLoginControls(false);
+    // messaging.deleteToken();
+
     deactivate();
   }
 

@@ -3,6 +3,7 @@ import ReactGA from "react-ga";
 import { ToastContainer } from "react-toastify";
 import { Web3Provider } from "ethers/providers";
 import { useWeb3React } from "@web3-react/core";
+// import { onMessageListener, getToken } from './firebase';
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
@@ -53,6 +54,10 @@ export default function App() {
   ReactGA.initialize("UA-165415629-5");
   ReactGA.pageview("/login");
   // Initialize GA
+
+
+
+  
 
   return (
     <>

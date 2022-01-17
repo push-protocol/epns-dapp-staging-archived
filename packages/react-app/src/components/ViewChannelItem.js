@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 import styled, { css } from "styled-components";
 import { Device } from "assets/Device";
 
@@ -43,6 +43,10 @@ function ViewChannelItem({ channelObjectProp, isOwner, canVerify }) {
   const [txInProgress, setTxInProgress] = React.useState(false);
   const [canUnverify, setCanUnverify] = React.useState(false);
 
+
+
+
+  
   // ------ toast related section
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const [toast, showToast] = React.useState(null);
@@ -367,6 +371,8 @@ function ViewChannelItem({ channelObjectProp, isOwner, canVerify }) {
       });
   };
 
+
+  
   if (isBlocked) return <></>;
 
   // render
