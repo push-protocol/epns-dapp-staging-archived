@@ -46,7 +46,7 @@ function Header() {
 
   const disconnect = () => {
     setShowLoginControls(false);
-    // messaging.deleteToken();
+    messaging.deleteToken();
 
     deactivate();
   }
