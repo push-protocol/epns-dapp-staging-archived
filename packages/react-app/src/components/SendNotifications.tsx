@@ -37,7 +37,7 @@ const NFTypes = [
   { value: "1", label: "Broadcast (IPFS Payload)" },
   { value: "2", label: "Secret (IPFS Payload)" },
   { value: "3", label: "Targetted (IPFS Payload)" },
-  // { value: "4", label: "Subset (IPFS Payload)" },
+  { value: "4", label: "Subset (IPFS Payload)" },
   // { value: "5", label: "Offchain (Push)" },
 ];
 const LIMITER_KEYS = ["Enter", ","];
@@ -111,6 +111,8 @@ function SendNotifications() {
         // use this combination to remove duplicates
         Array.from(new Set([...oldRecipients, tempRecipeint]))
       );
+      const listRecipients = Array.from(new Set([...multipleRecipients, tempRecipeint]));
+      setNFRecipient(listRecipients.join());
       setTempRecipient("");
     }
   };
@@ -123,7 +125,7 @@ function SendNotifications() {
   };
 
   React.useEffect(() => {
-    const broadcastIds = ["1", "4"]; //id's of notifications which qualify as broadcast
+    const broadcastIds = ["1"]; //id's of notifications which qualify as broadcast
     setMultipleRecipients([]); //reset array when type changes/
     if (broadcastIds.includes(nfType)) {
       // This is broadcast, nfRecipient will be the same
@@ -327,6 +329,7 @@ function SendNotifications() {
       }
 
       const input = JSON.stringify(jsonPayload);
+      console.log(input);
 
       console.log("Uploding to IPFS...");
       toast.update(notificationToast, {
@@ -390,6 +393,7 @@ function SendNotifications() {
         ._signTypedData(EPNS_DOMAIN, type, message);
       console.log("case5 signature", signature);
       try {
+        console.log(nfRecipient);
         postReq("/payloads/add_manual_payload", {
           signature,
           op: "write",
@@ -828,8 +832,10 @@ function SendNotifications() {
                         value={tempRecipeint}
                         onKeyPress={handleSubsetInputChange}
                         onChange={(e) => {
-                          const text = e.target.value;
-                          if (!LIMITER_KEYS.includes(text)) {
+                          const text = e.target.value.trim();
+                          console.log(text);
+                          console.log(tempRecipeint);
+                          if (!LIMITER_KEYS.includes(text) && text.length > 0 ) {
                             setTempRecipient(e.target.value);
                           }
                         }}
