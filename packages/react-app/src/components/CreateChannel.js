@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 import styled, { css } from "styled-components";
 import {
@@ -59,10 +59,25 @@ function CreateChannel() {
   const [channelURL, setChannelURL] = React.useState("");
   const [channelFile, setChannelFile] = React.useState(undefined);
   const [channelStakeFees, setChannelStakeFees] = React.useState(minStakeFees);
-
+  const [daiAmountVal,setDaiAmountVal]=useState("");
   const [stepFlow, setStepFlow] = React.useState(1);
 
-  React.useEffect(() => {});
+  //checking DAI for user 
+    React.useEffect(()=>{
+      const checkDaiFunc=async()=>{
+       let checkDaiAmount=new ethers.Contract(addresses.dai,abis.dai,library);
+
+      let value=await checkDaiAmount.allowance(account,addresses.epnscore)
+      value=value?.toString();
+      setDaiAmountVal(value);
+      if(value>="50000000000000000000"){
+        // value=Number(value);
+        const convertedVal=ethers.utils.formatEther(value);
+        setChannelStakeFees(convertedVal);
+      } 
+      }
+      checkDaiFunc();
+    },[])
 
   // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }, status) => {
@@ -208,6 +223,7 @@ function CreateChannel() {
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
 
+    if(daiAmountVal<"50000000000000000000"){
     var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
     const tx = await sendTransactionPromise;
    
@@ -217,7 +233,7 @@ function CreateChannel() {
     setProcessingInfo("Waiting for Approval TX to finish...");
 
     await library.waitForTransaction(tx.hash);
-
+    }
     let contract = new ethers.Contract(
       addresses.epnscore,
       abis.epnscore,
@@ -376,7 +392,7 @@ function CreateChannel() {
           </Content>
         </Section>
       )}
-
+      
       {/* Stake Fees Section */}
       {uploadDone && !stakeFeesChoosen && (
         <Section>
@@ -390,7 +406,9 @@ function CreateChannel() {
               padding="20px 20px 10px 20px"
               bg="#f1f1f1"
             >
-              <Slider
+              {
+                (daiAmountVal<'50000000000000000000') && (
+                  <Slider
                 defaultValue={minStakeFees}
                 onChangeCommitted={(event, value) => setChannelStakeFees(value)}
                 aria-labelledby="discrete-slider"
@@ -400,14 +418,18 @@ function CreateChannel() {
                 min={minStakeFees}
                 max={25000}
               />
+                )
+              }
+              
               <Span
                 weight="400"
                 size="1.0em"
                 textTransform="uppercase"
                 spacing="0.2em"
               >
-                Amount Staked: {channelStakeFees} DAI
+                 Amount Staked: {channelStakeFees} DAI
               </Span>
+
             </Item>
 
             <Item self="stretch" align="stretch" margin="20px 0px 0px 0px">
