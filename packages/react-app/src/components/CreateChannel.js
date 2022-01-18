@@ -69,10 +69,10 @@ function CreateChannel() {
 
       let value=await checkDaiAmount.allowance(account,addresses.epnscore)
       value=value?.toString();
-      setDaiAmountVal(value);
-      if(value>="50000000000000000000"){
-        // value=Number(value);
-        const convertedVal=ethers.utils.formatEther(value);
+      const convertedVal=ethers.utils.formatEther(value);
+      setDaiAmountVal(convertedVal);
+      if(convertedVal>=50.0){
+        
         setChannelStakeFees(convertedVal);
       } 
       }
@@ -223,7 +223,7 @@ function CreateChannel() {
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
 
-    if(daiAmountVal<"50000000000000000000"){
+    if(daiAmountVal<50.0){
     var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
     const tx = await sendTransactionPromise;
    
@@ -407,7 +407,7 @@ function CreateChannel() {
               bg="#f1f1f1"
             >
               {
-                (daiAmountVal<'50000000000000000000') && (
+                (daiAmountVal<50.0) && (
                   <Slider
                 defaultValue={minStakeFees}
                 onChangeCommitted={(event, value) => setChannelStakeFees(value)}
