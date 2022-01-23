@@ -59,25 +59,28 @@ function CreateChannel() {
   const [channelURL, setChannelURL] = React.useState("");
   const [channelFile, setChannelFile] = React.useState(undefined);
   const [channelStakeFees, setChannelStakeFees] = React.useState(minStakeFees);
-  const [daiAmountVal,setDaiAmountVal]=useState("");
+  const [daiAmountVal, setDaiAmountVal] = useState("");
   const [stepFlow, setStepFlow] = React.useState(1);
 
-  //checking DAI for user 
-    React.useEffect(()=>{
-      const checkDaiFunc=async()=>{
-       let checkDaiAmount=new ethers.Contract(addresses.dai,abis.dai,library);
+  //checking DAI for user
+  React.useEffect(() => {
+    const checkDaiFunc = async () => {
+      let checkDaiAmount = new ethers.Contract(
+        addresses.dai,
+        abis.dai,
+        library
+      );
 
-      let value=await checkDaiAmount.allowance(account,addresses.epnscore)
-      value=value?.toString();
-      const convertedVal=ethers.utils.formatEther(value);
+      let value = await checkDaiAmount.allowance(account, addresses.epnscore);
+      value = value?.toString();
+      const convertedVal = ethers.utils.formatEther(value);
       setDaiAmountVal(convertedVal);
-      if(convertedVal>=50.0){
-        
+      if (convertedVal >= 50.0) {
         setChannelStakeFees(convertedVal);
-      } 
       }
-      checkDaiFunc();
-    },[])
+    };
+    checkDaiFunc();
+  }, []);
 
   // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }, status) => {
@@ -223,16 +226,18 @@ function CreateChannel() {
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
 
-    if(daiAmountVal<50.0){
-    var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
-    const tx = await sendTransactionPromise;
-   
-    
-    console.log(tx);
-    console.log("waiting for tx to finish");
-    setProcessingInfo("Waiting for Approval TX to finish...");
+    if (daiAmountVal < 50.0) {
+      var sendTransactionPromise = daiContract.approve(
+        addresses.epnscore,
+        fees
+      );
+      const tx = await sendTransactionPromise;
 
-    await library.waitForTransaction(tx.hash);
+      console.log(tx);
+      console.log("waiting for tx to finish");
+      setProcessingInfo("Waiting for Approval TX to finish...");
+
+      await library.waitForTransaction(tx.hash);
     }
     let contract = new ethers.Contract(
       addresses.epnscore,
@@ -249,9 +254,9 @@ function CreateChannel() {
       identityBytes,
       fees,
       {
-        gasLimit: 1000000
+        gasLimit: 1000000,
       }
-     );
+    );
     setProcessingInfo("Creating Channel TX in progress");
     anotherSendTxPromise
       .then(async function(tx) {
@@ -263,7 +268,6 @@ function CreateChannel() {
 
         setTimeout(() => {
           window.location.reload();
-
         }, 2000);
       })
       .catch((err) => {
@@ -271,7 +275,7 @@ function CreateChannel() {
         console.log({ err });
         setProcessing(3);
         setProcessingInfo(
-          "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
+          `There was an error, ${err.message}`
         );
       });
   };
@@ -373,8 +377,7 @@ function CreateChannel() {
                 accept="image/jpeg,image/png"
               />
             </Item>
-            {
-              chainId != 1 ? (
+            {chainId != 1 ? (
               <Item align="flex-end">
                 <Minter
                   onClick={() => {
@@ -387,12 +390,13 @@ function CreateChannel() {
                   </Pool>
                 </Minter>
               </Item>
-              ): <></>
-            }
+            ) : (
+              <></>
+            )}
           </Content>
         </Section>
       )}
-      
+
       {/* Stake Fees Section */}
       {uploadDone && !stakeFeesChoosen && (
         <Section>
@@ -406,30 +410,29 @@ function CreateChannel() {
               padding="20px 20px 10px 20px"
               bg="#f1f1f1"
             >
-              {
-                (daiAmountVal<50.0) && (
-                  <Slider
-                defaultValue={minStakeFees}
-                onChangeCommitted={(event, value) => setChannelStakeFees(value)}
-                aria-labelledby="discrete-slider"
-                valueLabelDisplay="auto"
-                step={minStakeFees}
-                marks
-                min={minStakeFees}
-                max={25000}
-              />
-                )
-              }
-              
+              {daiAmountVal < 50.0 && (
+                <Slider
+                  defaultValue={minStakeFees}
+                  onChangeCommitted={(event, value) =>
+                    setChannelStakeFees(value)
+                  }
+                  aria-labelledby="discrete-slider"
+                  valueLabelDisplay="auto"
+                  step={minStakeFees}
+                  marks
+                  min={minStakeFees}
+                  max={25000}
+                />
+              )}
+
               <Span
                 weight="400"
                 size="1.0em"
                 textTransform="uppercase"
                 spacing="0.2em"
               >
-                 Amount Staked: {channelStakeFees} DAI
+                Amount Staked: {channelStakeFees} DAI
               </Span>
-
             </Item>
 
             <Item self="stretch" align="stretch" margin="20px 0px 0px 0px">
