@@ -6,6 +6,7 @@ import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
+import { envConfig } from "@project/contracts";
 import Home from "pages/Home";
 import Header from "segments/Header";
 import styled from "styled-components";
@@ -50,7 +51,8 @@ export default function App() {
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!triedEager || !!activatingConnector);
   // Initialize GA
-  ReactGA.initialize("UA-165415629-2");
+  ReactGA.initialize(envConfig.googleAnalyticsId);
+  alert(envConfig.googleAnalyticsId);
   ReactGA.pageview("/login");
   // Initialize GA
 
