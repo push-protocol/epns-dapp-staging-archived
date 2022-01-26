@@ -51,9 +51,9 @@ export default function App() {
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!triedEager || !!activatingConnector);
   // Initialize GA
-  ReactGA.initialize(envConfig.googleAnalyticsId);
-  alert(envConfig.googleAnalyticsId);
-  ReactGA.pageview("/login");
+  // ReactGA.initialize(envConfig.googleAnalyticsId);
+  // alert(envConfig.googleAnalyticsId);
+  // ReactGA.pageview("/login");
   // Initialize GA
 
   return (
