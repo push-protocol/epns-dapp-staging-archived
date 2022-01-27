@@ -35,7 +35,7 @@ const ethers = require("ethers");
 // Set Notification Form Type | 0 is reserved for protocol storage
 const NFTypes = [
   { value: "1", label: "Broadcast (IPFS Payload)" },
-  { value: "2", label: "Secret (IPFS Payload)" },
+  // { value: "2", label: "Secret (IPFS Payload)" },
   { value: "3", label: "Targetted (IPFS Payload)" },
   { value: "4", label: "Subset (IPFS Payload)" },
   // { value: "5", label: "Offchain (Push)" },
@@ -139,7 +139,7 @@ function SendNotifications() {
   const bodyValidated = (notificationToast) => {
     let validated = true;
     // if we are sending for a subset and there
-    if (nfType === "4" && !multipleRecipients.length) {
+    if (nfType === "4" && multipleRecipients.length < 2) {
       toast.update(notificationToast, {
         render:
           "Please enter at least two recipients in order to use subset notifications type",
@@ -610,7 +610,7 @@ function SendNotifications() {
             {!isChannelDeactivated ? (
               <H3>
                 EPNS supports three types of notifications (for now!).{" "}
-                <b>Groups</b>, <b>Secrets</b>, and <b>Targetted</b>
+                <b>Groups</b>, <b>Subsets</b>, and <b>Targetted</b>
                  {/* and{" "} <b>Subsets</b>. */}
               </H3>
             ) : (
@@ -835,9 +835,9 @@ function SendNotifications() {
                           const text = e.target.value.trim();
                           console.log(text);
                           console.log(tempRecipeint);
-                          if (!LIMITER_KEYS.includes(text) && text.length > 0 ) {
+                          // if (!LIMITER_KEYS.includes(text) && text.length > 0 ) {
                             setTempRecipient(e.target.value);
-                          }
+                          // }
                         }}
                       />
                       {nfRecipient.trim().length == 0 && (
