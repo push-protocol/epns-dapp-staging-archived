@@ -121,6 +121,7 @@ function SendNotifications() {
     const filteredRecipients = multipleRecipients.filter(
       (rec) => rec !== recipientAddress
     );
+    setNFRecipient(filteredRecipients.join());
     setMultipleRecipients(filteredRecipients);
   };
 
