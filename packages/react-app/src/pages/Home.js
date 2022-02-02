@@ -249,9 +249,6 @@ function Home() {
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
-        console.log('\n\n\n')
-        console.log(response)
-        console.log('\n\n\n')
         // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
         const verificationStatus = await epnsReadProvider.getChannelVerfication(
           ownerAccount
