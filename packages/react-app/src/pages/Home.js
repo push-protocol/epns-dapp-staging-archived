@@ -60,7 +60,13 @@ function Home() {
   const [aliasVerified, setAliasVerified] = React.useState(null); // null means error, false means unverified and true means verified
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
-
+  console.log('\n\n\n');
+  console.log({
+    aliasEthAccount,
+    aliasVerified,
+    channelAdmin
+  })
+  console.log('\n\n\n');
   // toast related section
   const [toast, showToast] = React.useState(null);
   const clearToast = () => showToast(null);
@@ -243,11 +249,14 @@ function Home() {
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
+        console.log('\n\n\n')
+        console.log(response)
+        console.log('\n\n\n')
         // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
-        const verificationStatus = await epnsWriteProvider.getChannelVerfication(
+        const verificationStatus = await epnsReadProvider.getChannelVerfication(
           ownerAccount
         );
-        const channelJson = await epnsWriteProvider.channels(ownerAccount);
+        const channelJson = await epnsReadProvider.channels(ownerAccount);
         const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
           ownerAccount
         );
