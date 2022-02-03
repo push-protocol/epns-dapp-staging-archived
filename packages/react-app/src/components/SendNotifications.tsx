@@ -352,7 +352,9 @@ function SendNotifications() {
       // Prepare Identity and send notification
       const identity = nfType + "+" + storagePointer;
       const identityBytes = ethers.utils.toUtf8Bytes(identity);
-
+      console.log({
+        identityBytes
+      });
       const EPNS_DOMAIN = {
         name: "EPNS COMM V1",
         chainId: chainId,
