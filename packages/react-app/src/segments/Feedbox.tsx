@@ -231,6 +231,7 @@ const ControlButtonBack = styled.div`
   margin-left: 27px;
 
   overflow: hidden;
+  background: #fafafa;
 
   display: flex;
   visibility:${(props) => (props.active ? "hidden" : "")};
