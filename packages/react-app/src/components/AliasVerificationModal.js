@@ -32,13 +32,13 @@ export default function AliasVerificationModal({
             console.log(tx);
             setLoading("Transaction Sent!");
 
-            setTimeout(() => {
+						await tx.wait(1);
+            setLoading("Transaction Mined!");
+					
+            // setTimeout(() => {
                 onSuccess();
                 onClose();
-            }, 2000);
-
-            // await tx.wait(1);
-            // setLoading("Transaction Mined!");
+            // }, 2000);
         })
         .catch(() => {
             setLoading('There was an error');

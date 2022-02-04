@@ -32,8 +32,8 @@ export default function ChannelDetails() {
     (async function() {
       const bn = channelDetails.channelStartBlock.toString();
       const block = await library.getBlock(+bn);
-      const date = moment(block.timestamp * 1000);//convert from millisecs
-      setCreationDate(date.format(DATE_FORMAT))
+      const date = moment(block?.timestamp * 1000);//convert from millisecs
+      setCreationDate(block ? date.format(DATE_FORMAT) : "");
     })();
   }, [channelDetails]);
 
