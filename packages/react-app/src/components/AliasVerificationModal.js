@@ -45,21 +45,22 @@ export default function AliasVerificationModal({
             console.log(tx);
             setLoading("Transaction Sent!");
 
-						await tx.wait(1);
-            setLoading("Transaction Mined!");
-					
-            setTimeout(async () => {
+			await tx.wait(1);
+            setTimeout(() => {
+                setLoading("Transaction Mined!");
+            }, 2000);
+            setLoading(' ');
+			
+            const intervalId = setInterval(async () => {
                 const response = await postReq("/channels/get_alias_verification_status", {
                     aliasAddress: account,
                     op: "read",
                 })
-                console.log(response);
                 const status = response?.data?.status;
                 if (status == true) {
+                    clearInterval(intervalId);
                     onSuccess();
                     onClose();
-                } else {
-                    window.location.reload();
                 }
             }, 5000);
         })

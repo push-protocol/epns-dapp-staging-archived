@@ -129,7 +129,7 @@ function Home() {
               return;
             }
             const { status } = data;
-            setAliasVerified(status || null);
+            setAliasVerified(status || false);
             return data;
           });
         }
