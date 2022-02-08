@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useWeb3React } from '@web3-react/core';
 import { addresses, abis } from "@project/contracts";
 import Loader from 'react-loader-spinner';
+import { postReq } from "../api";
 
 import {Item, H2, H3, Span, Button, Input} from 'components/SharedStyling';
 
@@ -11,22 +12,34 @@ const ethers = require('ethers');
 
 
 export default function AliasVerificationModal({
-    onClose,onSuccess, verificationStatus
+    onClose,onSuccess, verificationStatus, aliasEthAccount
 }) {
     const { active, error, account, library, chainId } = useWeb3React();
     const signer = library.getSigner(account);
 
     const modalRef = useRef(null);
     const polygonCommsContract = new ethers.Contract(addresses.epnsPolyComm, abis.epnsComm, signer);
-    const [mainAdress, setMainAddress] = useState('');
+    const [mainAddress, setMainAddress] = useState(aliasEthAccount);
     const [loading, setLoading] = useState('');
 
     // Form signer and contract connection
     useClickAway(modalRef, onClose);
 
+    const checkAlias = async () => {
+        console.log(mainAddress, aliasEthAccount);
+        if (mainAddress == aliasEthAccount) {
+            submitAlias();
+        } else {
+            setLoading('Enter Correct Eth Channel Address');
+            setTimeout(() => {
+                setLoading('')
+            }, 4000)
+        }
+    }
+
     const submitAlias = () => {
         setLoading('loading')
-        const anotherSendTxPromise = polygonCommsContract.verifyChannelAlias(mainAdress);
+        const anotherSendTxPromise = polygonCommsContract.verifyChannelAlias(mainAddress);
         anotherSendTxPromise
         .then(async (tx) => {
             console.log(tx);
@@ -35,10 +48,20 @@ export default function AliasVerificationModal({
 						await tx.wait(1);
             setLoading("Transaction Mined!");
 					
-            // setTimeout(() => {
-                onSuccess();
-                onClose();
-            // }, 2000);
+            setTimeout(async () => {
+                const response = await postReq("/channels/get_alias_verification_status", {
+                    aliasAddress: account,
+                    op: "read",
+                })
+                console.log(response);
+                const status = response?.data?.status;
+                if (status == true) {
+                    onSuccess();
+                    onClose();
+                } else {
+                    window.location.reload();
+                }
+            }, 5000);
         })
         .catch(() => {
             setLoading('There was an error');
@@ -76,7 +99,7 @@ export default function AliasVerificationModal({
                                     padding="12px"
                                     border="1px solid #674c9f"
                                     bg="#fff"
-                                    value={mainAdress}
+                                    value={aliasEthAccount}
                                     onChange={(e) => {setMainAddress(e.target.value)}}
                                 />
                             </Item>
@@ -87,8 +110,8 @@ export default function AliasVerificationModal({
                                     flex="1"
                                     radius="0px"
                                     padding="20px 10px"
-                                    disabled={mainAdress.length !== 42}
-                                    onClick={submitAlias}
+                                    disabled={mainAddress.length !== 42}
+                                    onClick={checkAlias}
                                 >
                                     { loading && <Loader
                                         type="Oval"

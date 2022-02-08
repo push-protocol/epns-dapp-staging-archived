@@ -418,6 +418,7 @@ function Home() {
             onClose={() => setModalOpen(false)}
             onSuccess={() => setAliasVerified(true)}
             verificationStatus={aliasVerified}
+            aliasEthAccount={aliasEthAccount}
           />
         )}
       </Interface>
