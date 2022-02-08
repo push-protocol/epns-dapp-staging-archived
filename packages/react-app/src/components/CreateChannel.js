@@ -401,16 +401,16 @@ function CreateChannel() {
       {uploadDone && !stakeFeesChoosen && (
         <Section>
           <Content padding="50px 0px 0px 0px">
-            <Item align="flex-start" margin="0px 20px">
+            {/* <Item align="flex-start" margin="0px 20px">
               <H3 color="#e20880">Set your staking fees in DAI</H3>
-            </Item>
+            </Item> */}
 
             <Item
               margin="-10px 20px 20px 20px"
               padding="20px 20px 10px 20px"
               bg="#f1f1f1"
             >
-              {daiAmountVal < 50.0 && (
+              {/* {daiAmountVal < 50.0 && (
                 <Slider
                   defaultValue={minStakeFees}
                   onChangeCommitted={(event, value) =>
@@ -421,9 +421,9 @@ function CreateChannel() {
                   step={minStakeFees}
                   marks
                   min={minStakeFees}
-                  max={25000}
+                  max={minStakeFees}
                 />
-              )}
+              )} */}
 
               <Span
                 weight="400"
@@ -431,7 +431,7 @@ function CreateChannel() {
                 textTransform="uppercase"
                 spacing="0.2em"
               >
-                Amount Staked: {channelStakeFees} DAI
+                Amount to be Staked: {channelStakeFees} DAI
               </Span>
             </Item>
 
