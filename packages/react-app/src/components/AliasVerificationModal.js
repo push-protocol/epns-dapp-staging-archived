@@ -49,7 +49,10 @@ export default function AliasVerificationModal({
             setTimeout(() => {
                 setLoading("Transaction Mined!");
             }, 2000);
-            setLoading(' ');
+            
+            setTimeout(() => {
+                setLoading("Verification in Process. Please wait, it may take some time");
+            }, 2000);
 			
             const intervalId = setInterval(async () => {
                 const response = await postReq("/channels/get_alias_verification_status", {
@@ -100,6 +103,7 @@ export default function AliasVerificationModal({
                                     padding="12px"
                                     border="1px solid #674c9f"
                                     bg="#fff"
+                                    disabled
                                     value={aliasEthAccount}
                                     onChange={(e) => {setMainAddress(e.target.value)}}
                                 />
