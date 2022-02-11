@@ -315,7 +315,7 @@ export default class ChannelsDataStore {
    * Get paginated channel information
    * @param {Number} startIndex the number of channels viewed so far e.g 50
    * @param {Number} pageCount the number of items per page we want
-   * @returns 
+   * @returns
    */
   getChannelFromApi = async (startIndex, pageCount) => {
     return postReq("/channels/fetch_channels", {
@@ -323,7 +323,9 @@ export default class ChannelsDataStore {
       pageSize: pageCount,
       op: "write",
     }).then((response) => {
-      const output = response.data.results.map(({channel}) => ({addr: channel}));
+      const output = response.data.results.map(({ channel }) => ({
+        addr: channel,
+      }));
       return output;
     });
   };
@@ -332,7 +334,7 @@ export default class ChannelsDataStore {
   // get channels meta in a paginated format
   // by passing in the starting index and the number of items per page
   getChannelsMetaAsync = async (startIndex, pageCount) => {
-    this.getChannelFromApi(startIndex, pageCount)
+    this.getChannelFromApi(startIndex, pageCount);
     return new Promise(async (resolve, reject) => {
       // get total number of channels
       const channelsCount = await this.getChannelsCountAsync();
@@ -441,6 +443,24 @@ export default class ChannelsDataStore {
           });
       }
     });
+  };
+  optInCache = async (channelAddress, userAddress) => {
+    const cachedSubscribers = [...this.state.subscribers[channelAddress]];
+    if (!cachedSubscribers) return;
+    this.state.subscribers[channelAddress] = [
+      ...cachedSubscribers,
+      userAddress,
+    ];
+    return cachedSubscribers;
+  };
+
+  optOutCache = async (channelAddress, userAddress) => {
+    const cachedSubscribers = [...this.state.subscribers[channelAddress]];
+    if (!cachedSubscribers) return;
+    this.state.subscribers[channelAddress] = cachedSubscribers.filter(
+      (sub) => sub != userAddress
+    );
+    return cachedSubscribers;
   };
 
   getChannelSubscribers = async (channelAddress) => {
