@@ -3,19 +3,24 @@ import moment from "moment";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
+import { ALLOWED_CORE_NETWORK } from "pages/Home";
 import { useWeb3React } from "@web3-react/core";
+import { postReq } from "api";
 const DATE_FORMAT = "DD/MM/YYYY";
 export default function ChannelDetails() {
-  const { library } = useWeb3React();
   const { channelDetails, canVerify } = useSelector((state) => state.admin);
   const { CHANNEL_ACTIVE_STATE, CHANNNEL_DEACTIVATED_STATE } = useSelector(
     (state) => state.channels
   );
   const [verifyingChannel, setVerifyingChannel] = React.useState([]);
   const [creationDate, setCreationDate] = React.useState("");
+  const [ethAliasAccount, setEthAliasAccount] = React.useState(null);
+  const [aliasVerified, setAliasVerified] = React.useState(null); // null means error, false means unverified and true means verified
   const { channelState } = channelDetails;
   const channelIsActive = channelState === CHANNEL_ACTIVE_STATE;
   const channelIsDeactivated = channelState === CHANNNEL_DEACTIVATED_STATE;
+  const { account, library, chainId } = useWeb3React();
+  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
 
   React.useEffect(() => {
     if (!channelDetails || !canVerify) return;
@@ -36,6 +41,35 @@ export default function ChannelDetails() {
       setCreationDate(block ? date.format(DATE_FORMAT) : "");
     })();
   }, [channelDetails]);
+
+  React.useEffect(() => {
+    if (!onCoreNetwork) return;
+    (async function() {
+      await postReq("/channels/get_alias_details", {
+        channel : account,
+        op: "read",
+      }).then(async ({ data }) => {
+        const aliasAccount = data;
+        console.log(aliasAccount);
+        if (aliasAccount) {
+          setEthAliasAccount(aliasAccount.aliasAddress);
+            await postReq("/channels/get_alias_verification_status", {
+              aliasAddress: account,
+              op: "read",
+            }).then(({ data }) => {
+              // if it returns undefined then we need to let them know to verify their channel
+              if (!data) {
+                setAliasVerified(false);
+                return;
+              }
+              const { status } = data;
+              setAliasVerified(status || false);
+              return data;
+            });
+        }
+      });
+    })();
+  }, [account , chainId]);
 
   return (
     <ChannelDetailsWrapper>
@@ -64,7 +98,7 @@ export default function ChannelDetails() {
       </SectionTop>
 
       <SectionDes>{channelDetails.info}</SectionDes>
-
+        {aliasVerified === false && <span style={{ fontSize : "16px" , fontWeight : 500, color : "red"}}>Please Verify Alias on Polygon</span>}
       <SectionDate>
         {canVerify && (
           <Verified>
