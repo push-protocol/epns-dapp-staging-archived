@@ -21,7 +21,6 @@ import {
 } from "redux/slices/notificationSlice";
 import Button from "@material-ui/core/Button/Button";
 
-
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
 function Feedbox() {
@@ -115,51 +114,50 @@ function Feedbox() {
   };
   const [clicked, setClicked] = React.useState(false);
 
-
-
-
   // Render
   return (
     <FullWidth>
-
-<Wrapper>
-        <ControlButtonBack active={currentTab == "inbox"}  onClick={() => {
-          setCurrentTab("inbox");
-          setClicked(false);
-          }}>
+      <Wrapper>
+        {bgUpdateLoading && (
+          <div style={{ marginTop: "10px", marginLeft: "21px" }}>
+            <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+          </div>
+        )}
+        <ControlButtonBack
+          active={currentTab == "inbox"}
+          onClick={() => {
+            setCurrentTab("inbox");
+            setClicked(false);
+          }}
+        >
           {/* Inbox */}
-          <img src="./arrow_back.png"/>
-          <img style={{marginLeft:"15px"}} src="./svg/INBOX.svg"/>
-           {/* <ControlText color="#35C5F3">INBOX</ControlText> */}
-          </ControlButtonBack>
+          <img src="./arrow_back.png" />
+          <img style={{ marginLeft: "15px" }} src="./svg/INBOX.svg" />
+          {/* <ControlText color="#35C5F3">INBOX</ControlText> */}
+        </ControlButtonBack>
 
-
-        <ControlButton active={currentTab == "spambox"}  onClick={() => {
-          setCurrentTab("spambox");
-          setClicked(true);
-          } } spam>
+        <ControlButton
+          active={currentTab == "spambox"}
+          onClick={() => {
+            setCurrentTab("spambox");
+            setClicked(true);
+          }}
+          spam
+        >
           {/* spambox */}
+
           {/* <Button style={{ border: '2px solid black',width:"35px",height:"45px",borderRadius:"10px" }} > */}
           
           <ControlImage active={currentTab == "spambox"} src="./spam.png"/>
             {/* </Button> */}
-        </ControlButton>
-       
-      </Wrapper>
-      
-      {currentTab == "spambox" ? (
-        
-        <SpamBox currentTab={currentTab} />
-      
-      ) : (
 
+        </ControlButton>
+      </Wrapper>
+
+      {currentTab == "spambox" ? (
+        <SpamBox currentTab={currentTab} />
+      ) : (
         <Container>
-          
-          {bgUpdateLoading && (
-            <div style={{ marginTop: "10px" }}>
-              <Loader type="Oval" color="#35c5f3" height={40} width={40} />
-            </div>
-          )}
           {notifications && (
             <Items id="scrollstyle-secondary">
               {notifications.map((oneNotification, index) => {
@@ -226,6 +224,7 @@ const ControlButtonBack = styled.div`
   margin-left: 27px;
 
   overflow: hidden;
+  background: #fafafa;
 
   display: flex;
   visibility:${(props) => (props.active ? "hidden" : "")};
@@ -262,6 +261,7 @@ const ControlImage = styled.img`
   width: 40px;
   
 
+
 `;
 
 const ControlText = styled.div`
@@ -269,19 +269,16 @@ const ControlText = styled.div`
   font-weight: 400;
   margin-left: 15px;
   opacity: ${(props) => (props.active ? "1" : "0.75")};
-
 `;
-
-
-
 
 const FullWidth = styled.div`
   width: 100%;
 `;
 const Wrapper = styled.div`
-display: flex;
-flex-direction: row;
-margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  padding-top: 20px;
+  background: #fafafa;
 `;
 
 const EmptyWrapper = styled.div`
