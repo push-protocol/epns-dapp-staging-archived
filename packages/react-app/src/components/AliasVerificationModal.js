@@ -23,7 +23,7 @@ export default function AliasVerificationModal({
     const [loading, setLoading] = useState('');
 
     // Form signer and contract connection
-    useClickAway(modalRef, onClose);
+    useClickAway(modalRef, ()=>onClose(loading !== ''));
 
     const checkAlias = async () => {
         console.log(mainAddress, aliasEthAccount);

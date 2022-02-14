@@ -415,7 +415,7 @@ function Home() {
         )}
         {modalOpen && (
           <AliasVerificationodal
-            onClose={() => setModalOpen(false)}
+            onClose={(val) => setModalOpen(val)}
             onSuccess={() => setAliasVerified(true)}
             verificationStatus={aliasVerified}
             aliasEthAccount={aliasEthAccount}
