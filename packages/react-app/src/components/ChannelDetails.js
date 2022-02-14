@@ -51,7 +51,7 @@ export default function ChannelDetails() {
       }).then(async ({ data }) => {
         const aliasAccount = data;
         console.log(aliasAccount);
-        if (aliasAccount) {
+        if (aliasAccount.aliasAddress) {
           setEthAliasAccount(aliasAccount.aliasAddress);
             await postReq("/channels/get_alias_verification_status", {
               aliasAddress: account,
