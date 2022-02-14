@@ -97,15 +97,13 @@ export default function AliasVerificationModal({
                         <>
                             <Item align="flex-start">
                                 <CustomInput
-                                    required
-                                    placeholder="Enter ethereum wallet address of this channel"
+                                    placeholder={aliasEthAccount}
                                     radius="4px"
                                     padding="12px"
                                     border="1px solid #674c9f"
                                     bg="#fff"
                                     disabled
-                                    value={aliasEthAccount}
-                                    onChange={(e) => {setMainAddress(e.target.value)}}
+                                    readOnly={true}
                                 />
                             </Item>
                             <Item margin="15px 0px 0px 0px" flex="1" self="stretch" align="stretch">
@@ -115,7 +113,7 @@ export default function AliasVerificationModal({
                                     flex="1"
                                     radius="0px"
                                     padding="20px 10px"
-                                    disabled={mainAddress.length !== 42}
+                                    disabled={mainAddress.length !== 42 || loading !== ''}
                                     onClick={checkAlias}
                                 >
                                     { loading && <Loader
