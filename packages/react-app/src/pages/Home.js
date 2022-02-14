@@ -14,7 +14,7 @@ import NotificationToast from "components/NotificationToast";
 import AliasVerificationodal from "components/AliasVerificationModal";
 import Info from "segments/Info";
 import SpamBox from "segments/spam";
-import Feedbox from "segments/Feedbox";
+import Feedbox from "segments/Feedbox"; 
 import ViewChannels from "segments/ViewChannels";
 import ChannelOwnerDashboard from "segments/ChannelOwnerDashboard";
 import ChannelCreationDashboard from "segments/ChannelCreationDashboard";

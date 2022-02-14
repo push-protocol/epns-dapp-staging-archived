@@ -139,10 +139,10 @@ function Feedbox() {
           setClicked(true);
           } } spam>
           {/* spambox */}
-          <Button style={{ border: '2px solid black',width:"35px",height:"45px",borderRadius:"10px" }} >
+          {/* <Button style={{ border: '2px solid black',width:"35px",height:"45px",borderRadius:"10px" }} > */}
           
-          <ControlImage active={currentTab == "spambox"} src={clicked? './bin-white.png' : './svg/bin.svg'}/>
-            </Button>
+          <ControlImage active={currentTab == "spambox"} src="./spam.png"/>
+            {/* </Button> */}
         </ControlButton>
        
       </Wrapper>
@@ -247,8 +247,8 @@ const ControlButton = styled.div`
   margin-right: 30px;
   margin-bottom: 20px;
 
-  opacity: ${(props) => (props.active ? "1" : "0.4")};
-  background-color: ${(props) => (props.active ? "#E20880" : "")};
+  // opacity: ${(props) => (props.active ? "1" : "0.4")};
+  // background-color: ${(props) => (props.active ? "#E20880" : "")};
 
   &:hover {
     opacity: 0.9;
@@ -258,8 +258,8 @@ const ControlButton = styled.div`
 `;
 
 const ControlImage = styled.img`
-  height: 30px;
-  width: 30px;
+  height: 40px;
+  width: 40px;
   
 
 `;
