@@ -14,7 +14,7 @@ import NotificationToast from "components/NotificationToast";
 import AliasVerificationodal from "components/AliasVerificationModal";
 import Info from "segments/Info";
 import SpamBox from "segments/spam";
-import Feedbox from "segments/Feedbox";
+import Feedbox from "segments/Feedbox"; 
 import ViewChannels from "segments/ViewChannels";
 import ChannelOwnerDashboard from "segments/ChannelOwnerDashboard";
 import ChannelCreationDashboard from "segments/ChannelCreationDashboard";
@@ -129,7 +129,7 @@ function Home() {
               return;
             }
             const { status } = data;
-            setAliasVerified(status || null);
+            setAliasVerified(status || false);
             return data;
           });
         }
@@ -415,9 +415,10 @@ function Home() {
         )}
         {modalOpen && (
           <AliasVerificationodal
-            onClose={() => setModalOpen(false)}
+            onClose={(val) => setModalOpen(val)}
             onSuccess={() => setAliasVerified(true)}
             verificationStatus={aliasVerified}
+            aliasEthAccount={aliasEthAccount}
           />
         )}
       </Interface>
