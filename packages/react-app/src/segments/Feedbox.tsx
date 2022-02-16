@@ -148,7 +148,7 @@ function Feedbox() {
 
           {/* <Button style={{ border: '2px solid black',width:"35px",height:"45px",borderRadius:"10px" }} > */}
           
-          <ControlImage active={currentTab == "spambox"} src="./spam.png"/>
+          <ControlImage active={currentTab == "spambox"} src="./spam-icon.png"/>
             {/* </Button> */}
 
         </ControlButton>
