@@ -19,6 +19,7 @@ const CHANNELS_PER_PAGE = 30; //pagination parameter which indicates how many ch
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
 const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for then to finish typing
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
+const SEARCH_DELAY = 1000;
 
 // Create Header
 function ViewChannels(props) {
@@ -47,7 +48,9 @@ function ViewChannels(props) {
   React.useEffect(() => {
     const parsedChannel = String(queryString.parse(window.location.search).channel);
     if(!ADDRESS_REGEX.test(parsedChannel)) return; //match it against a regex to confirm its actually an address and not a random string
-    setSearch(parsedChannel);
+    setTimeout(() => {
+      setSearch(parsedChannel);
+    }, SEARCH_DELAY)
   }, []);
 
   // to update a page
