@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import NotificationToast from "components/NotificationToast";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
-import { cacheChannelInfo } from "redux/slices/channelSlice";
+import { cacheChannelInfo, subscribeChannel, unsubscribeChannel } from "redux/slices/channelSlice";
 
 // Create Header
 function ViewChannelItem({ channelObjectProp }) {
@@ -83,6 +83,8 @@ function ViewChannelItem({ channelObjectProp }) {
   React.useEffect(() => {
     if (!channelObjectProp) return;
     setChannelObject(channelObjectProp);
+    setMemberCount(channelObjectProp.subscribersCount);
+    setSubscribed(channelObjectProp.isSubscriber);
   }, [channelObjectProp]);
 
   React.useEffect(() => {
@@ -120,14 +122,14 @@ function ViewChannelItem({ channelObjectProp }) {
           })
         );
       }
-      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
-      const subscribed = channelSubscribers.find((sub) => {
-        return sub.toLowerCase() === account.toLowerCase();
-      });
+      // const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
+      // const subscribed = channelSubscribers.find((sub) => {
+      //   return sub.toLowerCase() === account.toLowerCase();
+      // });
 
       setIsPushAdmin(pushAdminAddress === account);
-      setMemberCount(channelSubscribers.length);
-      setSubscribed(subscribed);
+      // setMemberCount(channelSubscribers.length);
+      // setSubscribed(subscribed);
       setChannelJson({ ...channelJson, addr: channelObject.addr });
       setLoading(false);
     } catch (err) {
@@ -316,7 +318,8 @@ function ViewChannelItem({ channelObjectProp }) {
           type: toaster.TYPE.SUCCESS,
           autoClose: 5000,
         });
-        ChannelsDataStore.instance.optInCache(channelObject.addr, account);
+        // ChannelsDataStore.instance.optInCache(channelObject.addr, account);
+        dispatch(subscribeChannel({ address: channelObject.addr }));
         setTxInProgress(false);
       });
     } catch (err) {
@@ -387,7 +390,8 @@ function ViewChannelItem({ channelObjectProp }) {
         .then((res) => {
           setSubscribed(false);
           setMemberCount(memberCount - 1);
-          ChannelsDataStore.instance.optOutCache(channelObject.addr, account);
+          // ChannelsDataStore.instance.optOutCache(channelObject.addr, account);
+          dispatch(unsubscribeChannel({ address: channelObject.addr }));
           toaster.update(txToast, {
             render: "Successfully opted out of channel !",
             type: toaster.TYPE.SUCCESS,
@@ -482,7 +486,7 @@ function ViewChannelItem({ channelObjectProp }) {
               <FlexBox style={{ marginBottom: "10px" }}>
                 <Subscribers>
                   <IoMdPeople size={20} color="#ccc" />
-                  <SubscribersCount>{memberCount?.toLocaleString()}</SubscribersCount>
+                  <SubscribersCount>{memberCount.toLocaleString()}</SubscribersCount>
                 </Subscribers>
 
                 <Subscribers style={{ marginLeft: "10px" }}>

@@ -27,6 +27,30 @@ export const contractSlice = createSlice({
       const { address, meta } = action.payload;
       state.channelsCache[address] = meta;
     },
+    subscribeChannel: (state, action) => {
+      const { address } = action.payload;
+      let channelIndex;
+      state.channels.find((channel, index) => {
+        if (channel.addr === address) {
+          channelIndex = index;
+          return true;
+        }
+      });
+      state.channels[channelIndex].isSubscriber = true;
+      state.channels[channelIndex].subscribersCount++;
+    },
+    unsubscribeChannel: (state, action) => {
+      const { address } = action.payload;
+      let channelIndex;
+      state.channels.find((channel, index) => {
+        if (channel.addr === address) {
+          channelIndex = index;
+          return true;
+        }
+      });
+      state.channels[channelIndex].isSubscriber = false;
+      state.channels[channelIndex].subscribersCount--;
+    }
   },
 });
 
@@ -35,6 +59,8 @@ export const {
   setChannelMeta,
   incrementPage,
   cacheChannelInfo,
+  subscribeChannel,
+  unsubscribeChannel
 } = contractSlice.actions;
 
 export default contractSlice.reducer;
