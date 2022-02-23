@@ -486,7 +486,7 @@ function ViewChannelItem({ channelObjectProp }) {
               <FlexBox style={{ marginBottom: "10px" }}>
                 <Subscribers>
                   <IoMdPeople size={20} color="#ccc" />
-                  <SubscribersCount>{memberCount.toLocaleString()}</SubscribersCount>
+                  <SubscribersCount>{memberCount?.toLocaleString()}</SubscribersCount>
                 </Subscribers>
 
                 <Subscribers style={{ marginLeft: "10px" }}>
