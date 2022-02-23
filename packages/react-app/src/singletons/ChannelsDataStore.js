@@ -28,14 +28,16 @@ export default class ChannelsDataStore {
     callbacks: [],
 
     account: null,
+    chainId: null,
     epnsReadProvider: null,
     epnsCommReadProvider: null,
   };
 
   // init
-  init = (account, epnsReadProvider, epnsCommReadProvider) => {
-    // set account
+  init = (account, chainId, epnsReadProvider, epnsCommReadProvider) => {
+    // set account and chainId
     this.state.account = account;
+    this.state.chainId = chainId;
 
     // First attach listeners then overwrite the old one if any
     this.resetChannelsListeners();
@@ -334,6 +336,7 @@ export default class ChannelsDataStore {
       page: Math.ceil(startIndex / pageCount) || 1,
       pageSize: pageCount,
       op: "read",
+      blockchain: this.state.chainId,
       address: account,
     }).then((response) => {
       const output = response.data.channelsDetail.map(({ channel, memberCount, isSubscriber }) => ({
@@ -478,13 +481,14 @@ export default class ChannelsDataStore {
     return cachedSubscribers;
   };
 
-  getChannelSubscribers = async (channelAddress) => {
+  getChannelSubscribers = async (channelAddress, chainId) => {
     const cachedSubscribers = this.state.subscribers[channelAddress];
     if (cachedSubscribers) {
       return cachedSubscribers;
     }
     return postReq("/channels/get_subscribers", {
       channel: channelAddress,
+      blockchain: chainId,
       op: "read",
     })
       .then(({ data }) => {
