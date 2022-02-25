@@ -18,7 +18,6 @@ import {
 import { postReq } from "api";
 import DisplayNotice from "components/DisplayNotice";
 import { updateTopNotifications } from "redux/slices/notificationSlice";
-
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
 function SpamBox({ currentTab }) {
@@ -27,7 +26,6 @@ function SpamBox({ currentTab }) {
   const { epnsCommReadProvider } = useSelector(
     (state: any) => state.contracts
   );
-
   const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
   const { toggle } = useSelector(
     (state: any) => state.notifications
@@ -37,10 +35,8 @@ function SpamBox({ currentTab }) {
     chainId: chainId,
     verifyingContract: epnsCommReadProvider?.address,
   };
-
   const [bgUpdateLoading, setBgUpdateLoading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-
   const loadNotifications = async () => {
     if (loading || finishedFetching) return;
     setLoading(true);
@@ -60,6 +56,7 @@ function SpamBox({ currentTab }) {
           } = await postReq("/channels/get_subscribers", {
             channel: results[i].channel,
             op: "read",
+            blockchain : chainId
           });
           elem.subscribers = subscribers;
           return { ...elem };
@@ -76,12 +73,10 @@ function SpamBox({ currentTab }) {
       setLoading(false);
     }
   };
-
   const fetchLatestNotifications = async () => {
     if (loading || bgUpdateLoading) return;
     setBgUpdateLoading(true);
     setLoading(true);
-
     try {
       const { count, results } = await api.fetchSpamNotifications(
         account,
@@ -101,6 +96,7 @@ function SpamBox({ currentTab }) {
           } = await postReq("/channels/get_subscribers", {
             channel: results[i].channel,
             op: "read",
+            blockchain : chainId
           });
           elem.subscribers = subscribers;
           return { ...elem };
@@ -122,25 +118,21 @@ function SpamBox({ currentTab }) {
       setLoading(false);
     }
   };
-
   React.useEffect(() => {
     if (account && currentTab === "spambox") {
       fetchLatestNotifications();
     }
   }, [account, currentTab]);
-
   React.useEffect(() => {
     if (epnsCommReadProvider) {
       loadNotifications();
     }
   }, [epnsCommReadProvider, account]);
-
   //function to query more notifications
   const handlePagination = async () => {
     loadNotifications();
     dispatch(incrementPage());
   };
-
   const showWayPoint = (index: any) => {
     return (
       Number(index) === notifications.length - 1 &&
@@ -148,7 +140,6 @@ function SpamBox({ currentTab }) {
       !bgUpdateLoading
     );
   };
-
   const onSubscribeToChannel = async (channelAddress) => {
     let txToast;
     const type = {
@@ -163,11 +154,9 @@ function SpamBox({ currentTab }) {
       subscriber: account,
       action: "Subscribe",
     };
-
     const signature = await library
       .getSigner(account)
       ._signTypedData(EPNS_DOMAIN, type, message);
-
     return postReq("/channels/subscribe_offchain", {
       signature,
       message,
@@ -176,13 +165,11 @@ function SpamBox({ currentTab }) {
       contractAddress: epnsCommReadProvider.address,
     });
   };
-
   const isSubscribedFn = async (subscribers: any) => {
     return subscribers
       .map((a) => a.toLowerCase())
       .includes(account.toLowerCase());
   };
-
   // Render
   return (
     <>
@@ -245,14 +232,12 @@ function SpamBox({ currentTab }) {
     </>
   );
 }
-
 const CenteredContainerInfo = styled.div`
   padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
-
 const Items = styled.div`
   display: block;
   align-self: stretch;
@@ -265,13 +250,11 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-
   font-weight: 200;
   align-content: center;
   align-items: center;
   justify-content: center;
   max-height: 100vh;
-
   // padding: 20px;
   // font-size: 16px;
   // display: flex;
@@ -282,6 +265,5 @@ const Container = styled.div`
   // width: 100%;
   // min-height: 40vh;
 `;
-
 // Export Default
 export default SpamBox;

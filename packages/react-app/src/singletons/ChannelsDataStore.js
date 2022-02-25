@@ -28,14 +28,16 @@ export default class ChannelsDataStore {
     callbacks: [],
 
     account: null,
+    chainId: null,
     epnsReadProvider: null,
     epnsCommReadProvider: null,
   };
 
   // init
-  init = (account, epnsReadProvider, epnsCommReadProvider) => {
-    // set account
+  init = (account, chainId, epnsReadProvider, epnsCommReadProvider) => {
+    // set account and chainId
     this.state.account = account;
+    this.state.chainId = chainId;
 
     // First attach listeners then overwrite the old one if any
     this.resetChannelsListeners();
@@ -317,14 +319,18 @@ export default class ChannelsDataStore {
    * @param {Number} pageCount the number of items per page we want
    * @returns
    */
-  getChannelFromApi = async (startIndex, pageCount) => {
-    return postReq("/channels/fetch_channels", {
+  getChannelFromApi = async (startIndex, pageCount, account) => {
+    return postReq("/channels/get_channels_with_sub", {
       page: Math.ceil(startIndex / pageCount) || 1,
       pageSize: pageCount,
-      op: "write",
+      op: "read",
+      blockchain: this.state.chainId,
+      address: account,
     }).then((response) => {
-      const output = response.data.results.map(({ channel }) => ({
+      const output = response.data.channelsDetail.map(({ channel, memberCount, isSubscriber }) => ({
         addr: channel,
+        memberCount: memberCount,
+        isSubscriber: isSubscriber
       }));
       return output;
     });
@@ -334,7 +340,7 @@ export default class ChannelsDataStore {
   // get channels meta in a paginated format
   // by passing in the starting index and the number of items per page
   getChannelsMetaAsync = async (startIndex, pageCount) => {
-    this.getChannelFromApi(startIndex, pageCount);
+    this.getChannelFromApi(startIndex, pageCount, this.state.account);
     return new Promise(async (resolve, reject) => {
       // get total number of channels
       const channelsCount = await this.getChannelsCountAsync();
@@ -463,13 +469,14 @@ export default class ChannelsDataStore {
     return cachedSubscribers;
   };
 
-  getChannelSubscribers = async (channelAddress) => {
+  getChannelSubscribers = async (channelAddress, chainId) => {
     const cachedSubscribers = this.state.subscribers[channelAddress];
     if (cachedSubscribers) {
       return cachedSubscribers;
     }
     return postReq("/channels/get_subscribers", {
       channel: channelAddress,
+      blockchain: chainId,
       op: "read",
     })
       .then(({ data }) => {
