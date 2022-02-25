@@ -7,7 +7,6 @@ import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
 import { addresses, abis, envConfig } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
-
 import config from "config";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import NotificationToast from "components/NotificationToast";
@@ -34,14 +33,11 @@ import {
   setDelegatees,
 } from "redux/slices/adminSlice";
 import { addNewNotification, toggleToggler, resetState } from "redux/slices/notificationSlice";
-
 export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
-
 // Create Header
 function Home() {
   ReactGA.pageview("/home");
-
   const dispatch = useDispatch();
   const { account, library, chainId } = useWeb3React();
   const {
@@ -49,10 +45,8 @@ function Home() {
     epnsWriteProvider,
     epnsCommReadProvider,
   } = useSelector((state) => state.contracts);
-
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
-
   const [controlAt, setControlAt] = React.useState(0);
   const [modalOpen, setModalOpen] = React.useState(false);
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
@@ -79,7 +73,6 @@ function Home() {
         "Please connect to the Kovan network to access channels",
     });
   };
-
   //clear toast variable after it is shown
   React.useEffect(() => {
     if (toast) {
@@ -87,12 +80,10 @@ function Home() {
     }
   }, [toast]);
   // toast related section
-
   React.useEffect(() => {
     dispatch(resetState());
     setTimeout(() => dispatch(toggleToggler()), 300)
   }, [account]);
-
   /**
    * Logic to get channel alias and alias verification status as well as create instances of core and comunicator contract
    */
@@ -170,7 +161,6 @@ function Home() {
       }
     })();
   }, [account, chainId]);
-
   /**
    * When we instantiate the contract instances, fetch basic information about the user
    * Corresponding channel owned.
@@ -187,7 +177,6 @@ function Home() {
     epnsReadProvider.pushChannelAdmin().then((response) => {
       dispatch(setPushAdmin(response));
     });
-
     // EPNS Read Provider Set
     if (epnsReadProvider != null && epnsCommReadProvider != null) {
       // Instantiate Data Stores
@@ -198,6 +187,7 @@ function Home() {
       );
       ChannelsDataStore.instance.init(
         account,
+        chainId,
         epnsReadProvider,
         epnsCommReadProvider
       );
@@ -205,12 +195,10 @@ function Home() {
       fetchDelegators();
     }
   }, [epnsReadProvider, epnsCommReadProvider]);
-
   // handle user action at control center
   const userClickedAt = (controlIndex) => {
     setControlAt(controlIndex);
   };
-
   // fetch all the channels who have delegated to this account
   const fetchDelegators = () => {
     postReq("/channels/delegatee/get_channels", {
@@ -242,7 +230,6 @@ function Home() {
         console.log({ err });
       });
   };
-
   // Check if a user is a channel or not
   const checkUserForChannelOwnership = async () => {
     // Check if account is admin or not and handle accordingly
@@ -255,7 +242,7 @@ function Home() {
         );
         const channelJson = await epnsReadProvider.channels(ownerAccount);
         const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-          ownerAccount
+          ownerAccount, chainId
         );
         dispatch(
           setUserChannelDetails({
@@ -281,7 +268,6 @@ function Home() {
         setAdminStatusLoaded(true);
       });
   };
-
   // Render
   return (
     <Container>
@@ -300,7 +286,6 @@ function Home() {
           />
           <ControlText active={controlAt == 0 ? 1 : 0}>Inbox</ControlText>
         </ControlButton>
-
         <ControlButton
           index={1}
           active={controlAt == 1 ? 1 : 0}
@@ -315,7 +300,6 @@ function Home() {
           />
           <ControlText active={controlAt == 1 ? 1 : 0}>Channels</ControlText>
         </ControlButton>
-
         <ControlButton
           index={2}
           active={controlAt == 2 ? 1 : 0}
@@ -390,7 +374,6 @@ function Home() {
             </>
           )}
         </ControlButton>
-
         <ControlButton
           index={3}
           active={controlAt == 3 ? 1 : 0}
@@ -425,7 +408,6 @@ function Home() {
     </Container>
   );
 }
-
 // css style
 const Container = styled.div`
   flex: 1;
@@ -433,7 +415,6 @@ const Container = styled.div`
   flex-direction: column;
   min-height: calc(100vh - 100px);
 `;
-
 const Controls = styled.div`
   flex: 0;
   display: flex;
@@ -442,28 +423,22 @@ const Controls = styled.div`
   flex-wrap: wrap;
   justify-content: space-between;
 `;
-
 const ControlButton = styled.div`
   flex: 1 1 21%;
   height: 120px;
   min-width: 200px;
   background: #fff;
-
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   border: 1px solid rgb(225, 225, 225);
-
   border-bottom: 10px solid rgb(180, 180, 180);
   margin: 20px;
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-bottom: 10px solid
     ${(props) => (props.active ? props.border : "rgb(180,180,180)")};
-
   &:hover {
     opacity: 0.9;
     cursor: pointer;
@@ -475,13 +450,11 @@ const ControlButton = styled.div`
     pointer: hand;
   }
 `;
-
 const ControlImage = styled.img`
   height: 30%;
   margin-right: 15px;
   filter: ${(props) => (props.active ? "brightness(1)" : "brightness(0)")};
   opacity: ${(props) => (props.active ? "1" : "0.25")};
-
   transition: transform 0.2s ease-out;
   ${(props) =>
     props.active &&
@@ -490,12 +463,10 @@ const ControlImage = styled.img`
       opacity: 0.4;
     `};
 `;
-
 const ControlText = styled.label`
   font-size: 16px;
   font-weight: 200;
   opacity: ${(props) => (props.active ? "1" : "0.75")};
-
   transition: transform 0.2s ease-out;
   ${(props) =>
     props.active &&
@@ -503,14 +474,12 @@ const ControlText = styled.label`
       transform: scale(1.3) translate(-10px, 0px);
     `};
 `;
-
 const ControlChannelContainer = styled.div`
   margin: 0px 20px;
   flex-direction: column;
   align-items: center;
   display: flex;
 `;
-
 const ControlChannelImage = styled.img`
   width: 20%;
   margin-bottom: 10px;
@@ -523,7 +492,6 @@ const ControlChannelImage = styled.img`
       z-index: 1;
     `};
 `;
-
 const ControlChannelText = styled.label`
   font-size: 16px;
   font-weight: 300;
@@ -539,18 +507,14 @@ const ControlChannelText = styled.label`
       transform: scale(1.1) translate(0px, -20px);
     `};
 `;
-
 const Interface = styled.div`
   flex: 1;
   display: flex;
-
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
   border-radius: 20px;
   border: 1px solid rgb(225, 225, 225);
-
   margin: 15px;
   overflow: hidden;
 `;
-
 // Export Default
 export default Home;

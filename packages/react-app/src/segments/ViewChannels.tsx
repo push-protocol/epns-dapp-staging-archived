@@ -67,7 +67,8 @@ function ViewChannels(props) {
     // fetch the meta of the first `CHANNELS_PER_PAGE` channels
     const channelsMeta = await ChannelsDataStore.instance.getChannelFromApi(
       channelsVisited,
-      CHANNELS_PER_PAGE
+      CHANNELS_PER_PAGE,
+      account
     );
     dispatch(incrementPage());
     if (!channels.length) {
@@ -81,7 +82,8 @@ function ViewChannels(props) {
     const startingPoint = newPageNumber * CHANNELS_PER_PAGE;
     const moreChannels = await ChannelsDataStore.instance.getChannelFromApi(
       startingPoint,
-      CHANNELS_PER_PAGE
+      CHANNELS_PER_PAGE,
+      account
     );
     dispatch(setChannelMeta([...channels, ...moreChannels]));
     setMoreLoading(false);
@@ -106,6 +108,8 @@ function ViewChannels(props) {
       setChannelToShow([]); //maybe remove later
       postReq("/channels/search", {
         query: search,
+        address: account,
+        chainId: chainId,
         op: "read",
       })
         .then((data) => {

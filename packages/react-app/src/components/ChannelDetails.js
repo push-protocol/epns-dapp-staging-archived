@@ -52,9 +52,11 @@ export default function ChannelDetails() {
         const aliasAccount = data;
         console.log(aliasAccount);
         if (aliasAccount.aliasAddress) {
-          setEthAliasAccount(aliasAccount.aliasAddress);
+          const { aliasAddress } = aliasAccount;
+          console.log(aliasAddress);
+          setEthAliasAccount(aliasAddress);
             await postReq("/channels/get_alias_verification_status", {
-              aliasAddress: account,
+              aliasAddress: aliasAddress,
               op: "read",
             }).then(({ data }) => {
               // if it returns undefined then we need to let them know to verify their channel
