@@ -242,8 +242,9 @@ function Home() {
         );
         const channelJson = await epnsReadProvider.channels(ownerAccount);
         const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-          ownerAccount, chainId
+          account, chainId
         );
+        console.log(channelSubscribers);
         dispatch(
           setUserChannelDetails({
             ...response,

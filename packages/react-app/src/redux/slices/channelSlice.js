@@ -36,7 +36,7 @@ export const contractSlice = createSlice({
           return true;
         }
       });
-      state.channels[channelIndex].isSubscriber = true;
+       state.channels[channelIndex].isSubscriber = true;
       state.channels[channelIndex].memberCount++;
     },
     unsubscribeChannel: (state, action) => {
