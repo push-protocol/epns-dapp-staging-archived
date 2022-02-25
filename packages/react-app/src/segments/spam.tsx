@@ -37,6 +37,10 @@ function SpamBox({ currentTab }) {
   };
   const [bgUpdateLoading, setBgUpdateLoading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const BLOCKCHAIN = {
+    "ETH_TEST_KOVAN": 42,
+    "POLYGON_TEST_MUMBAI": 80001,
+  }
   const loadNotifications = async () => {
     if (loading || finishedFetching) return;
     setLoading(true);
@@ -140,7 +144,7 @@ function SpamBox({ currentTab }) {
       !bgUpdateLoading
     );
   };
-  const onSubscribeToChannel = async (channelAddress) => {
+  const onSubscribeToChannel = async (channelAddress, notifChainId) => {
     let txToast;
     const type = {
       Subscribe: [
@@ -149,8 +153,32 @@ function SpamBox({ currentTab }) {
         { name: "action", type: "string" },
       ],
     };
+    let channelAddressToSend = channelAddress;
+    if (chainId !== notifChainId) {
+      if (chainId !== 42) {
+        try {
+          const response = await postReq("/channels/get_alias_details", {
+            channel: channelAddress,
+            op: "read",
+          })
+          channelAddressToSend = response?.data?.aliasAddress;
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          const response = await postReq("/channels/get_eth_address", {
+            aliasAddress: channelAddress,
+            op: "read",
+          })
+          channelAddressToSend = response?.data?.ethAddress;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
     const message = {
-      channel: channelAddress,
+      channel: channelAddressToSend,
       subscriber: account,
       action: "Subscribe",
     };
@@ -208,7 +236,7 @@ function SpamBox({ currentTab }) {
                     image={image}
                     subscribeFn={(e) => {
                       e?.stopPropagation();
-                      onSubscribeToChannel(channel);
+                      onSubscribeToChannel(channel, BLOCKCHAIN[blockchain]);
                     }}
                     isSpam
                     isSubscribedFn={async () => isSubscribedFn(subscribers)}
