@@ -9,7 +9,7 @@ import Skeleton from "@yisheng90/react-loading";
 import { IoMdPeople } from "react-icons/io";
 import { GoVerified } from "react-icons/go";
 import { FaRegAddressCard } from "react-icons/fa";
-import { AiTwotoneCopy } from "react-icons/ai";
+import { AiOutlineShareAlt } from "react-icons/ai";
 import { useWeb3React } from "@web3-react/core";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -120,7 +120,9 @@ function ViewChannelItem({ channelObjectProp }) {
           })
         );
       }
-      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
+      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
+        channelObject.addr
+      );
       const subscribed = channelSubscribers.find((sub) => {
         return sub.toLowerCase() === account.toLowerCase();
       });
@@ -136,7 +138,7 @@ function ViewChannelItem({ channelObjectProp }) {
   };
 
   React.useEffect(() => {
-    if(!channelObject) return;
+    if (!channelObject) return;
     setIsVerified(
       Boolean(
         (channelObject.verifiedBy &&
@@ -193,7 +195,7 @@ function ViewChannelItem({ channelObjectProp }) {
         });
 
         await tx.wait(1);
-        console.log ("Transaction Mined!");
+        console.log("Transaction Mined!");
         setIsVerified(true);
       })
       .catch((err) => {
@@ -331,7 +333,13 @@ function ViewChannelItem({ channelObjectProp }) {
     }
   };
 
-  const copyToClipboard = (url) => {
+  const copyToClipboard = (address) => {
+    let hostname = window.location.hostname;
+    // if we are on localhost, attach the port
+    if (hostname === "localhost") {
+      hostname = hostname + ":3000";
+    }
+    const url = `${hostname}/?channel=${address}`;
     // fallback for non navigator browser support
     if (navigator && navigator.clipboard) {
       navigator.clipboard.writeText(url);
@@ -482,7 +490,9 @@ function ViewChannelItem({ channelObjectProp }) {
               <FlexBox style={{ marginBottom: "10px" }}>
                 <Subscribers>
                   <IoMdPeople size={20} color="#ccc" />
-                  <SubscribersCount>{memberCount?.toLocaleString()}</SubscribersCount>
+                  <SubscribersCount>
+                    {memberCount?.toLocaleString()}
+                  </SubscribersCount>
                 </Subscribers>
 
                 <Subscribers style={{ marginLeft: "10px" }}>
@@ -500,7 +510,7 @@ function ViewChannelItem({ channelObjectProp }) {
                     }}
                     style={{ cursor: "pointer" }}
                   >
-                    <AiTwotoneCopy />
+                    <AiOutlineShareAlt />
                     {formatAddress(copyText)}
                   </SubscribersCount>
                 </Subscribers>
@@ -724,7 +734,7 @@ const ChannelDesc = styled.div`
   color: rgba(0, 0, 0, 0.75);
   font-weight: 400;
   flex-direction: column;
-  margin-bottom: 30px
+  margin-bottom: 30px;
 `;
 
 const ChannelDescLabel = styled.label`
