@@ -319,18 +319,6 @@ export default class ChannelsDataStore {
    * @param {Number} pageCount the number of items per page we want
    * @returns
    */
-  // getChannelFromApi = async (startIndex, pageCount) => {
-  //   return postReq("/channels/fetch_channels", {
-  //     page: Math.ceil(startIndex / pageCount) || 1,
-  //     pageSize: pageCount,
-  //     op: "write",
-  //   }).then((response) => {
-  //     const output = response.data.results.map(({ channel }) => ({
-  //       addr: channel,
-  //     }));
-  //     return output;
-  //   });
-  // };
   getChannelFromApi = async (startIndex, pageCount, account) => {
     return postReq("/channels/get_channels_with_sub", {
       page: Math.ceil(startIndex / pageCount) || 1,
@@ -341,7 +329,7 @@ export default class ChannelsDataStore {
     }).then((response) => {
       const output = response.data.channelsDetail.map(({ channel, memberCount, isSubscriber }) => ({
         addr: channel,
-        subscribersCount: memberCount,
+        memberCount: memberCount,
         isSubscriber: isSubscriber
       }));
       return output;

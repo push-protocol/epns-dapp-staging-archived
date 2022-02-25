@@ -105,6 +105,8 @@ function ViewChannels(props) {
       setChannelToShow([]); //maybe remove later
       postReq("/channels/search", {
         query: search,
+        address: account,
+        chainId: chainId,
         op: "read",
       })
         .then((data) => {

@@ -37,7 +37,7 @@ export const contractSlice = createSlice({
         }
       });
       state.channels[channelIndex].isSubscriber = true;
-      state.channels[channelIndex].subscribersCount++;
+      state.channels[channelIndex].memberCount++;
     },
     unsubscribeChannel: (state, action) => {
       const { address } = action.payload;
@@ -49,7 +49,7 @@ export const contractSlice = createSlice({
         }
       });
       state.channels[channelIndex].isSubscriber = false;
-      state.channels[channelIndex].subscribersCount--;
+      state.channels[channelIndex].memberCount--;
     }
   },
 });

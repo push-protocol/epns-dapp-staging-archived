@@ -83,7 +83,7 @@ function ViewChannelItem({ channelObjectProp }) {
   React.useEffect(() => {
     if (!channelObjectProp) return;
     setChannelObject(channelObjectProp);
-    setMemberCount(channelObjectProp.subscribersCount);
+    setMemberCount(channelObjectProp.memberCount);
     setSubscribed(channelObjectProp.isSubscriber);
   }, [channelObjectProp]);
 
