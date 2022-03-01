@@ -9,6 +9,7 @@
   ],
   "private": true,
   "scripts": {
+    "react-app:install": "yarn workspace @project/react-app install",
     "react-app:build": "yarn workspace @project/react-app build",
     "react-app:eject": "yarn workspace @project/react-app eject",
     "react-app:start": "yarn workspace @project/react-app start",

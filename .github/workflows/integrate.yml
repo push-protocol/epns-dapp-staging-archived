@@ -30,7 +30,7 @@ jobs:
                   node-version: "16"
 
             - name: Install Dependencies
-              run: npm install
+              run: npm react-app:install
 
             - name: Check Formatting
               run: npm run react-app:lint
