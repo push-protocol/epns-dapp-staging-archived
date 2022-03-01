@@ -83,6 +83,8 @@
     "extends": "react-app"
   },
   "scripts": {
+    "format": "prettier --write \"src/**/*.{js,jsx,json,ts,tsx,css,html}\"",
+    "lint": "prettier --check \"src/**/*.{js,jsx,json,ts,tsx,css,html}\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "build": "react-scripts build",
