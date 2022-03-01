@@ -106,7 +106,7 @@ function ChannelDashboard() {
             1
         );
 
-        anotherSendTxPromise.then(function(tx) {
+        anotherSendTxPromise.then(function (tx) {
             console.log(tx);
             console.log("Check: " + account);
         });
@@ -136,7 +136,7 @@ function ChannelDashboard() {
                         <Input
                             placeholder=" (1 for Normal, 2 for Secret)"
                             value={type}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setType(e.target.value);
                             }}
                         />
@@ -147,7 +147,7 @@ function ChannelDashboard() {
                         <Input
                             placeholder="Channel Address for msg type 1, recipient for 2"
                             value={recipient}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setRecipient(e.target.value);
                             }}
                         />
@@ -158,7 +158,7 @@ function ChannelDashboard() {
                         <Input
                             placeholder="The subject of the topic"
                             value={sub}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setSub(e.target.value);
                             }}
                         />
@@ -170,7 +170,7 @@ function ChannelDashboard() {
                             placeholder="The message to deliver"
                             maxlength="500"
                             value={msg}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setMsg(e.target.value);
                             }}
                         />
@@ -182,7 +182,7 @@ function ChannelDashboard() {
                             placeholder="Call to action url if any"
                             maxlength="200"
                             value={cta}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setCTA(e.target.value);
                             }}
                         />
@@ -194,7 +194,7 @@ function ChannelDashboard() {
                             placeholder="Image url if any"
                             maxlength="200"
                             value={img}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setImg(e.target.value);
                             }}
                         />
@@ -340,7 +340,7 @@ const Continue = styled.button`
     color: #fff;
     border-radius: 20px;
     font-size: 14px;
-    background: ${props => props.theme || "#674c9f"};
+    background: ${(props) => props.theme || "#674c9f"};
     border-radius: 8px;
     padding: 16px;
     font-size: 16px;

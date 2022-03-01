@@ -14,10 +14,10 @@ export const contractSlice = createSlice({
     name: "spam",
     initialState,
     reducers: {
-        toggleToggler: state => {
+        toggleToggler: (state) => {
             state.toggler = !state.toggler;
         },
-        resetState: state => {
+        resetState: (state) => {
             state.page = initialState.page;
             state.notifications = initialState.notifications;
             state.finishedFetching = initialState.finishedFetching;
@@ -26,7 +26,7 @@ export const contractSlice = createSlice({
             state.notifications = [...state.notifications, ...action.payload];
             state.page += 1;
         },
-        incrementPage: state => {
+        incrementPage: (state) => {
             state.page += 1;
         },
         addNewNotification: (state, action) => {
@@ -35,7 +35,7 @@ export const contractSlice = createSlice({
                 ...state.notifications,
             ];
         },
-        setFinishedFetching: state => {
+        setFinishedFetching: (state) => {
             state.finishedFetching = true;
         },
         updateTopNotifications: (state, action) => {

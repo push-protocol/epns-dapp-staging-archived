@@ -32,7 +32,7 @@ function CreateChannel() {
         console.log(status, meta, file);
     };
 
-    const onDropHandler = files => {
+    const onDropHandler = (files) => {
         //   var file = files[0]
         //   const reader = new FileReader();
         //   reader.onload = (event) => {
@@ -48,13 +48,13 @@ function CreateChannel() {
     const handleSubmit = (files, allFiles) => {
         setUploadDone(true);
 
-        console.log(files.map(f => f.meta));
-        allFiles.forEach(f => {
+        console.log(files.map((f) => f.meta));
+        allFiles.forEach((f) => {
             var file = f.file;
             var reader = new FileReader();
             reader.readAsDataURL(file);
             console.log(f.file);
-            reader.onloadend = function(e) {
+            reader.onloadend = function (e) {
                 console.log(reader.result);
                 setFile(reader.result);
             };
@@ -118,7 +118,7 @@ function CreateChannel() {
         );
         var anotherSendTxPromise = contract.createChannelWithFees(cid);
 
-        anotherSendTxPromise.then(function(tx) {
+        anotherSendTxPromise.then(function (tx) {
             console.log(tx);
             console.log("Check: " + account);
         });
@@ -168,7 +168,7 @@ function CreateChannel() {
                             placeholder="Your Channel Name"
                             maxlength="40"
                             value={name}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setName(e.target.value);
                             }}
                         />
@@ -176,7 +176,7 @@ function CreateChannel() {
                             placeholder="Your Channel's Short Description"
                             maxlength="200"
                             value={desc}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setDesc(e.target.value);
                             }}
                         />
@@ -184,7 +184,7 @@ function CreateChannel() {
                             placeholder="Your website"
                             maxlength="200"
                             value={url}
-                            onChange={e => {
+                            onChange={(e) => {
                                 setURL(e.target.value);
                             }}
                         />
@@ -320,7 +320,7 @@ const Continue = styled.button`
     color: #fff;
     border-radius: 20px;
     font-size: 14px;
-    background: ${props => props.theme || "#674c9f"};
+    background: ${(props) => props.theme || "#674c9f"};
     margin: 30px 0px 0px 0px;
     border-radius: 8px;
     padding: 16px;

@@ -26,10 +26,7 @@ export const contractSlice = createSlice({
     },
 });
 
-export const {
-    setUserChannelDetails,
-    setCanVerify,
-    setDelegatees,
-} = contractSlice.actions;
+export const { setUserChannelDetails, setCanVerify, setDelegatees } =
+    contractSlice.actions;
 
 export default contractSlice.reducer;

@@ -238,44 +238,44 @@ function Feedbox() {
 // `;
 
 const ControlButtonBack = styled.div`
-  flex: 1 1 21%;
-  height: 20px;
-  min-width: 70px;
-  background: #fff;
-  margin-top: 10px;
-  margin-left: 27px;
+    flex: 1 1 21%;
+    height: 20px;
+    min-width: 70px;
+    background: #fff;
+    margin-top: 10px;
+    margin-left: 27px;
 
-  overflow: hidden;
-  background: #fafafa;
+    overflow: hidden;
+    background: #fafafa;
 
-  display: flex;
-  visibility:${props => (props.active ? "hidden" : "")};
+    display: flex;
+    visibility: ${(props) => (props.active ? "hidden" : "")};
 
-  // opacity: ${props => (props.active ? "1" : "0.4")};
+    // opacity: ${(props) => (props.active ? "1" : "0.4")};
 
-  &:hover {
-    opacity: 0.9;
-    cursor: pointer;
-    pointer: hand;
-  }
+    &:hover {
+        opacity: 0.9;
+        cursor: pointer;
+        pointer: hand;
+    }
 `;
 
 const ControlButton = styled.div`
-  display: flex;
-  height: 44px;
-  min-width: 40px;
-  border-radius: 10px;
-  margin-right: 30px;
-  margin-bottom: 20px;
+    display: flex;
+    height: 44px;
+    min-width: 40px;
+    border-radius: 10px;
+    margin-right: 30px;
+    margin-bottom: 20px;
 
-  // opacity: ${props => (props.active ? "1" : "0.4")};
-  // background-color: ${props => (props.active ? "#E20880" : "")};
+    // opacity: ${(props) => (props.active ? "1" : "0.4")};
+    // background-color: ${(props) => (props.active ? "#E20880" : "")};
 
-  &:hover {
-    opacity: 0.9;
-    cursor: pointer;
-    pointer: hand;
-  }
+    &:hover {
+        opacity: 0.9;
+        cursor: pointer;
+        pointer: hand;
+    }
 `;
 
 const ControlImage = styled.img`
@@ -287,7 +287,7 @@ const ControlText = styled.div`
     font-size: 20px;
     font-weight: 400;
     margin-left: 15px;
-    opacity: ${props => (props.active ? "1" : "0.75")};
+    opacity: ${(props) => (props.active ? "1" : "0.75")};
 `;
 
 const FullWidth = styled.div`

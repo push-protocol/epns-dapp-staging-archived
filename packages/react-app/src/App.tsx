@@ -36,9 +36,8 @@ const web3Connectors = {
 
 export default function App() {
     const { connector, activate, active, error } = useWeb3React<Web3Provider>();
-    const [activatingConnector, setActivatingConnector] = React.useState<
-        AbstractConnector
-    >();
+    const [activatingConnector, setActivatingConnector] =
+        React.useState<AbstractConnector>();
 
     React.useEffect(() => {
         if (activatingConnector && activatingConnector === connector) {
@@ -98,7 +97,7 @@ export default function App() {
                             </H2>
 
                             <ItemH maxWidth="800px" align="stretch">
-                                {Object.keys(web3Connectors).map(name => {
+                                {Object.keys(web3Connectors).map((name) => {
                                     const currentConnector =
                                         web3Connectors[name].obj;
                                     const connected =
@@ -228,13 +227,13 @@ const ProviderButton = styled.button`
         opacity: 0.9;
         cursor: pointer;
         pointer: hand;
-        border: 1px solid ${props => props.border};
+        border: 1px solid ${(props) => props.border};
     }
     &:active {
         opacity: 0.75;
         cursor: pointer;
         pointer: hand;
-        border: 1px solid ${props => props.border};
+        border: 1px solid ${(props) => props.border};
     }
 `;
 

@@ -25,7 +25,7 @@ function Profile() {
                 // get ens
                 library
                     .lookupAddress(account)
-                    .then(function(name) {
+                    .then(function (name) {
                         setENS(name);
                         setENSFetched(true);
                         setAddress(account);

@@ -58,9 +58,8 @@ function CreateChannel() {
     const [channelInfo, setChannelInfo] = React.useState("");
     const [channelURL, setChannelURL] = React.useState("");
     const [channelFile, setChannelFile] = React.useState(undefined);
-    const [channelStakeFees, setChannelStakeFees] = React.useState(
-        minStakeFees
-    );
+    const [channelStakeFees, setChannelStakeFees] =
+        React.useState(minStakeFees);
     const [daiAmountVal, setDaiAmountVal] = useState("");
     const [stepFlow, setStepFlow] = React.useState(1);
 
@@ -92,7 +91,7 @@ function CreateChannel() {
         console.log(status, meta, file);
     };
 
-    const onDropHandler = files => {
+    const onDropHandler = (files) => {
         //   var file = files[0]
         //   const reader = new FileReader();
         //   reader.onload = (event) => {
@@ -107,13 +106,13 @@ function CreateChannel() {
     // receives array of files that are done uploading when submit button is clicked
     const handleLogoSubmit = (files, allFiles) => {
         // console.log(files.map(f => f.meta))
-        allFiles.forEach(f => {
+        allFiles.forEach((f) => {
             var file = f.file;
             var reader = new FileReader();
             reader.readAsDataURL(file);
             // console.log(f.file);
 
-            reader.onloadend = function(e) {
+            reader.onloadend = function (e) {
                 // console.log(reader.result);
                 const response = handleLogoSizeLimitation(reader.result);
                 if (response.success) {
@@ -129,7 +128,7 @@ function CreateChannel() {
         });
     };
 
-    const handleLogoSizeLimitation = base64 => {
+    const handleLogoSizeLimitation = (base64) => {
         // Setup Error on higher size of 128px
         var sizeOf = require("image-size");
         var base64Data = base64.split(";base64,").pop();
@@ -169,7 +168,7 @@ function CreateChannel() {
         }
     };
 
-    const handleCreateChannel = async e => {
+    const handleCreateChannel = async (e) => {
         // Check everything in order
         // skip this for now
         e.preventDefault();
@@ -270,7 +269,7 @@ function CreateChannel() {
         );
         setProcessingInfo("Creating Channel TX in progress");
         anotherSendTxPromise
-            .then(async function(tx) {
+            .then(async function (tx) {
                 console.log(tx);
                 console.log("Check: " + account);
                 await library.waitForTransaction(tx.hash);
@@ -281,7 +280,7 @@ function CreateChannel() {
                     window.location.reload();
                 }, 2000);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log("Error --> %o", err);
                 console.log({ err });
                 setProcessing(3);
@@ -289,7 +288,7 @@ function CreateChannel() {
             });
     };
 
-    const isEmpty = field => {
+    const isEmpty = (field) => {
         if (field.trim().length == 0) {
             return true;
         }
@@ -517,7 +516,7 @@ function CreateChannel() {
                                     size="1.2em"
                                     bg="#fff"
                                     value={channelName}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setChannelName(e.target.value);
                                     }}
                                 />
@@ -550,7 +549,7 @@ function CreateChannel() {
                                     placeholder="Alias network"
                                     name="color"
                                     options={ALIAS_CHAINS}
-                                    theme={theme => ({
+                                    theme={(theme) => ({
                                         ...theme,
                                         borderRadius: 0,
                                         colors: {
@@ -559,7 +558,7 @@ function CreateChannel() {
                                             primary: "#e20880",
                                         },
                                     })}
-                                    onChange={selectedOption => {
+                                    onChange={(selectedOption) => {
                                         setChainDetails(selectedOption.value);
                                     }}
                                 />
@@ -573,7 +572,7 @@ function CreateChannel() {
                                     size="1rem"
                                     bg="#fff"
                                     value={channelAlias}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setChannelAlias(e.target.value);
                                     }}
                                 />
@@ -595,7 +594,7 @@ function CreateChannel() {
                                     border="1px solid #000"
                                     bg="#fff"
                                     value={channelInfo}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setChannelInfo(e.target.value);
                                     }}
                                     autocomplete="off"
@@ -625,7 +624,7 @@ function CreateChannel() {
                                         weight="400"
                                         bg="#f1f1f1"
                                         value={channelURL}
-                                        onChange={e => {
+                                        onChange={(e) => {
                                             setChannelURL(e.target.value);
                                         }}
                                     />
@@ -729,14 +728,14 @@ function CreateChannel() {
 const Step = styled.div`
     height: 12px;
     width: 12px;
-    background: ${props => props.bg || "#fff"};
-    border: 4px solid ${props => props.activeBG || "#000"};
+    background: ${(props) => props.bg || "#fff"};
+    border: 4px solid ${(props) => props.activeBG || "#000"};
     border-radius: 100%;
 
     ${({ type }) =>
         type == "active" &&
         css`
-            background: ${props => props.activeBG || "#ddd"};
+            background: ${(props) => props.activeBG || "#ddd"};
             border: 4px solid #00000022;
         `};
 `;
@@ -809,7 +808,7 @@ const Continue = styled.button`
     color: #fff;
     border-radius: 20px;
     font-size: 14px;
-    background: ${props => props.theme || "#674c9f"};
+    background: ${(props) => props.theme || "#674c9f"};
     margin: 30px 0px 0px 0px;
     border-radius: 8px;
     padding: 16px;

@@ -281,7 +281,7 @@ export default class ChannelsDataStore {
                 const count = EPNSCoreHelper.getTotalNumberOfChannels(
                     this.state.epnsReadProvider
                 )
-                    .then(response => {
+                    .then((response) => {
                         this.state.channelsCount = response;
 
                         if (enableLogs)
@@ -291,7 +291,7 @@ export default class ChannelsDataStore {
                             );
                         resolve(this.state.channelsCount);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getChannelsCountAsync() --> %o",
                             err
@@ -304,10 +304,10 @@ export default class ChannelsDataStore {
         });
     };
 
-    incrementChannelsCountAsync = async incrementCount => {
+    incrementChannelsCountAsync = async (incrementCount) => {
         return new Promise((resolve, reject) => {
             this.getChannelsCountAsync()
-                .then(response => {
+                .then((response) => {
                     this.state.channelsCount = response + incrementCount;
                     console.log(
                         "incrementChannelsCountAsync() --> %d",
@@ -315,7 +315,7 @@ export default class ChannelsDataStore {
                     );
                     resolve(this.state.channelsCount);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, incrementChannelsCountAsync() --> %o",
                         err
@@ -337,7 +337,7 @@ export default class ChannelsDataStore {
             op: "read",
             blockchain: this.state.chainId,
             address: account,
-        }).then(response => {
+        }).then((response) => {
             const output = response.data.channelsDetail.map(
                 ({ channel, memberCount, isSubscriber }) => ({
                     addr: channel,
@@ -372,11 +372,11 @@ export default class ChannelsDataStore {
             }
             console.log({ channelIDs });
 
-            const promises = channelIDs.map(async channelID => {
+            const promises = channelIDs.map(async (channelID) => {
                 // Match the cache
                 return this.getChannelMetaAsync(channelID)
-                    .then(response => response)
-                    .catch(err =>
+                    .then((response) => response)
+                    .catch((err) =>
                         console.log(
                             "!!!Error (but skipping), getChannelMetaAsync() --> %o",
                             err
@@ -394,7 +394,7 @@ export default class ChannelsDataStore {
     };
 
     // To get a single channel meta via id
-    getChannelMetaAsync = async channelID => {
+    getChannelMetaAsync = async (channelID) => {
         return new Promise(async (resolve, reject) => {
             if (this.state.channelsMeta[channelID]) {
                 console.log(
@@ -409,11 +409,11 @@ export default class ChannelsDataStore {
                     channelID,
                     this.state.epnsReadProvider
                 )
-                    .then(async response => {
+                    .then(async (response) => {
                         channelAddress = response;
                         await this.getChannelMetaViaAddressAsync(
                             channelAddress
-                        ).then(response => {
+                        ).then((response) => {
                             // update the channel cache before resolving
                             this.state.channelsMeta[channelID] = response;
                             this.state.channelsMeta[channelAddress] = channelID;
@@ -423,7 +423,7 @@ export default class ChannelsDataStore {
                             resolve(response);
                         });
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getChannelMetaAsync() --> %o",
                             err
@@ -435,7 +435,7 @@ export default class ChannelsDataStore {
     };
 
     // To get a single channel meta via address
-    getChannelMetaViaAddressAsync = async channelAddress => {
+    getChannelMetaViaAddressAsync = async (channelAddress) => {
         return new Promise(async (resolve, reject) => {
             if (this.state.channelsMeta[channelAddress]) {
                 const channelID = this.state.channelsMeta[channelAddress];
@@ -451,12 +451,12 @@ export default class ChannelsDataStore {
                     channelAddress,
                     this.state.epnsReadProvider
                 )
-                    .then(response => {
+                    .then((response) => {
                         // resolve
                         // console.log("getChannelMetaViaAddressAsync() [Address: %s] --> %o", channelAddress, response);
                         resolve(response);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getChannelMetaViaAddressAsync() --> %o",
                             err
@@ -480,7 +480,7 @@ export default class ChannelsDataStore {
         const cachedSubscribers = [...this.state.subscribers[channelAddress]];
         if (!cachedSubscribers) return;
         this.state.subscribers[channelAddress] = cachedSubscribers.filter(
-            sub => sub != userAddress
+            (sub) => sub != userAddress
         );
         return cachedSubscribers;
     };
@@ -500,7 +500,7 @@ export default class ChannelsDataStore {
                 this.state.subscribers[channelAddress] = subs;
                 return subs;
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log(`getChannelSubscribers => ${err.message}`);
                 return [];
             });
@@ -508,7 +508,7 @@ export default class ChannelsDataStore {
 
     // CHANNELS INFO FUNCTIONS
     // To get a single channel meta via id
-    getChannelJsonAsync = async channelAddress => {
+    getChannelJsonAsync = async (channelAddress) => {
         return new Promise(async (resolve, reject) => {
             if (this.state.channelsJson[channelAddress]) {
                 // console.log("getChannelJsonAsync() [CACHED] --> %o", this.state.channelsJson[channelAddress]);
@@ -518,7 +518,7 @@ export default class ChannelsDataStore {
                     channelAddress,
                     this.state.epnsReadProvider
                 )
-                    .then(response => {
+                    .then((response) => {
                         // First set the cache
                         this.state.channelsJson[channelAddress] = response;
 
@@ -526,7 +526,7 @@ export default class ChannelsDataStore {
                         // console.log("getChannelJsonAsync() [Address: %s] --> %o", channelAddress, response);
                         resolve(response);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getChannelJsonAsync() --> %o",
                             err

@@ -45,11 +45,10 @@ export default function AliasVerificationModal({
 
     const submitAlias = () => {
         setLoading("loading");
-        const anotherSendTxPromise = polygonCommsContract.verifyChannelAlias(
-            mainAddress
-        );
+        const anotherSendTxPromise =
+            polygonCommsContract.verifyChannelAlias(mainAddress);
         anotherSendTxPromise
-            .then(async tx => {
+            .then(async (tx) => {
                 console.log(tx);
                 setLoading("Transaction Sent!");
 

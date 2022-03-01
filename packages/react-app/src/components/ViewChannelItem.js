@@ -31,10 +31,10 @@ function ViewChannelItem({ channelObjectProp }) {
         epnsCommReadProvider,
         pushAdminAddress,
         ZERO_ADDRESS,
-    } = useSelector(state => state.contracts);
-    const { canVerify } = useSelector(state => state.admin);
+    } = useSelector((state) => state.contracts);
+    const { canVerify } = useSelector((state) => state.admin);
     const { channelsCache, CHANNEL_BLACKLIST } = useSelector(
-        state => state.channels
+        (state) => state.channels
     );
     const { account, library, chainId } = useWeb3React();
     const isOwner = channelObjectProp.addr === account;
@@ -71,14 +71,14 @@ function ViewChannelItem({ channelObjectProp }) {
         if (!channelObject.addr) return;
         if (channelObject.verifiedBy) {
             // procced as usual
-            fetchChannelJson().catch(err => alert(err.message));
+            fetchChannelJson().catch((err) => alert(err.message));
             setIsBlocked(
                 channelObject.channelState === 3 ||
                     channelObject.channelState === 2 //dont display channel if blocked //dont display channel if deactivated
             );
         } else {
             // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
-            epnsReadProvider.channels(channelObject.addr).then(response => {
+            epnsReadProvider.channels(channelObject.addr).then((response) => {
                 setChannelObject({ ...response, addr: channelObject.addr });
                 fetchChannelJson();
             });
@@ -96,10 +96,10 @@ function ViewChannelItem({ channelObjectProp }) {
         if (!isVerified || channelObject?.verifiedBy === ZERO_ADDRESS) return;
         ChannelsDataStore.instance
             .getChannelJsonAsync(channelObject.verifiedBy)
-            .then(verifierDetails => {
+            .then((verifierDetails) => {
                 setVerifierDetails(verifierDetails);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log(channelObject.verifiedBy, err);
             });
     }, [isVerified, channelObject]);
@@ -117,9 +117,10 @@ function ViewChannelItem({ channelObjectProp }) {
             if (channelsCache[channelObject.addr]) {
                 channelJson = channelsCache[channelObject.addr];
             } else {
-                channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
-                    channelObject.addr
-                );
+                channelJson =
+                    await ChannelsDataStore.instance.getChannelJsonAsync(
+                        channelObject.addr
+                    );
                 dispatch(
                     cacheChannelInfo({
                         address: channelObject.addr,
@@ -166,7 +167,7 @@ function ViewChannelItem({ channelObjectProp }) {
     const subscribe = async () => {
         subscribeAction(false);
     };
-    const formatAddress = addressText => {
+    const formatAddress = (addressText) => {
         return addressText.length > 40
             ? `${addressText.slice(0, 4)}....${addressText.slice(36)}`
             : addressText;
@@ -192,7 +193,7 @@ function ViewChannelItem({ channelObjectProp }) {
         // post op
         epnsWriteProvider
             .verifyChannel(channelObject.addr)
-            .then(async tx => {
+            .then(async (tx) => {
                 console.log(tx);
                 console.log("Transaction Sent!");
 
@@ -206,7 +207,7 @@ function ViewChannelItem({ channelObjectProp }) {
                 console.log("Transaction Mined!");
                 setIsVerified(true);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log("!!!Error verifyChannel() --> %o", err);
                 toaster.update(notificationToast(), {
                     render:
@@ -225,7 +226,7 @@ function ViewChannelItem({ channelObjectProp }) {
         setvLoading(true);
         epnsWriteProvider
             .unverifyChannel(channelObject.addr)
-            .then(async tx => {
+            .then(async (tx) => {
                 console.log(tx);
                 console.log("Transaction Sent!");
 
@@ -239,7 +240,7 @@ function ViewChannelItem({ channelObjectProp }) {
                 console.log("Transaction Mined!");
                 setIsVerified(false);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log("!!!Error handleSendMessage() --> %o", err);
                 toaster.update(notificationToast(), {
                     render:
@@ -255,7 +256,7 @@ function ViewChannelItem({ channelObjectProp }) {
         setBLoading(true);
         epnsWriteProvider
             .blockChannel(channelObject.addr)
-            .then(async tx => {
+            .then(async (tx) => {
                 console.log(tx);
                 console.log("Transaction Sent!");
 
@@ -268,7 +269,7 @@ function ViewChannelItem({ channelObjectProp }) {
                 // await tx.wait(1);
                 // console.log ("Transaction Mined!");
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log("!!!Error handleSendMessage() --> %o", err);
                 toaster.update(notificationToast(), {
                     render: "Transacion Failed: " + err.error.message,
@@ -325,7 +326,7 @@ function ViewChannelItem({ channelObjectProp }) {
                 op: "write",
                 chainId,
                 contractAddress: epnsCommReadProvider.address,
-            }).then(res => {
+            }).then((res) => {
                 setSubscribed(true);
                 setMemberCount(memberCount + 1);
                 toaster.update(txToast, {
@@ -352,7 +353,7 @@ function ViewChannelItem({ channelObjectProp }) {
         }
     };
 
-    const copyToClipboard = address => {
+    const copyToClipboard = (address) => {
         let hostname = window.location.hostname;
         // if we are on localhost, attach the port
         if (hostname === "localhost") {
@@ -414,7 +415,7 @@ function ViewChannelItem({ channelObjectProp }) {
                 chainId,
                 contractAddress: epnsCommReadProvider.address,
             })
-                .then(res => {
+                .then((res) => {
                     setSubscribed(false);
                     setMemberCount(memberCount - 1);
                     // ChannelsDataStore.instance.optOutCache(channelObject.addr, account);
@@ -428,7 +429,7 @@ function ViewChannelItem({ channelObjectProp }) {
                     });
                     console.log(res);
                 })
-                .catch(err => {
+                .catch((err) => {
                     toaster.update(txToast, {
                         render:
                             "There was an error opting into channel (" +
@@ -723,11 +724,11 @@ const Container = styled.div`
 
 const SkeletonWrapper = styled.div`
     overflow: hidden;
-    width: ${props => props.atW + "%" || "100%"};
-    height: ${props => props.atH}px;
-    border-radius: ${props => props.borderRadius || 10}px;
-    margin-bottom: ${props => props.marginBottom || 5}px;
-    margin-right: ${props => props.marginRight || 0}px;
+    width: ${(props) => props.atW + "%" || "100%"};
+    height: ${(props) => props.atH}px;
+    border-radius: ${(props) => props.borderRadius || 10}px;
+    margin-bottom: ${(props) => props.marginBottom || 5}px;
+    margin-right: ${(props) => props.marginRight || 0}px;
 `;
 
 const ChannelLogo = styled.div`
@@ -916,7 +917,7 @@ const ChannelActionButton = styled.button`
         cursor: pointer;
         pointer: hand;
     }
-    ${props =>
+    ${(props) =>
         props.disabled &&
         css`
             &:hover {
@@ -933,7 +934,7 @@ const ChannelActionButton = styled.button`
 `;
 
 const ActionTitle = styled.span`
-    ${props =>
+    ${(props) =>
         props.hideit &&
         css`
             visibility: hidden;

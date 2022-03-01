@@ -63,7 +63,7 @@ function TransferNFT({ tokenId }) {
         }
     }, [account]);
 
-    const handleTransferNFT = async e => {
+    const handleTransferNFT = async (e) => {
         if (nftWriteProvider) {
             console.log(
                 "🚀 ~ file: TransferNFT.js ~ line 64 ~ handleTransferNFT ~ nftWriteProvider",
@@ -100,7 +100,7 @@ function TransferNFT({ tokenId }) {
         }
     };
 
-    const isEmpty = field => {
+    const isEmpty = (field) => {
         if (field.trim().length == 0) {
             return true;
         }
@@ -155,7 +155,7 @@ function TransferNFT({ tokenId }) {
                                 size="1.2em"
                                 bg="#fff"
                                 value={toAddress}
-                                onChange={e => {
+                                onChange={(e) => {
                                     setToAddress(e.target.value);
                                 }}
                             />
@@ -244,14 +244,14 @@ function TransferNFT({ tokenId }) {
 const Step = styled.div`
     height: 12px;
     width: 12px;
-    background: ${props => props.bg || "#fff"};
-    border: 4px solid ${props => props.activeBG || "#000"};
+    background: ${(props) => props.bg || "#fff"};
+    border: 4px solid ${(props) => props.activeBG || "#000"};
     border-radius: 100%;
 
     ${({ type }) =>
         type == "active" &&
         css`
-            background: ${props => props.activeBG || "#ddd"};
+            background: ${(props) => props.activeBG || "#ddd"};
             border: 4px solid #00000022;
         `};
 `;

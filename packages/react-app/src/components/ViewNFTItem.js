@@ -51,7 +51,7 @@ function ViewNFTItem({
     }, [account, NFTObject]);
 
     // to claim
-    const handleClaim = async tokenId => {
+    const handleClaim = async (tokenId) => {
         if (NFTRewardsContract) {
             setTxInProgress(true);
             let sendWithTxPromise;
@@ -118,7 +118,7 @@ function ViewNFTItem({
                         {!loading && (
                             <ChannelLogoImg
                                 src={`https://ipfs.io/ipfs/${NFTObject.metadata}`}
-                                onError={e => (
+                                onError={(e) => (
                                     (e.target.onerror = null),
                                     (e.target.src =
                                         "./image-not-available.jpeg")
@@ -248,11 +248,11 @@ const Container = styled.div`
 
 const SkeletonWrapper = styled.div`
     overflow: hidden;
-    width: ${props => props.atW + "%" || "100%"};
-    height: ${props => props.atH}px;
-    border-radius: ${props => props.borderRadius || 10}px;
-    margin-bottom: ${props => props.marginBottom || 5}px;
-    margin-right: ${props => props.marginRight || 0}px;
+    width: ${(props) => props.atW + "%" || "100%"};
+    height: ${(props) => props.atH}px;
+    border-radius: ${(props) => props.borderRadius || 10}px;
+    margin-bottom: ${(props) => props.marginBottom || 5}px;
+    margin-right: ${(props) => props.marginRight || 0}px;
 `;
 
 const ChannelLogo = styled.div`
@@ -411,7 +411,7 @@ const ChannelActionButton = styled.button`
         cursor: pointer;
         pointer: hand;
     }
-    ${props =>
+    ${(props) =>
         props.disabled &&
         css`
             background: #e20880;
@@ -429,7 +429,7 @@ const ChannelActionButton = styled.button`
 `;
 
 const ActionTitle = styled.span`
-    ${props =>
+    ${(props) =>
         props.hideit &&
         css`
             visibility: hidden;

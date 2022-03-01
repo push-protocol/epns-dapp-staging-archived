@@ -44,11 +44,8 @@ function Home() {
     ReactGA.pageview("/home");
     const dispatch = useDispatch();
     const { account, library, chainId } = useWeb3React();
-    const {
-        epnsReadProvider,
-        epnsWriteProvider,
-        epnsCommReadProvider,
-    } = useSelector(state => state.contracts);
+    const { epnsReadProvider, epnsWriteProvider, epnsCommReadProvider } =
+        useSelector((state) => state.contracts);
     const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
     const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
     const [controlAt, setControlAt] = React.useState(0);
@@ -180,7 +177,7 @@ function Home() {
         userClickedAt(INITIAL_OPEN_TAB);
         setChannelJson([]);
         // save push admin to global state
-        epnsReadProvider.pushChannelAdmin().then(response => {
+        epnsReadProvider.pushChannelAdmin().then((response) => {
             dispatch(setPushAdmin(response));
         });
         // EPNS Read Provider Set
@@ -202,7 +199,7 @@ function Home() {
         }
     }, [epnsReadProvider, epnsCommReadProvider]);
     // handle user action at control center
-    const userClickedAt = controlIndex => {
+    const userClickedAt = (controlIndex) => {
         setControlAt(controlIndex);
     };
     // fetch all the channels who have delegated to this account
@@ -217,10 +214,13 @@ function Home() {
                 if (delegators && delegators.channelOwners) {
                     const channelInformationPromise = [
                         ...new Set([account, ...delegators.channelOwners]), //make the accounts unique
-                    ].map(channelAddress =>
+                    ].map((channelAddress) =>
                         ChannelsDataStore.instance
                             .getChannelJsonAsync(channelAddress)
-                            .then(res => ({ ...res, address: channelAddress }))
+                            .then((res) => ({
+                                ...res,
+                                address: channelAddress,
+                            }))
                             .catch(() => false)
                     );
                     const channelInformation = await Promise.all(
@@ -232,7 +232,7 @@ function Home() {
                     dispatch(setDelegatees([]));
                 }
             })
-            .catch(async err => {
+            .catch(async (err) => {
                 console.log({ err });
             });
     };
@@ -244,18 +244,18 @@ function Home() {
             ownerAccount,
             epnsReadProvider
         )
-            .then(async response => {
+            .then(async (response) => {
                 // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
-                const verificationStatus = await epnsReadProvider.getChannelVerfication(
-                    ownerAccount
-                );
+                const verificationStatus =
+                    await epnsReadProvider.getChannelVerfication(ownerAccount);
                 const channelJson = await epnsReadProvider.channels(
                     ownerAccount
                 );
-                const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-                    account,
-                    chainId
-                );
+                const channelSubscribers =
+                    await ChannelsDataStore.instance.getChannelSubscribers(
+                        account,
+                        chainId
+                    );
                 console.log(channelSubscribers);
                 dispatch(
                     setUserChannelDetails({
@@ -269,7 +269,7 @@ function Home() {
                 setChannelAdmin(true);
                 setAdminStatusLoaded(true);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log(
                     "There was an error [checkUserForChannelOwnership]:",
                     err.message
@@ -438,7 +438,7 @@ function Home() {
                 )}
                 {modalOpen && (
                     <AliasVerificationodal
-                        onClose={val => setModalOpen(val)}
+                        onClose={(val) => setModalOpen(val)}
                         onSuccess={() => setAliasVerified(true)}
                         verificationStatus={aliasVerified}
                         aliasEthAccount={aliasEthAccount}
@@ -478,7 +478,7 @@ const ControlButton = styled.div`
     align-items: center;
     justify-content: center;
     border-bottom: 10px solid
-        ${props => (props.active ? props.border : "rgb(180,180,180)")};
+        ${(props) => (props.active ? props.border : "rgb(180,180,180)")};
     &:hover {
         opacity: 0.9;
         cursor: pointer;
@@ -493,10 +493,10 @@ const ControlButton = styled.div`
 const ControlImage = styled.img`
     height: 30%;
     margin-right: 15px;
-    filter: ${props => (props.active ? "brightness(1)" : "brightness(0)")};
-    opacity: ${props => (props.active ? "1" : "0.25")};
+    filter: ${(props) => (props.active ? "brightness(1)" : "brightness(0)")};
+    opacity: ${(props) => (props.active ? "1" : "0.25")};
     transition: transform 0.2s ease-out;
-    ${props =>
+    ${(props) =>
         props.active &&
         css`
             transform: scale(3.5) translate(-20px, 0px);
@@ -506,9 +506,9 @@ const ControlImage = styled.img`
 const ControlText = styled.label`
     font-size: 16px;
     font-weight: 200;
-    opacity: ${props => (props.active ? "1" : "0.75")};
+    opacity: ${(props) => (props.active ? "1" : "0.75")};
     transition: transform 0.2s ease-out;
-    ${props =>
+    ${(props) =>
         props.active &&
         css`
             transform: scale(1.3) translate(-10px, 0px);
@@ -524,7 +524,7 @@ const ControlChannelImage = styled.img`
     width: 20%;
     margin-bottom: 10px;
     transition: transform 0.2s ease-out;
-    ${props =>
+    ${(props) =>
         props.active &&
         css`
             transform: scale(3.5) translate(-40px, 5px);
@@ -535,13 +535,13 @@ const ControlChannelImage = styled.img`
 const ControlChannelText = styled.label`
     font-size: 16px;
     font-weight: 300;
-    opacity: ${props => (props.active ? "1" : "0.75")};
+    opacity: ${(props) => (props.active ? "1" : "0.75")};
     transition: transform 0.2s ease-out;
     background: -webkit-linear-gradient(#db268a, #34c6f3);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     z-index: 2;
-    ${props =>
+    ${(props) =>
         props.active &&
         css`
             transform: scale(1.1) translate(0px, -20px);

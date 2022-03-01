@@ -113,14 +113,14 @@ function ViewChannels(props) {
                 chainId: chainId,
                 op: "read",
             })
-                .then(data => {
+                .then((data) => {
                     setChannelToShow(data.data.channels || []);
                     setLoadingChannel(false);
                 })
                 .catch(() => {
                     // if there's an error search for three times before giving up and displaying the normal channels
                     if (trialCount < SEARCH_TRIAL_LIMIT) {
-                        setTrialCount(t => t + 1);
+                        setTrialCount((t) => t + 1);
                         searchForChannel(); //if theres an error, recursively search
                     } else {
                         setChannelToShow(channels);

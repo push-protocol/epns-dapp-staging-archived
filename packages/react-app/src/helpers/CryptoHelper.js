@@ -6,16 +6,16 @@ var CryptoJS = require("crypto-js");
 
 const CryptoHelper = {
     // To Encrypt with AES
-    encryptWithAES: function(message, key) {
+    encryptWithAES: function (message, key) {
         return CryptoJS.AES.encrypt(message, key).toString();
     },
     // To Decrypt with AES
-    decryptWithAES: function(message, key) {
+    decryptWithAES: function (message, key) {
         let bytes = CryptoJS.AES.decrypt(message, key);
         return bytes.toString(CryptoJS.enc.Utf8);
     },
     // To Form Encryted Secret, no more than 15 characters supported
-    encryptWithECIES: async function(message, publicKey) {
+    encryptWithECIES: async function (message, publicKey) {
         const compressedKey = EthCrypto.publicKey.compress(publicKey);
 
         const encryptedSecret = await this.encryptWithPublicKey(
@@ -29,14 +29,14 @@ const CryptoHelper = {
         return encryptedSecret;
     },
     // To Form Decrypted Secret, no more than 15 characters supported
-    decryptWithECIES: async function(message, privateKey) {
+    decryptWithECIES: async function (message, privateKey) {
         // Message is always compressed, not using because sqlite2 has some error with this
         //const uncompressedMessage = EthCrypto.hex.decompress(message).substr(2); // to remove 0x
 
         return await this.decryptWithPrivateKey(message, privateKey);
     },
     // Encryption with public key
-    encryptWithPublicKey: async function(message, publicKey) {
+    encryptWithPublicKey: async function (message, publicKey) {
         // Convert compressed public key, starts with 03 or 04
         const pubKeyUint8Array = Uint8Array.from(new Buffer(publicKey, "hex"));
         //console.log("[ENCRYPTION] Public Key Uint8Array: " + pubKeyUint8Array);
@@ -53,7 +53,7 @@ const CryptoHelper = {
         const pubKey = new Buffer(convertedPublicKeyHex, "hex");
         //console.log("[ENCRYPTION] pubkey getting sentout for encrypt: " + pubKey);
 
-        return encrypt(pubKey, Buffer(message)).then(encryptedBuffers => {
+        return encrypt(pubKey, Buffer(message)).then((encryptedBuffers) => {
             const cipher = {
                 iv: encryptedBuffers.iv.toString("hex"),
                 ephemPublicKey: encryptedBuffers.ephemPublicKey.toString("hex"),
@@ -88,7 +88,7 @@ const CryptoHelper = {
         });
     },
     // Decryption with public key
-    decryptWithPrivateKey: async function(message, privateKey) {
+    decryptWithPrivateKey: async function (message, privateKey) {
         let encrypted = message;
         const buf = new Buffer(encrypted, "hex");
         // console.log("[DECRYPTION] Buffer Passed: " + buf);
@@ -126,13 +126,12 @@ const CryptoHelper = {
             mac: new Buffer(encrypted.mac, "hex"),
         };
 
-        return decrypt(
-            new Buffer(twoStripped, "hex"),
-            encryptedBuffer
-        ).then(decryptedBuffer => decryptedBuffer.toString());
+        return decrypt(new Buffer(twoStripped, "hex"), encryptedBuffer).then(
+            (decryptedBuffer) => decryptedBuffer.toString()
+        );
     },
     // Testing of Encryption and Decryption from Public to Private key
-    encryptionDecryptionPublicToPrivateTest: async function(privateKey) {
+    encryptionDecryptionPublicToPrivateTest: async function (privateKey) {
         const startTime = new Date();
         console.log("[ENCRYPTION / DECRYPTION TEST STARTED] - " + startTime);
 
@@ -172,7 +171,7 @@ const CryptoHelper = {
         );
     },
     // To output messge payload if required
-    outputMsgPayload: async function(
+    outputMsgPayload: async function (
         secret,
         subject,
         message,
@@ -210,7 +209,7 @@ const CryptoHelper = {
         console.log("decrypted aimg --> ");
         console.log(this.decryptWithAES(aimgE, secret));
     },
-    makeid: function(length) {
+    makeid: function (length) {
         var result = "[" + new Date().toISOString() + "] ";
         var characters =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

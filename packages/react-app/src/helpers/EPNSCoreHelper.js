@@ -7,19 +7,19 @@ import { ethers } from "ethers";
 // FeedDB Helper Function
 const EPNSCoreHelper = {
     // To get owner info
-    getOwnerInfo: async contract => {
+    getOwnerInfo: async (contract) => {
         const enableLogs = 0;
 
         return new Promise((resolve, reject) => {
             // Get User Info from EPNS Core
             contract
                 .governance()
-                .then(response => {
+                .then((response) => {
                     if (enableLogs)
                         console.log("getOwnerInfo() --> %o", response);
                     resolve(response);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getOwnerInfo() --> %o", err);
                     reject(err);
                 });
@@ -33,7 +33,7 @@ const EPNSCoreHelper = {
             // Get User Info from EPNS Core
             contract
                 .users(user)
-                .then(response => {
+                .then((response) => {
                     const mappings = { ...response };
                     mappings.addr = user;
 
@@ -41,7 +41,7 @@ const EPNSCoreHelper = {
                         console.log("getUserInfo() --> %o", mappings);
                     resolve(mappings);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getUserInfo() --> %o", err);
                     reject(err);
                 });
@@ -53,11 +53,11 @@ const EPNSCoreHelper = {
             // To get channel info from a channel address
             contract
                 .channelById(channelID)
-                .then(response => {
+                .then((response) => {
                     // console.log("getChannelAddressFromID() --> %o", response.toString());
                     resolve(response.toString());
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getChannelAddressFromID() --> %o",
                         err
@@ -73,7 +73,7 @@ const EPNSCoreHelper = {
             // To get channel info from a channel address
             contract
                 .channels(channel)
-                .then(response => {
+                .then((response) => {
                     // Add an extra field for future info
                     const mappings = { ...response };
                     mappings.addr = channel;
@@ -82,7 +82,7 @@ const EPNSCoreHelper = {
                         console.log("getChannelInfo() --> %o", mappings);
                     resolve(mappings);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getChannelInfo() --> %o", err);
                     reject(err);
                 });
@@ -103,7 +103,7 @@ const EPNSCoreHelper = {
 
             contract
                 .queryFilter(filter, block, block)
-                .then(response => {
+                .then((response) => {
                     let filteredResponse;
 
                     if (enableLogs)
@@ -113,7 +113,7 @@ const EPNSCoreHelper = {
                             response
                         );
 
-                    response.forEach(function(item) {
+                    response.forEach(function (item) {
                         if (
                             item.args.channel.toString() == channel.toString()
                         ) {
@@ -135,7 +135,7 @@ const EPNSCoreHelper = {
                         );
                     resolve(filteredResponse);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getChannelEvent() --> %o", err);
                     reject(err);
                 });
@@ -157,8 +157,8 @@ const EPNSCoreHelper = {
                 // Form Gateway URL
                 const url = "https://ipfs.io/ipfs/" + ids[1];
                 fetch(url)
-                    .then(response => response.json())
-                    .then(response => {
+                    .then((response) => response.json())
+                    .then((response) => {
                         if (enableLogs)
                             console.log(
                                 "getJsonFileFromIdentity() --> %o",
@@ -166,7 +166,7 @@ const EPNSCoreHelper = {
                             );
                         resolve(response);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getJsonFileFromIdentity() --> %o",
                             err
@@ -183,7 +183,7 @@ const EPNSCoreHelper = {
         return new Promise((resolve, reject) => {
             // To get channel info from a channel address
             EPNSCoreHelper.getChannelInfo(channel, contract)
-                .then(response =>
+                .then((response) =>
                     EPNSCoreHelper.getChannelEvent(
                         channel,
                         response.channelStartBlock.toNumber(),
@@ -191,7 +191,7 @@ const EPNSCoreHelper = {
                         contract
                     )
                 )
-                .then(response => {
+                .then((response) => {
                     // add little hack for now to change coindesk's descriptioon
                     const hash =
                         channel === "0x8C28Cf33d9Fd3D0293f963b1cd27e3FF422B425c"
@@ -203,7 +203,7 @@ const EPNSCoreHelper = {
                     );
                     // return EPNSCoreHelper.getJsonFileFromIdentity(response, channel)
                 })
-                .then(response => {
+                .then((response) => {
                     if (enableLogs)
                         console.log(
                             "getChannelJsonFromChannelAddress() --> %o",
@@ -211,7 +211,7 @@ const EPNSCoreHelper = {
                         );
                     resolve(response);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getChannelJsonFromChannelAddress() --> %o",
                         err
@@ -229,7 +229,7 @@ const EPNSCoreHelper = {
             // EPNSCoreHelper.getUserInfo(user, contract)
             //   .then(response => EPNSCoreHelper.getChannelJsonFromChannelAddress(user, contract))
             EPNSCoreHelper.getChannelJsonFromChannelAddress(user, contract)
-                .then(response => {
+                .then((response) => {
                     if (enableLogs)
                         console.log(
                             "getChannelJsonFromUserAddress() --> %o",
@@ -237,7 +237,7 @@ const EPNSCoreHelper = {
                         );
                     resolve(response);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getChannelJsonFromUserAddress() --> %o",
                         err
@@ -247,14 +247,14 @@ const EPNSCoreHelper = {
         });
     },
     // Get Total Number of Channels
-    getTotalNumberOfChannels: async contract => {
+    getTotalNumberOfChannels: async (contract) => {
         const enableLogs = 0;
 
         return new Promise((resolve, reject) => {
             // Get User Info from EPNS Core
             contract
                 .channelsCount()
-                .then(response => {
+                .then((response) => {
                     if (enableLogs)
                         console.log(
                             "getTotalNumberOfChannels() --> %o",
@@ -262,7 +262,7 @@ const EPNSCoreHelper = {
                         );
                     resolve(response.toNumber());
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getTotalNumberOfChannels() --> %o",
                         err
@@ -277,7 +277,7 @@ const EPNSCoreHelper = {
 
         return new Promise((resolve, reject) => {
             EPNSCoreHelper.getTotalNumberOfChannels(contract)
-                .then(async response => {
+                .then(async (response) => {
                     let channelsInfo = [];
                     const channelsCount = response;
 
@@ -299,18 +299,18 @@ const EPNSCoreHelper = {
                         channelArrays.push(assignedChannelID);
                     }
 
-                    const promises = channelArrays.map(async channelID => {
+                    const promises = channelArrays.map(async (channelID) => {
                         await EPNSCoreHelper.getChannelAddressFromID(
                             channelID,
                             contract
                         )
-                            .then(response =>
+                            .then((response) =>
                                 EPNSCoreHelper.getChannelInfo(
                                     response,
                                     contract
                                 )
                             )
-                            .then(response => {
+                            .then((response) => {
                                 if (enableLogs)
                                     console.log(
                                         "getChannelsMetaLatestToOldest(%d, %d) --> %o",
@@ -320,7 +320,7 @@ const EPNSCoreHelper = {
                                     );
                                 channelsInfo = [response, ...channelsInfo];
                             })
-                            .catch(err =>
+                            .catch((err) =>
                                 console.log(
                                     "Error in channel: %d | skipping...",
                                     channelID
@@ -340,7 +340,7 @@ const EPNSCoreHelper = {
                         );
                     resolve(channelsInfo);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getChannelsMetaLatestToOldest() --> %o",
                         err
@@ -350,19 +350,19 @@ const EPNSCoreHelper = {
         });
     },
     // Get Total Number of Users
-    getTotalNumberOfUsers: async contract => {
+    getTotalNumberOfUsers: async (contract) => {
         return new Promise((resolve, reject) => {
             // Get User Info from EPNS Core
             contract
                 .usersCount()
-                .then(response => {
+                .then((response) => {
                     console.log(
                         "getTotalNumberOfUsers() --> %o",
                         response.toNumber()
                     );
                     resolve(response.toNumber());
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getTotalNumberOfUsers() --> %o",
                         err
@@ -380,8 +380,8 @@ const EPNSCoreHelper = {
             let filteredResponse;
             contract
                 .queryFilter("PublicKeyRegistered")
-                .then(response => {
-                    response.forEach(function(item) {
+                .then((response) => {
+                    response.forEach(function (item) {
                         if (item.args[0] == address) {
                             filteredResponse = item;
                         }
@@ -402,7 +402,7 @@ const EPNSCoreHelper = {
                         resolve(filteredResponse.args[1]);
                     }
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(err);
                     reject(err);
                 });
@@ -414,11 +414,11 @@ const EPNSCoreHelper = {
             // Get User Info from EPNS Core
             contract
                 .isUserSubscribed(channel, user)
-                .then(response => {
+                .then((response) => {
                     // console.log("getSubscribedStatus() --> %o", {response, user, channel});
                     resolve(response);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getSubscribedStatus() --> %o", err);
                     reject(err);
                 });
@@ -430,14 +430,14 @@ const EPNSCoreHelper = {
             // Get User Info from EPNS Core
             contract.users[user]
                 .subscribedCount()
-                .then(response => {
+                .then((response) => {
                     console.log(
                         "getTotalSubscribedChannels() --> %o",
                         response.toNumber()
                     );
                     resolve(response.toNumber());
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(
                         "!!!Error, getTotalSubscribedChannels() --> %o",
                         err
@@ -454,11 +454,11 @@ const EPNSCoreHelper = {
             // Get User Info from EPNS Core
             contract
                 .users(user)
-                .then(response => {
+                .then((response) => {
                     if (response.userActivated) {
                         contract
                             .calcAllChannelsRatio(user, block)
-                            .then(response => {
+                            .then((response) => {
                                 if (enableLogs)
                                     console.log(
                                         "calcAllChannelsRatio() --> %o",
@@ -466,7 +466,7 @@ const EPNSCoreHelper = {
                                     );
                                 resolve(response);
                             })
-                            .catch(err => {
+                            .catch((err) => {
                                 console.log(
                                     "!!!Error, calcAllChannelsRatio() --> %o",
                                     err
@@ -481,25 +481,25 @@ const EPNSCoreHelper = {
                         reject("User not activated");
                     }
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, calcAllChannelsRatio() --> %o", err);
                     reject(err);
                 });
         });
     },
     // Get Pool Funds
-    getPoolFunds: async contract => {
+    getPoolFunds: async (contract) => {
         const enableLogs = 0;
 
         return new Promise((resolve, reject) => {
             contract
                 .poolFunds()
-                .then(response => {
+                .then((response) => {
                     if (enableLogs)
                         console.log("getPoolFunds() --> %o", response);
                     resolve(response);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getPoolFunds() --> %o", err);
                     reject(err);
                 });

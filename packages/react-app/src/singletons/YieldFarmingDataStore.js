@@ -58,14 +58,17 @@ export default class YieldFarmingDataStore {
             );
             const epochEndTimestamp = start.add(epochDuration);
 
-            const pushTotalDistributedAmount = await yieldFarmingPUSH.TOTAL_DISTRIBUTED_AMOUNT();
-            const lpTotalDistributedAmount = await yieldFarmingLP.TOTAL_DISTRIBUTED_AMOUNT();
+            const pushTotalDistributedAmount =
+                await yieldFarmingPUSH.TOTAL_DISTRIBUTED_AMOUNT();
+            const lpTotalDistributedAmount =
+                await yieldFarmingLP.TOTAL_DISTRIBUTED_AMOUNT();
 
             const totalDistributedAmount = pushTotalDistributedAmount.add(
                 lpTotalDistributedAmount
             );
 
-            const pushRewardsDistributed = await this.getPushRewardsDistributed();
+            const pushRewardsDistributed =
+                await this.getPushRewardsDistributed();
 
             resolve({
                 nextPoolSize,
@@ -155,7 +158,7 @@ export default class YieldFarmingDataStore {
     };
 
     // 1. Listen for Subscribe Async
-    getUserData = async contract => {
+    getUserData = async (contract) => {
         return new Promise(async (resolve, reject) => {
             if (this.state.account) {
                 const epnsToken = this.state.epnsToken;

@@ -14,7 +14,7 @@ export default class App extends React.Component {
         localStorage.setItem("myValueInLocalStorage", this.state.value);
     }
 
-    onChange = event => {
+    onChange = (event) => {
         this.setState({ value: event.target.value });
     };
 

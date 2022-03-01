@@ -119,11 +119,11 @@ const Container = styled.div`
 
 const SkeletonWrapper = styled.div`
     overflow: hidden;
-    width: ${props => props.atW + "%" || "100%"};
-    height: ${props => props.atH}px;
-    border-radius: ${props => props.borderRadius || 10}px;
-    margin-bottom: ${props => props.marginBottom || 5}px;
-    margin-right: ${props => props.marginRight || 0}px;
+    width: ${(props) => props.atW + "%" || "100%"};
+    height: ${(props) => props.atH}px;
+    border-radius: ${(props) => props.borderRadius || 10}px;
+    margin-bottom: ${(props) => props.marginBottom || 5}px;
+    margin-right: ${(props) => props.marginRight || 0}px;
 `;
 
 const ChannelTitle = styled.div`

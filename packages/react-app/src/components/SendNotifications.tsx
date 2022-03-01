@@ -106,7 +106,7 @@ function SendNotifications() {
             e.preventDefault();
             // if they enter a limiter key, then add the temp value to the recipeints list
             // then clear the value of the temp text
-            setMultipleRecipients(oldRecipients =>
+            setMultipleRecipients((oldRecipients) =>
                 // use this combination to remove duplicates
                 Array.from(new Set([...oldRecipients, tempRecipeint]))
             );
@@ -120,7 +120,7 @@ function SendNotifications() {
     // when to remove a subscriber
     const removeRecipient = (recipientAddress: any) => {
         const filteredRecipients = multipleRecipients.filter(
-            rec => rec !== recipientAddress
+            (rec) => rec !== recipientAddress
         );
         setNFRecipient(filteredRecipients.join());
         setMultipleRecipients(filteredRecipients);
@@ -138,13 +138,12 @@ function SendNotifications() {
     }, [nfType]);
 
     // validate the body being sent, return true if no errors
-    const bodyValidated = notificationToast => {
+    const bodyValidated = (notificationToast) => {
         let validated = true;
         // if we are sending for a subset and there
         if (nfType === "4" && multipleRecipients.length < 2) {
             toast.update(notificationToast, {
-                render:
-                    "Please enter at least two recipients in order to use subset notifications type",
+                render: "Please enter at least two recipients in order to use subset notifications type",
                 type: toast.TYPE.ERROR,
                 autoClose: 5000,
             });
@@ -153,7 +152,7 @@ function SendNotifications() {
         return validated;
     };
 
-    const handleSendMessage = async e => {
+    const handleSendMessage = async (e) => {
         // Check everything in order
         e.preventDefault();
 
@@ -223,8 +222,7 @@ function SendNotifications() {
                     setNFProcessing(2);
 
                     toast.update(notificationToast, {
-                        render:
-                            "Unable to encrypt for this user, no public key registered",
+                        render: "Unable to encrypt for this user, no public key registered",
                         type: toast.TYPE.ERROR,
                         autoClose: 5000,
                     });
@@ -431,7 +429,7 @@ function SendNotifications() {
                     deployedContract: epnsCommReadProvider.address,
                     payload: payload,
                     type: nfType,
-                }).then(async res => {
+                }).then(async (res) => {
                     toast.update(notificationToast, {
                         render: "Notification Sent",
                         type: toast.TYPE.INFO,
@@ -576,7 +574,7 @@ function SendNotifications() {
                     deployedContract: epnsCommReadProvider.address,
                     payload: payload,
                     type: "3",
-                }).then(async res => {
+                }).then(async (res) => {
                     toast.update(notificationToast, {
                         render: "Notification Sent",
                         type: toast.TYPE.INFO,
@@ -695,7 +693,7 @@ function SendNotifications() {
                                                         );
                                                     }}
                                                     value={delegateeOptions.find(
-                                                        d =>
+                                                        (d) =>
                                                             d.value ==
                                                             channelAddress
                                                     )}
@@ -707,7 +705,7 @@ function SendNotifications() {
                                     <Input
                                         display="none"
                                         value={nfType}
-                                        onChange={e => {
+                                        onChange={(e) => {
                                             setNFType(e.target.value);
                                         }}
                                     />
@@ -721,7 +719,7 @@ function SendNotifications() {
                                         <DropdownStyledParent>
                                             <DropdownStyled
                                                 options={NFTypes}
-                                                onChange={option => {
+                                                onChange={(option) => {
                                                     setNFType(option.value);
                                                     console.log(option);
                                                 }}
@@ -733,7 +731,7 @@ function SendNotifications() {
                                     <Input
                                         display="none"
                                         value={nfType}
-                                        onChange={e => {
+                                        onChange={(e) => {
                                             setNFType(e.target.value);
                                         }}
                                     />
@@ -853,7 +851,7 @@ function SendNotifications() {
                                             border="1px solid #674c9f"
                                             bg="#fff"
                                             value={nfRecipient}
-                                            onChange={e => {
+                                            onChange={(e) => {
                                                 setNFRecipient(e.target.value);
                                             }}
                                         />
@@ -878,7 +876,7 @@ function SendNotifications() {
                                     <>
                                         <MultiRecipientsContainer>
                                             {multipleRecipients.map(
-                                                oneRecipient => (
+                                                (oneRecipient) => (
                                                     <span key={oneRecipient}>
                                                         {oneRecipient}
                                                         <i
@@ -914,8 +912,9 @@ function SendNotifications() {
                                                 onKeyPress={
                                                     handleSubsetInputChange
                                                 }
-                                                onChange={e => {
-                                                    const text = e.target.value.trim();
+                                                onChange={(e) => {
+                                                    const text =
+                                                        e.target.value.trim();
                                                     console.log(text);
                                                     console.log(tempRecipeint);
                                                     // if (!LIMITER_KEYS.includes(text) && text.length > 0 ) {
@@ -959,7 +958,7 @@ function SendNotifications() {
                                             size="1.2em"
                                             bg="#fff"
                                             value={nfSub}
-                                            onChange={e => {
+                                            onChange={(e) => {
                                                 setNFSub(e.target.value);
                                             }}
                                         />
@@ -997,7 +996,7 @@ function SendNotifications() {
                                             border="1px solid #000"
                                             bg="#fff"
                                             value={nfMsg}
-                                            onChange={e => {
+                                            onChange={(e) => {
                                                 setNFMsg(e.target.value);
                                             }}
                                             autocomplete="off"
@@ -1032,7 +1031,7 @@ function SendNotifications() {
                                                 weight="400"
                                                 bg="#f1f1f1"
                                                 value={nfMedia}
-                                                onChange={e => {
+                                                onChange={(e) => {
                                                     setNFMedia(e.target.value);
                                                 }}
                                             />
@@ -1078,7 +1077,7 @@ function SendNotifications() {
                                                 weight="400"
                                                 bg="#f1f1f1"
                                                 value={nfCTA}
-                                                onChange={e => {
+                                                onChange={(e) => {
                                                     setNFCTA(e.target.value);
                                                 }}
                                             />

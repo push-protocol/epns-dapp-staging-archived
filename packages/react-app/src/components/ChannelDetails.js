@@ -8,9 +8,9 @@ import { useWeb3React } from "@web3-react/core";
 import { postReq } from "api";
 const DATE_FORMAT = "DD/MM/YYYY";
 export default function ChannelDetails() {
-    const { channelDetails, canVerify } = useSelector(state => state.admin);
+    const { channelDetails, canVerify } = useSelector((state) => state.admin);
     const { CHANNEL_ACTIVE_STATE, CHANNNEL_DEACTIVATED_STATE } = useSelector(
-        state => state.channels
+        (state) => state.channels
     );
     const [verifyingChannel, setVerifyingChannel] = React.useState([]);
     const [creationDate, setCreationDate] = React.useState("");
@@ -24,17 +24,18 @@ export default function ChannelDetails() {
 
     React.useEffect(() => {
         if (!channelDetails || !canVerify) return;
-        (async function() {
-            let channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
-                channelDetails.verifiedBy
-            );
+        (async function () {
+            let channelJson =
+                await ChannelsDataStore.instance.getChannelJsonAsync(
+                    channelDetails.verifiedBy
+                );
             setVerifyingChannel(channelJson);
         })();
     }, [channelDetails, canVerify]);
 
     React.useEffect(() => {
         if (!channelDetails) return;
-        (async function() {
+        (async function () {
             const bn = channelDetails.channelStartBlock.toString();
             const block = await library.getBlock(+bn);
             const date = moment(block?.timestamp * 1000); //convert from millisecs
@@ -44,7 +45,7 @@ export default function ChannelDetails() {
 
     React.useEffect(() => {
         if (!onCoreNetwork) return;
-        (async function() {
+        (async function () {
             await postReq("/channels/get_alias_details", {
                 channel: account,
                 op: "read",
@@ -190,12 +191,12 @@ const ChanneStateText = styled.span`
     line-height: 23px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: ${props => (props.active ? "#57c255" : "red")};
+    color: ${(props) => (props.active ? "#57c255" : "red")};
     margin-bottom: 8px;
     display: flex;
     align-items: center;
 
-    ${props =>
+    ${(props) =>
         props.active &&
         `
         &::after {

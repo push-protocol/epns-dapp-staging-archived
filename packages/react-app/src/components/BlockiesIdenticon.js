@@ -43,7 +43,7 @@ export default class BlockiesIdenticon extends React.Component {
     }
     render() {
         return React.createElement("canvas", {
-            ref: canvas => (this.canvas = canvas),
+            ref: (canvas) => (this.canvas = canvas),
         });
     }
 }

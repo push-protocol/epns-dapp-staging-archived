@@ -201,7 +201,7 @@ function SpamBox({ currentTab }) {
     };
     const isSubscribedFn = async (subscribers: any) => {
         return subscribers
-            .map(a => a.toLowerCase())
+            .map((a) => a.toLowerCase())
             .includes(account.toLowerCase());
     };
     // Render
@@ -247,7 +247,7 @@ function SpamBox({ currentTab }) {
                                         app={app}
                                         icon={icon}
                                         image={image}
-                                        subscribeFn={e => {
+                                        subscribeFn={(e) => {
                                             e?.stopPropagation();
                                             onSubscribeToChannel(
                                                 channel,

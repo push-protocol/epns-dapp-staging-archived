@@ -20,7 +20,7 @@ export default function AddDelegateModal({ onClose, onSuccess, addDelegate }) {
     const addDelegateFunction = () => {
         setLoading("loading");
         addDelegate(mainAdress)
-            .then(async tx => {
+            .then(async (tx) => {
                 console.log(tx);
                 setLoading("Transaction Sent!");
 
@@ -29,7 +29,7 @@ export default function AddDelegateModal({ onClose, onSuccess, addDelegate }) {
                     onClose();
                 }, 2000);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log({
                     err,
                 });
@@ -69,7 +69,7 @@ export default function AddDelegateModal({ onClose, onSuccess, addDelegate }) {
                         border="1px solid #674c9f"
                         bg="#fff"
                         value={mainAdress}
-                        onChange={e => {
+                        onChange={(e) => {
                             setMainAddress(e.target.value);
                         }}
                     />

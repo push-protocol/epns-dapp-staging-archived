@@ -47,7 +47,7 @@ export default function PoolCard({
             )
         );
 
-        tx.then(async tx => {
+        tx.then(async (tx) => {
             let txToast = toast.dark(
                 <LoaderToast
                     msg="Waiting for Confirmation..."
@@ -80,7 +80,7 @@ export default function PoolCard({
                     )
                 );
 
-                tx2.then(async tx => {
+                tx2.then(async (tx) => {
                     let txToast = toast.dark(
                         <LoaderToast
                             msg="Waiting for Confirmation..."
@@ -120,7 +120,7 @@ export default function PoolCard({
 
                         setTxInProgress(false);
                     }
-                }).catch(err => {
+                }).catch((err) => {
                     toast.dark("Transaction Cancelled!", {
                         position: "bottom-right",
                         type: toast.TYPE.ERROR,
@@ -145,7 +145,7 @@ export default function PoolCard({
 
                 setTxInProgress(false);
             }
-        }).catch(err => {
+        }).catch((err) => {
             toast.dark("Transaction Cancelled!", {
                 position: "bottom-right",
                 type: toast.TYPE.ERROR,
@@ -176,7 +176,7 @@ export default function PoolCard({
             )
         );
 
-        tx.then(async tx => {
+        tx.then(async (tx) => {
             let txToast = toast.dark(
                 <LoaderToast
                     msg="Waiting for Confirmation..."
@@ -212,7 +212,7 @@ export default function PoolCard({
 
                 setTxInProgress(false);
             }
-        }).catch(err => {
+        }).catch((err) => {
             toast.dark("Transaction Cancelled!", {
                 position: "bottom-right",
                 type: toast.TYPE.ERROR,
@@ -241,7 +241,7 @@ export default function PoolCard({
         );
         if (harvestEpochValue) {
             const tx = yieldFarmingPUSH.harvest(harvestEpochValue);
-            tx.then(async tx => {
+            tx.then(async (tx) => {
                 let txToast = toast.dark(
                     <LoaderToast
                         msg="Waiting for Confirmation..."
@@ -277,7 +277,7 @@ export default function PoolCard({
 
                     setTxInProgress(false);
                 }
-            }).catch(err => {
+            }).catch((err) => {
                 toast.dark("Transaction Cancelled!", {
                     position: "bottom-right",
                     type: toast.TYPE.ERROR,
@@ -302,7 +302,7 @@ export default function PoolCard({
             signer
         );
         const tx = yieldFarmingPUSH.massHarvest();
-        tx.then(async tx => {
+        tx.then(async (tx) => {
             let txToast = toast.dark(
                 <LoaderToast
                     msg="Waiting for Confirmation..."
@@ -338,7 +338,7 @@ export default function PoolCard({
 
                 setTxInProgress(false);
             }
-        }).catch(err => {
+        }).catch((err) => {
             toast.dark("Transaction Cancelled!", {
                 position: "bottom-right",
                 type: toast.TYPE.ERROR,
@@ -354,7 +354,7 @@ export default function PoolCard({
         });
     };
 
-    const formatTokens = tokens => {
+    const formatTokens = (tokens) => {
         if (tokens) {
             return tokens.div(ethers.BigNumber.from(10).pow(18)).toString();
         }
@@ -399,17 +399,17 @@ export default function PoolCard({
 
             <input
                 placeholder="Amount"
-                onChange={e => setDepositAmountToken(e.target.value)}
+                onChange={(e) => setDepositAmountToken(e.target.value)}
             />
             <Button onClick={depositAmountTokenFarm}>Deposit</Button>
             <input
                 placeholder="Amount"
-                onChange={e => setWithdrawAmountToken(e.target.value)}
+                onChange={(e) => setWithdrawAmountToken(e.target.value)}
             />
             <Button onClick={withdrawAmountTokenFarm}>Withdraw</Button>
             <input
                 placeholder="Enter Epoch Id"
-                onChange={e => setHarvestEpochValue(e.target.value)}
+                onChange={(e) => setHarvestEpochValue(e.target.value)}
             />
             <Button onClick={harvestTokens}>Harvest</Button>
 
@@ -476,7 +476,7 @@ const Button = styled.button`
         cursor: pointer;
         pointer: hand;
     }
-    ${props =>
+    ${(props) =>
         props.disabled &&
         css`
             &:hover {

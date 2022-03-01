@@ -63,7 +63,7 @@ function AllNFTs({ controlAt, setControlAt, setTokenId }) {
                 nftReadProvider,
                 NFTRewardsContract
             );
-            await setNFTObjects(prev => [...prev, NFTObject]);
+            await setNFTObjects((prev) => [...prev, NFTObject]);
         }
     };
 
@@ -91,7 +91,7 @@ function AllNFTs({ controlAt, setControlAt, setTokenId }) {
 
             {!loading && NFTObjects.length != 0 && (
                 <Items id="scrollstyle-secondary">
-                    {Object.keys(NFTObjects).map(index => {
+                    {Object.keys(NFTObjects).map((index) => {
                         if (NFTObjects) {
                             return (
                                 <>

@@ -133,19 +133,19 @@ const Connection = styled.span`
     border-radius: 100%;
     flex-shrink: 0;
 
-    ${props =>
+    ${(props) =>
         props.phase === "active" &&
         css`
             background: #77dd77;
         `};
 
-    ${props =>
+    ${(props) =>
         props.phase === "waiting" &&
         css`
             background: #ffae42;
         `};
 
-    ${props =>
+    ${(props) =>
         props.phase === "error" &&
         css`
             background: #dc143c;

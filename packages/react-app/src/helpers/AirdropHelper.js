@@ -43,7 +43,7 @@ const AirdropHelper = {
         return pair.equals(root);
     },
 
-    getNextLayer: elements => {
+    getNextLayer: (elements) => {
         return elements.reduce((layer, el, idx, arr) => {
             if (idx % 2 === 0) {
                 // Hash the current element with its pair element
@@ -54,7 +54,7 @@ const AirdropHelper = {
         }, []);
     },
 
-    getRoot: balances => {
+    getRoot: (balances) => {
         let nodes = balances
             .map(({ account, amount, index }) =>
                 AirdropHelper.toNode(index, account, amount)
@@ -84,7 +84,9 @@ const AirdropHelper = {
         const merkleRoot = Buffer.from(merkleRootHex.slice(2), "hex");
         if (claims.claims[user]) {
             const claim = claims.claims[user];
-            const proof = claim.proof.map(p => Buffer.from(p.slice(2), "hex"));
+            const proof = claim.proof.map((p) =>
+                Buffer.from(p.slice(2), "hex")
+            );
             const verified = AirdropHelper.verifyProof(
                 claim.index,
                 user,

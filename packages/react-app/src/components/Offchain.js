@@ -109,7 +109,7 @@ const payload = {
 
 const message = payload.data;
 console.log(message);
-wallet._signTypedData(domain, type, message).then(res => {
+wallet._signTypedData(domain, type, message).then((res) => {
     console.log("Signature", res);
     console.log("Length %s", res.length);
     const recovered = recoverTypedSignature_v4({

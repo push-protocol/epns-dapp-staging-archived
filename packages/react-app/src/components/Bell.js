@@ -68,8 +68,8 @@ const Container = styled.button`
     justify-content: center;
     margin: 0 10px;
     position: relative;
-    height: ${props => props.height || 40}px;
-    width: ${props => props.width || 40}px;
+    height: ${(props) => props.height || 40}px;
+    width: ${(props) => props.width || 40}px;
     &:hover {
         opacity: 0.9;
         cursor: pointer;
@@ -116,11 +116,11 @@ const tadaaa = keyframes`
 
 const BellImage = styled.img`
     position: absolute;
-    height: ${props => props.height || 40}px;
-    width: ${props => props.width || 40}px;
+    height: ${(props) => props.height || 40}px;
+    width: ${(props) => props.width || 40}px;
 
     transition: transform 0.2s ease-out;
-    ${props =>
+    ${(props) =>
         props.ringme &&
         css`
             animation: ${tadaaa} 1s ease-out;

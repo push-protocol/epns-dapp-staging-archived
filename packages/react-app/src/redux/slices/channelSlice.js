@@ -20,7 +20,7 @@ export const contractSlice = createSlice({
         setChannelMeta: (state, action) => {
             state.channels = action.payload;
         },
-        incrementPage: state => {
+        incrementPage: (state) => {
             state.page += 1;
         },
         cacheChannelInfo: (state, action) => {

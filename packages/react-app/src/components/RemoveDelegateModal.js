@@ -20,7 +20,7 @@ export default function RemoveDelegateModal({
     const addDelegateFunction = () => {
         setLoading("loading");
         removeDelegate(mainAdress)
-            .then(async tx => {
+            .then(async (tx) => {
                 console.log(tx);
                 setLoading("Transaction Sent!");
 
@@ -29,7 +29,7 @@ export default function RemoveDelegateModal({
                     onClose();
                 }, 2000);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log({
                     err,
                 });
@@ -69,7 +69,7 @@ export default function RemoveDelegateModal({
                         border="1px solid #674c9f"
                         bg="#fff"
                         value={mainAdress}
-                        onChange={e => {
+                        onChange={(e) => {
                             setMainAddress(e.target.value);
                         }}
                     />

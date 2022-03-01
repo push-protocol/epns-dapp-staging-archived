@@ -14,7 +14,7 @@ const UnderProgressModal = () => {
                     className="closeIcon"
                     style={{ margin: "15px" }}
                     fontSize="1.5rem"
-                    onClick={e => setShow(false)}
+                    onClick={(e) => setShow(false)}
                 />
                 {/* </ModalHeader> */}
                 {/* <ModalBody>
@@ -55,7 +55,7 @@ const DownTimeImg = styled.img`
     width: 900px;
 `;
 const Modal = styled.div`
-    display: ${props => {
+    display: ${(props) => {
         if (props.show) return "block";
         else return "none !important";
     }};

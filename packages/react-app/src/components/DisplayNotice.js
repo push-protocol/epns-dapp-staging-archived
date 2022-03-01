@@ -39,19 +39,19 @@ const Notice = styled.span`
     font-size: 14px;
     font-weight: 400;
 
-    ${props =>
+    ${(props) =>
         props.theme === "primary" &&
         css`
             background: #e20880;
         `};
 
-    ${props =>
+    ${(props) =>
         props.theme === "secondary" &&
         css`
             background: #35c5f3;
         `};
 
-    ${props =>
+    ${(props) =>
         props.theme === "third" &&
         css`
             background: #674c9f;

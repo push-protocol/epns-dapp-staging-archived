@@ -162,14 +162,14 @@ export default class UsersDataStore {
                 resolve(this.state.ownerMeta);
             } else {
                 EPNSCoreHelper.getOwnerInfo(this.state.epnsReadProvider)
-                    .then(response => {
+                    .then((response) => {
                         this.state.ownerMeta = response;
 
                         if (enableLogs)
                             console.log("getOwnerMetaAsync() --> %o", response);
                         resolve(this.state.ownerMeta);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getOwnerMetaAsync() --> %o",
                             err
@@ -188,12 +188,12 @@ export default class UsersDataStore {
                 const count = EPNSCoreHelper.getTotalNumberOfUsers(
                     this.state.epnsReadProvider
                 )
-                    .then(response => {
+                    .then((response) => {
                         this.state.usersCount = response;
                         console.log("getUsersCountAsync() --> %o", response);
                         resolve(this.state.usersCount);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(
                             "!!!Error, getUsersCountAsync() --> %o",
                             err
@@ -206,10 +206,10 @@ export default class UsersDataStore {
         });
     };
 
-    incrementUsersCountAsync = async incrementCount => {
+    incrementUsersCountAsync = async (incrementCount) => {
         return new Promise((resolve, reject) => {
             this.getUsersCountAsync()
-                .then(response => {
+                .then((response) => {
                     this.state.usersCount = response + incrementCount;
                     console.log(
                         "incrementChannelsCountAsync() --> %d",
@@ -217,7 +217,7 @@ export default class UsersDataStore {
                     );
                     resolve(this.state.usersCount);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log("!!!Error, getUsersCountAsync() --> %o", err);
                     reject(err);
                 });
@@ -241,7 +241,7 @@ export default class UsersDataStore {
                     this.state.account,
                     this.state.epnsCommReadProvider
                 )
-                    .then(response => {
+                    .then((response) => {
                         this.state.userMeta = response;
 
                         if (enableLogs)
@@ -251,7 +251,7 @@ export default class UsersDataStore {
                             );
                         resolve(this.state.userMeta);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log("!!!Error, getUserMetaAsync() --> %o", err);
                         reject(err);
                     });

@@ -40,19 +40,15 @@ function ChannelSettings() {
     const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
 
     const [loading, setLoading] = React.useState(false);
-    const [
-        showActivateChannelPopup,
-        setShowActivateChannelPopup,
-    ] = React.useState(false);
-    const [channelStakeFees, setChannelStakeFees] = React.useState(
-        MIN_STAKE_FEES
-    );
+    const [showActivateChannelPopup, setShowActivateChannelPopup] =
+        React.useState(false);
+    const [channelStakeFees, setChannelStakeFees] =
+        React.useState(MIN_STAKE_FEES);
     const [poolContrib, setPoolContrib] = React.useState(0);
     const [addDelegateLoading, setAddDelegateLoading] = React.useState(false);
     const [addModalOpen, setAddModalOpen] = React.useState(false);
-    const [removeDelegateLoading, setRemoveDelegateLoading] = React.useState(
-        false
-    );
+    const [removeDelegateLoading, setRemoveDelegateLoading] =
+        React.useState(false);
     const [removeModalOpen, setRemoveModalOpen] = React.useState(false);
 
     // toaster customize
@@ -372,7 +368,7 @@ const DropdownWrapper = styled.div`
 const ActiveChannelWrapper = styled.div`
     flex-direction: column;
     gap: 20px;
-    display: ${props => (props.inactive ? "none" : "flex")};
+    display: ${(props) => (props.inactive ? "none" : "flex")};
 `;
 
 const Toaster = styled.div`
@@ -396,7 +392,7 @@ const ToasterMsg = styled.div`
 
 const DeactivateButton = styled.div`
     text-decoration: underline;
-    color: ${props => (props.isChannelDeactivated ? "#674C9F" : "#e20880")};
+    color: ${(props) => (props.isChannelDeactivated ? "#674C9F" : "#e20880")};
     text-align: center;
     font-size: 16px;
     line-height: 20px;
@@ -417,16 +413,16 @@ const ChannelActionButton = styled.button`
     position: relative;
     background-color: #674c9f;
     &:hover {
-        opacity: ${props => (props.disabled ? 0.5 : 0.9)};
-        cursor: ${props => (props.disabled ? "not-allowed" : "pointer")};
+        opacity: ${(props) => (props.disabled ? 0.5 : 0.9)};
+        cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
         pointer: hand;
     }
     &:active {
-        opacity: ${props => (props.disabled ? 0.5 : 0.75)};
-        cursor: ${props => (props.disabled ? "not-allowed" : "pointer")};
+        opacity: ${(props) => (props.disabled ? 0.5 : 0.75)};
+        cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
         pointer: hand;
     }
-    opacity: ${props => (props.disabled ? 0.5 : 1)};
+    opacity: ${(props) => (props.disabled ? 0.5 : 1)};
 `;
 
 const Settings = styled.img`

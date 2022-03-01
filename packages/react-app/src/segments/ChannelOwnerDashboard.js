@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 
 // CREATE CHANNEL OWNER DASHBOARD
 function ChannelOwnerDashboard() {
-    const { channelDetails, delegatees } = useSelector(state => state.admin);
+    const { channelDetails, delegatees } = useSelector((state) => state.admin);
     return (
         <>
             <Section>

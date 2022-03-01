@@ -10,7 +10,7 @@ const BASE_URL = envConfig.apiUrl; // "https://backend-kovan.epns.io/apis";
  * @param {String} path e.g /feeds/get_feeds, this represents the route of the enpoint to call
  * @returns {Promise}
  */
-export const getReq = async path => {
+export const getReq = async (path) => {
     try {
         const response = await axios.get(BASE_URL + path);
         return response;
