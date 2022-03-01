@@ -12,25 +12,13 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v2
-              env:
-                  cache-name: cache-node-modules
-              with:
-                  path: |
-                      **/node_modules
-                  key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-build-${{ env.cache-name }}-
-                      ${{ runner.os }}-build-
-                      ${{ runner.os }}-
             - name: Setup Node
               uses: actions/setup-node@v2
               with:
                   node-version: "16"
 
-            - name: Install Dependencies
-              run: npm run react-app:install
+            - name: Install Prettier
+              run: npm install prettier
 
             - name: Check Formatting
               run: npm run react-app:lint
