@@ -4,7 +4,7 @@ on: [push, pull_request_target]
 
 jobs:
     setupnode:
-        name: Setup and Test NodeJs
+        name: Formatting Check
         # needs: format
         runs-on: ubuntu-latest
 
