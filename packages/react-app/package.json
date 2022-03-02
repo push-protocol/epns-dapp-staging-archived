@@ -77,12 +77,15 @@
     "@testing-library/dom": "^6.12.2",
     "@types/react": "^16.9.19",
     "eslint": "^6.8.0",
-    "eslint-plugin-flowtype": "^4.6.0"
+    "eslint-plugin-flowtype": "^4.6.0",
+    "prettier": "^2.5.1"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
   "scripts": {
+    "format": "prettier --write \"src/**/*.{js,jsx,json,ts,tsx,css,html}\"",
+    "lint": "prettier --check \"src/**/*.{js,jsx,json,ts,tsx,css,html}\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "build": "react-scripts build",
