@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { useWeb3React } from "@web3-react/core";
 const DATE_FORMAT = "DD/MM/YYYY";
+
+
 export default function ChannelDetails() {
   const theme = useTheme();
   const { library } = useWeb3React();
