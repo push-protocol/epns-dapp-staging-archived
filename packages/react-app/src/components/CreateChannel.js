@@ -28,7 +28,6 @@ import Slider from "@material-ui/core/Slider";
 import Loader from "react-loader-spinner";
 
 import { envConfig } from "@project/contracts";
-
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { ThemeProvider } from "styled-components";
 import { themeLight, themeDark } from "config/Themization";
@@ -243,6 +242,12 @@ function CreateChannel() {
 
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
+    if (daiAmountVal < 50.0) {
+      var sendTransactionPromise = daiContract.approve(
+        addresses.epnscore,
+        fees
+      );
+      const tx = await sendTransactionPromise;
 
     if(daiAmountVal < 50.0){
       var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
@@ -269,7 +274,7 @@ function CreateChannel() {
       identityBytes,
       fees,
       {
-        gasLimit: 1000000
+        gasLimit: 1000000,
       }
     );
 
@@ -291,7 +296,7 @@ function CreateChannel() {
         console.log({ err });
         setProcessing(3);
         setProcessingInfo(
-          "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
+          "There was an error creating your channel, please refer to our how-to guides for more information."
         );
       });
   };
@@ -868,6 +873,10 @@ bottom: 0px;
 right: 0.8rem;
 z-index: 1;
 `;
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 const Step = styled.div`
   height: 12px;
   width: 12px;
@@ -983,6 +992,16 @@ const Pool = styled.div`
 const PoolShare = styled(ChannelMetaBox)`
   background: #e20880;
   // background: #674c9f;
+  transition: 300ms;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
 `;
 
 const ButtonSpace = styled.div`

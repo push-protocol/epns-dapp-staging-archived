@@ -20,4 +20,5 @@ const addresses = {
 	WETHAddress: "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
 	USDTAddress: "0x13512979ade267ab5100878e2e0f485b568328a4",
 };
+
 export default addresses;

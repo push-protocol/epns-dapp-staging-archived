@@ -391,6 +391,7 @@ const QnAItem = styled(Item)`
     background: ${props => props.theme.qnaBg};
     justify-content: flex-start;
     text-transform: uppercase;
+    
     & ${Span} {
       font-weight: 400;
       letter-spacing: 0.2em;
