@@ -873,10 +873,6 @@ bottom: 0px;
 right: 0.8rem;
 z-index: 1;
 `;
-<<<<<<< HEAD
-=======
-
->>>>>>> main
 const Step = styled.div`
   height: 12px;
   width: 12px;
