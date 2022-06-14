@@ -40,13 +40,11 @@ function Feedbox() {
     if (loading || finishedFetching) return;
     setLoading(true);
     try {
-      const { count, results } = await fetchSpamNotifications({
-        user: account,
-        pageSize: 100000,
+      const { count, results } = await fetchSpamNotifications({user: account,
+        pageSize: NOTIFICATIONS_PER_PAGE,
         page,
-        
         chainId
-    });
+      });
       const parsedResponse = utils.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
       if (count === 0) {
@@ -63,13 +61,11 @@ function Feedbox() {
     setBgUpdateLoading(true);
     setLoading(true);
     try {
-      const { count, results } = await fetchSpamNotifications({
-        user: account,
-        pageSize: 100000,
+      const { count, results } = await fetchSpamNotifications({user: account,
+        pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
-        
         chainId
-    });
+      });
       if (!notifications.length) {
         dispatch(incrementPage());
       }

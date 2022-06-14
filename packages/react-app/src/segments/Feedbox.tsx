@@ -192,7 +192,7 @@ function Feedbox() {
       try {
         const { count, results } = await fetchNotifications({
           user:account,
-          pageSize: NOTIFICATIONS_PER_PAGE,
+          pageSize: 100000,
           page: 1,
           chainId,
           
