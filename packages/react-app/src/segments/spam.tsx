@@ -21,7 +21,7 @@ import { postReq } from "api";
 import DisplayNotice from "components/DisplayNotice";
 import { ThemeProvider } from "styled-components";
 import { ethers } from "ethers";
-import * as EPNSAPI from "@epnsproject/sdk-restapi";
+import * as EpnsAPI from "@epnsproject/sdk-restapi";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -129,7 +129,7 @@ function SpamBox({ currentTab }) {
     if (loading || finishedFetching  || run) return;
     setLoading(true);
     try {
-      const { count, results } = await EPNSAPI.fetchSpamNotifications({
+      const { count, results } = await EpnsAPI.fetchSpamNotifications({
         user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
@@ -176,7 +176,7 @@ function SpamBox({ currentTab }) {
     setLoading(true);
 
     try {
-      const { count, results } = await EPNSAPI.fetchSpamNotifications({
+      const { count, results } = await EpnsAPI.fetchSpamNotifications({
         user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
@@ -228,7 +228,7 @@ function SpamBox({ currentTab }) {
   const fetchAllNotif = async () => {
     setLoadFilter(true);
     try {
-      const { count, results } = await EPNSAPI.fetchSpamNotifications({
+      const { count, results } = await EpnsAPI.fetchSpamNotifications({
         user: account,
         pageSize: 100000,
         page: 1,
