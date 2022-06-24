@@ -38,7 +38,7 @@ const NFTypes = [
   // { value: "2", label: "Old Secret (IPFS Payload)" },
   { value: "3", label: "Targeted (IPFS Payload)" },
   { value: "4", label: "Subset (IPFS Payload)" },
-  { value: "5", label: "Secret (IPFS Payload)" },
+//   { value: "5", label: "Secret (IPFS Payload)" },
   // { value: "6", label: "Offchain (Push)" },
 ];
 const LIMITER_KEYS = ["Enter", ","];
@@ -728,9 +728,9 @@ function SendNotifications() {
                       </H2>
                       {!isChannelDeactivated ? (
                           <H3 style={{color : theme.color}}>
-                              EPNS supports four types of notifications (for
-                              now!). <b>Groups</b>, <b>Subsets</b>, <b>Targeted</b>, and{" "}
-                              <b>Secret</b>
+                              EPNS supports three types of notifications (for
+                              now!). <b>Groups</b>, <b>Subsets</b>, and{" "}<b>Targeted</b>
+                              {/* <b>Secret</b> */}
                               {/* and{" "} <b>Subsets</b>. */}
                           </H3>
                       ) : (
