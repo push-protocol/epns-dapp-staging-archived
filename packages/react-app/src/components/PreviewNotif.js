@@ -17,20 +17,22 @@ const blockchainName = {
 };
 
 export default function PreviewNotif({ details }) {
-  const { channelDetails } = useSelector((state) => state.admin);
+  const { delegatees } = useSelector((state) => state.admin);
   const { chainId } = useWeb3React();
   const [check, setCheck] = useState();
+
+  const channelDetail = delegatees.filter(delegateeInfo => delegateeInfo.address == details.channelAddress)[0];
 
   const themes = useTheme();
   const NotifItem = ({ test }) => {
     return (
-      channelDetails && (
+      channelDetail && (
         <NotificationItem
           notificationTitle={test?.asub}
           notificationBody={test?.amsg}
           cta={test?.acta}
-          app={channelDetails.name}
-          icon={channelDetails.icon}
+          app={channelDetail.name}
+          icon={channelDetail.icon}
           image={test?.aimg}
           chainName={blockchainName[chainId]}
           theme={themes.scheme}

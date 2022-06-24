@@ -154,7 +154,6 @@ function Feedbox() {
         user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
-        chainId,
       });
       const parsedResponse = utils.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
@@ -176,7 +175,6 @@ function Feedbox() {
                 user: account,
                 pageSize: NOTIFICATIONS_PER_PAGE,
                 page: 1,
-                chainId,
             });
             if (!notifications.length) {
                 dispatch(incrementPage());
@@ -217,7 +215,6 @@ function Feedbox() {
               user: account,
               pageSize: 100000,
               page: 1,
-              chainId,
           });
           if (!notifications.length) {
               dispatch(incrementPage());

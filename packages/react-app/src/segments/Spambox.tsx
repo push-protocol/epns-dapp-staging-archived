@@ -43,8 +43,7 @@ function Feedbox() {
       const { count, results } = await EpnsAPI.fetchNotifications({
         user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
-        page,
-        chainId,
+        page
       });
       const parsedResponse = utils.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
@@ -65,8 +64,7 @@ function Feedbox() {
       const { count, results } = await EpnsAPI.fetchNotifications({
         user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
-        page: 1,
-        chainId,
+        page: 1
       });
       if (!notifications.length) {
         dispatch(incrementPage());
