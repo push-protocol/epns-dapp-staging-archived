@@ -281,7 +281,6 @@ function Feedbox() {
             </Item>
           )}
           { run && welcomeNotifs.map((oneNotification, index) => {
-            console.log(oneNotification);
               const {
                 cta,
                 title,
@@ -324,7 +323,6 @@ function Feedbox() {
               blockchain,
               url,
             } = oneNotification;
-            console.log(oneNotification);
             if(run) return;
             // render the notification item
             return (
