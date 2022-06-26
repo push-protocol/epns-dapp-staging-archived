@@ -1580,10 +1580,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@epnsproject/frontend-sdk-staging@^1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.8.4.tgz#7099db410cebf4f0cfc3bb5f653463fdbbc1a934"
-  integrity sha512-duRO+PF/bLYzoWUYtzhZQtsEGGPn2oGEPcNG7dLQi1gyKVkwVdM7zbixcuF+XoIUON3tfem5+oCTSTL9qx8eiw==
+"@epnsproject/frontend-sdk-staging@^1.8.5":
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.8.5.tgz#c0e3ddb0f9144e76e0bebde1d0fd40b4a807d84b"
+  integrity sha512-iQIRtkwD98PtGELA2iZkSPL/W+fxlBnVYEQQr5JEmFWqkew8nFwpq8x//kBd0Q+V2s2fhoc0vvZ632WLAol5pA==
   dependencies:
     "@rollup/plugin-commonjs" "^20.0.0"
     ansi-regex "^2.1.1"
@@ -1691,13 +1691,21 @@
   optionalDependencies:
     fsevents "^2.3.2"
 
-"@epnsproject/sdk-restapi@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-restapi/-/sdk-restapi-0.0.3.tgz#6f71cb01a06093423fdf926953d4654781619952"
-  integrity sha512-gvXHV29Sl2MvSHgwdES61r4J6t4VwPejMOa30NFdc2/ruwdeuWRSX60edGdcQLNH8GFIZC2thsq9y0T0cb+emw==
+"@epnsproject/sdk-restapi@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-restapi/-/sdk-restapi-0.0.8.tgz#f9b7c76c3650b29f9538e45f8ded48c1d121be25"
+  integrity sha512-4iEK1YmuhTYwbpcPRZItVFicGHVxbyn5s+qDGz3RMQCAS/Eix7shtTFiPkrd9Mixge3ZNzvJjO7uQMEB1yyQTA==
   dependencies:
     axios "^0.27.2"
     tslib "^2.3.0"
+
+"@epnsproject/sdk-uiweb@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-uiweb/-/sdk-uiweb-0.1.6.tgz#415bafdeb11edbbe37257a28d5931a6e13cfe612"
+  integrity sha512-nPXczcexTMqvI8NrxC/f02wJ5fU+DJR8IpTAyKGFAOJGO9kNKOEFciK2Rbg8pC8weyssUgpxHhSsKGOisGtdUA==
+  dependencies:
+    date-fns "^2.28.0"
+    html-react-parser "^1.4.13"
 
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"
@@ -10517,6 +10525,16 @@ html-react-parser@^1.2.8:
     react-property "2.0.0"
     style-to-js "1.1.0"
 
+html-react-parser@^1.4.13:
+  version "1.4.14"
+  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-1.4.14.tgz#577b7a90be0c61eebbbc488d914ad08398c79ef5"
+  integrity sha512-pxhNWGie8Y+DGDpSh8cTa0k3g8PsDcwlfolA+XxYo1AGDeB6e2rdlyv4ptU9bOTiZ2i3fID+6kyqs86MN0FYZQ==
+  dependencies:
+    domhandler "4.3.1"
+    html-dom-parser "1.2.0"
+    react-property "2.0.0"
+    style-to-js "1.1.1"
+
 html-webpack-plugin@4.0.0-beta.11:
   version "4.0.0-beta.11"
   resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-4.0.0-beta.11.tgz#3059a69144b5aecef97708196ca32f9e68677715"
@@ -19023,6 +19041,13 @@ style-to-js@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/style-to-js/-/style-to-js-1.1.0.tgz#631cbb20fce204019b3aa1fcb5b69d951ceac4ac"
   integrity sha512-1OqefPDxGrlMwcbfpsTVRyzwdhr4W0uxYQzeA2F1CBc8WG04udg2+ybRnvh3XYL4TdHQrCahLtax2jc8xaE6rA==
+  dependencies:
+    style-to-object "0.3.0"
+
+style-to-js@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/style-to-js/-/style-to-js-1.1.1.tgz#417786986cda61d4525c80aed9d1123a6a7af9b8"
+  integrity sha512-RJ18Z9t2B02sYhZtfWKQq5uplVctgvjTfLWT7+Eb1zjUjIrWzX5SdlkwLGQozrqarTmEzJJ/YmdNJCUNI47elg==
   dependencies:
     style-to-object "0.3.0"
 
