@@ -10,7 +10,7 @@
 			},
 			{
 				"indexed": true,
-				"internalType": "enum EPNSCoreDevV2.ChannelType",
+				"internalType": "enum EPNSCoreStagingV1.ChannelType",
 				"name": "channelType",
 				"type": "uint8"
 			},
@@ -371,7 +371,7 @@
 		"name": "channels",
 		"outputs": [
 			{
-				"internalType": "enum EPNSCoreDevV2.ChannelType",
+				"internalType": "enum EPNSCoreStagingV1.ChannelType",
 				"name": "channelType",
 				"type": "uint8"
 			},
@@ -466,7 +466,7 @@
 	{
 		"inputs": [
 			{
-				"internalType": "enum EPNSCoreDevV2.ChannelType",
+				"internalType": "enum EPNSCoreStagingV1.ChannelType",
 				"name": "_channelType",
 				"type": "uint8"
 			},
@@ -664,7 +664,7 @@
 				"type": "address[]"
 			},
 			{
-				"internalType": "enum EPNSCoreDevV2.ChannelType[]",
+				"internalType": "enum EPNSCoreStagingV1.ChannelType[]",
 				"name": "_channelTypeList",
 				"type": "uint8[]"
 			},

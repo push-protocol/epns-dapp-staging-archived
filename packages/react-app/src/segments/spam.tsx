@@ -162,7 +162,7 @@ function SpamBox({ currentTab }) {
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
         chainId,
-        dev: true,
+        
       });
         let parsedResponse = utils.parseApiResponse(results);
           parsedResponse.forEach( (each,i) => {
@@ -173,6 +173,9 @@ function SpamBox({ currentTab }) {
             elem.channel = results[i].channel;
             let address = results[i].channel;
             
+            if (results[i].blockchain === 'POLYGON_TEST_MUMBAI') {
+              address = await fetchEthAddress(results[i].channel);
+            }
             const {
               data: { subscribers },
             } = await postReq("/channels/get_subscribers", {
@@ -206,7 +209,7 @@ function SpamBox({ currentTab }) {
         pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
         chainId,
-        dev: true,
+        
       });
       if (!notifications.length) {
         dispatch(incrementPage());
@@ -219,7 +222,9 @@ function SpamBox({ currentTab }) {
         const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
           let address = results[i].channel;
-
+          if (results[i].blockchain === 'POLYGON_TEST_MUMBAI') {
+            address = await fetchEthAddress(results[i].channel);
+          }
           const {
             data: { subscribers },
           } = await postReq("/channels/get_subscribers", {
@@ -256,7 +261,7 @@ function SpamBox({ currentTab }) {
         pageSize: 100000,
         page: 1,
         chainId,
-        dev: true,
+        
       });
       if (!notifications.length) {
         dispatch(incrementPage());
@@ -269,7 +274,9 @@ function SpamBox({ currentTab }) {
         const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
           let address = results[i].channel;
-          
+          if (results[i].blockchain === 'POLYGON_TEST_MUMBAI') {
+            address = await fetchEthAddress(results[i].channel);
+          }
           const {
             data: { subscribers },
           } = await postReq("/channels/get_subscribers", {

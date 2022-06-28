@@ -40,10 +40,10 @@ function Feedbox() {
     if (loading || finishedFetching) return;
     setLoading(true);
     try {
-      const { count, results } = await EpnsAPI.fetchNotifications({
-        user: account,
+      const { count, results } = await EpnsAPI.fetchNotifications({user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
-        page
+        page,
+        chainId
       });
       const parsedResponse = utils.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
@@ -61,10 +61,10 @@ function Feedbox() {
     setBgUpdateLoading(true);
     setLoading(true);
     try {
-      const { count, results } = await EpnsAPI.fetchNotifications({
-        user: account,
+      const { count, results } = await EpnsAPI.fetchNotifications({user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
-        page: 1
+        page: 1,
+        chainId
       });
       if (!notifications.length) {
         dispatch(incrementPage());

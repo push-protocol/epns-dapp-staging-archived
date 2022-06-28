@@ -260,13 +260,10 @@ function CreateChannel() {
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
 
-    if (daiAmountVal < 50.0) {
-      var sendTransactionPromise = daiContract.approve(
-        addresses.epnscore,
-        fees
-      );
+    if(daiAmountVal < 50.0){
+      var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
       const tx = await sendTransactionPromise;
-
+  
       console.log(tx);
       console.log("waiting for tx to finish");
       setProcessingInfo("Waiting for Approval TX to finish...");
@@ -570,7 +567,7 @@ function CreateChannel() {
                 accept="image/jpeg,image/png"
               />
             </Item> */}
-                {chainId != 1 ? (
+                {chainId != 1 || chainId != 137 ? (
                   <Item align="flex-end">
                     <Minter
                       onClick={() => {
@@ -589,7 +586,7 @@ function CreateChannel() {
               </Content>
             </Section>
           )}
-
+ 
           {/* Stake Fees Section */}
           {uploadDone && !stakeFeesChoosen && (
             <Section>

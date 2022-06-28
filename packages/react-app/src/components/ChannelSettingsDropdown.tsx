@@ -248,8 +248,9 @@ function ChannelSettings() {
           onClick={toggleChannelActivationState}
         >
           <ActionTitle>
-            {!onCoreNetwork ?
-              ("") : loading ? (
+            {!onCoreNetwork ? (
+              ""
+            ) : loading ? (
               "Loading ..."
             ) : isChannelBlocked ? (
               "Channel Blocked"
@@ -274,7 +275,6 @@ function ChannelSettings() {
               )}
             </ActionTitle>
           </ChannelActionButton>
-
 
           <ChannelActionButton
             disabled={channelInactive}
@@ -350,7 +350,7 @@ function ChannelSettings() {
         />
       )}
 
-      { addSubGraphIdOpen && (
+      {addSubGraphIdOpen && (
         <AddSubGraphIdModal
         onClose={(val) => setAddSubGraphIdOpen(val)}
         onSuccess={() => {
@@ -362,7 +362,6 @@ function ChannelSettings() {
         }}
         addSubGraphDetails={addSubgraphDetails}
         />
-
       ) }
     </div>
   );

@@ -54,6 +54,7 @@ export default function ChannelDetails() {
       setCreationDate(date.format(DATE_FORMAT))
     })();
   }, [channelDetails]);
+  
 
   React.useEffect(() => {
     if (!onCoreNetwork) return;

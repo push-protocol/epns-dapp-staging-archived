@@ -32,7 +32,7 @@ const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
 function Feedbox() {
   const dispatch = useDispatch();
-  const { account, library, chainId } = useWeb3React();
+  const { account, chainId, library } = useWeb3React();
   const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
   const { notifications, page, finishedFetching, toggle } = useSelector(
     (state: any) => state.notifications
@@ -151,9 +151,11 @@ function Feedbox() {
     setLoading(true);
     try {
       const { count, results } = await EpnsAPI.fetchNotifications({
-        user: account,
+        user:account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
+        chainId,
+        
       });
       const parsedResponse = utils.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
@@ -171,11 +173,12 @@ function Feedbox() {
         setBgUpdateLoading(true);
         setLoading(true);
         try {
-            const { count, results } = await EpnsAPI.fetchNotifications({
-                user: account,
-                pageSize: NOTIFICATIONS_PER_PAGE,
-                page: 1,
-            });
+          const { count, results } = await EpnsAPI.fetchNotifications({
+            user:account,
+            pageSize: NOTIFICATIONS_PER_PAGE,
+            page: 1,
+            chainId,
+          });
             if (!notifications.length) {
                 dispatch(incrementPage());
             }
@@ -211,11 +214,13 @@ function Feedbox() {
     const fetchAllNotif = async () => {
       setLoadFilter(true);
       try {
-          const { count, results } = await EpnsAPI.fetchNotifications({
-              user: account,
-              pageSize: 100000,
-              page: 1,
-          });
+        const { count, results } = await EpnsAPI.fetchNotifications({
+          user:account,
+          pageSize: 100000,
+          page: 1,
+          chainId,
+          
+        });
           if (!notifications.length) {
               dispatch(incrementPage());
           }

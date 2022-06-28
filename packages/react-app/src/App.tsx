@@ -32,6 +32,7 @@ import { postReq } from "api";
 import { toast } from "react-toastify";
 dotenv.config();
 
+const CACHEPREFIX = "PUSH_TOKEN_";
 // define the different type of connectors which we use
 const web3Connectors = {
   Injected: {
@@ -48,17 +49,16 @@ const web3Connectors = {
   Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
-const CACHEPREFIX = "PUSH_TOKEN_";
 export default function App() {
 
   const dispatch = useDispatch();
 
   const { connector, activate, active, error, account } = useWeb3React<Web3Provider>();
+  const [info, setInfo] = useState("");
   const [activatingConnector, setActivatingConnector] = React.useState<
     AbstractConnector
   >();
   const [currentTime, setcurrentTime] = React.useState(0);
-
   const themes = useTheme();
 
   const {
@@ -116,7 +116,7 @@ export default function App() {
   // }, [triggerNotification]);
   
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     const now = Date.now()/ 1000;
     setcurrentTime(now)
   },[])
@@ -200,6 +200,15 @@ export default function App() {
     //   dispatch(incrementStepIndex());
     // }
   }
+
+  // toast customize
+  // const LoaderToast = ({ msg, color }) => (
+  //   <Toaster>
+  //     <Loader type="Oval" color={color} height={30} width={30} />
+  //     <ToasterMsg>{msg}</ToasterMsg>
+  //   </Toaster>
+  // );
+
 
   return (
     <ThemeProvider theme={darkMode ? themeDark : themeLight }>
@@ -498,4 +507,15 @@ const BeaconExamplePulse = styled.span`
   opacity: 0.9;
   position: absolute;
   transform-origin: center center;
+`;
+
+const Toaster = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0px 10px;
+`;
+
+const ToasterMsg = styled.div`
+  margin: 0px 10px;
 `;

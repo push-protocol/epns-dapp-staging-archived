@@ -26,6 +26,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
   ReactGA.pageview("/rockstars");
 
   const { account, library, chainId } = useWeb3React();
+  const onCoreNetwork = chainId === envConfig.coreContractChain;
 
   const themes = useTheme();
   const [darkMode, setDarkMode] = useState(false);
