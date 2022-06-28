@@ -16,7 +16,7 @@ export default function AddDelegateModal({
 }) {
 
     const themes = useTheme();
-    console.log(themes);
+    // console.log(themes);
     const modalRef = useRef(null);
     const [mainAdress, setMainAddress] = useState('');
     const [loading, setLoading] = useState('');
@@ -28,7 +28,7 @@ export default function AddDelegateModal({
         setLoading('loading')
         addDelegate(mainAdress)
         .then(async (tx) => {
-            console.log(tx);
+            // console.log(tx);
             setLoading("Transaction Sent!");
 
             setTimeout(() => {
