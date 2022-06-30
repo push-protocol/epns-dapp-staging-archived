@@ -376,6 +376,7 @@ function Feedbox() {
                 cta,
                 title,
                 message,
+                url,
                 app,
                 icon,
                 image,
@@ -389,6 +390,7 @@ function Feedbox() {
                   <NotificationItem
                     notificationTitle={title}
                     notificationBody={message}
+                    url={url}
                     cta={cta}
                     app={app}
                     icon={icon}
@@ -407,6 +409,7 @@ function Feedbox() {
             const {
               cta,
               title,
+              url,
               message,
               app,
               icon,
@@ -414,7 +417,6 @@ function Feedbox() {
               secret,
               notification,
               blockchain,
-              url
             } = oneNotification;
             if(run) return;
             // render the notification item
@@ -426,6 +428,7 @@ function Feedbox() {
                 <NotificationItem
                   notificationTitle={notification.title}
                   notificationBody={notification.body}
+                  url={url}
                   cta={cta}
                   app={app}
                   icon={icon}
@@ -434,7 +437,6 @@ function Feedbox() {
                   decryptFn={() => onDecrypt({ secret, title, message, image, cta })}
                   chainName={blockchain}
                   theme={themes.scheme}
-                  url={url}
                   // NotificationItem throws an error if this variable is not passed
                   isSpam={false}
                 />

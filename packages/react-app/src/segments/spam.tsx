@@ -500,6 +500,7 @@ function SpamBox({ currentTab }) {
               const {
                 cta,
                 title,
+                url,
                 message,
                 app,
                 icon,
@@ -522,6 +523,7 @@ function SpamBox({ currentTab }) {
                     notificationTitle={notification.title}
                     notificationBody={notification.body}
                     cta={cta}
+                    url={url}
                     app={app}
                     icon={icon}
                     image={image}
