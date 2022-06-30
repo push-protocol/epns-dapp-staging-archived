@@ -166,8 +166,6 @@ function SpamBox({ currentTab }) {
         
       });
         let parsedResponse = EpnsAPI.parseApiResponse(results);
-        // return type of parsedApiResponse does not contain date, epoch and channel
-        // so it gives error below but it works
           parsedResponse.forEach( (each,i) => {
               each['date'] = results[i].epoch;
               each['epoch'] = (new Date(each['date']).getTime() / 1000);
@@ -218,8 +216,6 @@ function SpamBox({ currentTab }) {
         dispatch(incrementPage());
       }
       let parsedResponse = EpnsAPI.parseApiResponse(results);
-      // return type of parsedApiResponse does not contain date, epoch and channel
-      // so it gives error below but it works
         parsedResponse.forEach( (each,i) => {
             each['date'] = results[i].epoch;
             each['epoch'] = (new Date(each['date']).getTime() / 1000);
@@ -272,8 +268,6 @@ function SpamBox({ currentTab }) {
         dispatch(incrementPage());
       }
       let parsedResponse = EpnsAPI.parseApiResponse(results);
-      // return type of parsedApiResponse does not contain date, epoch and channel
-      // so it gives error below but it works
         parsedResponse.forEach( (each,i) => {
             each['date'] = results[i].epoch;
             each['epoch'] = (new Date(each['date']).getTime() / 1000);
@@ -518,7 +512,6 @@ function SpamBox({ currentTab }) {
                   {showWayPoint(index) && !loading && (
                     <Waypoint onEnter={handlePagination} />
                   )}
-                  {/* subscribeFn is not expected as prop for NotificationItem */}
                   <NotificationItem
                     notificationTitle={notification.title}
                     notificationBody={notification.body}
