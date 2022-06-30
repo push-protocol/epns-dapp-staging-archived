@@ -193,9 +193,9 @@ function Feedbox() {
             // return type of parsedApiResponse does not contain date, epoch and channel
             // so it gives error below but it works
             parsedResponse.forEach( each => {
-                each.date = map1.get(each.sid);
-                each.epoch = (new Date(each.date).getTime() / 1000);
-                each.channel = map2.get(each.sid);
+                each['date'] = map1.get(each.sid);
+                each['epoch'] = (new Date(each['date']).getTime() / 1000);
+                each['channel'] = map2.get(each.sid);
             })
             dispatch(
                 updateTopNotifications({
@@ -237,9 +237,9 @@ function Feedbox() {
           // return type of parsedApiResponse does not contain date, epoch and channel
           // so it gives error below but it works
           parsedResponse.forEach( each => {
-              each.date = map1.get(each.sid);
-              each.epoch = (new Date(each.date).getTime() / 1000);
-              each.channel = map2.get(each.sid);
+              each['date'] = map1.get(each.sid);
+              each['epoch'] = (new Date(each['date']).getTime() / 1000);
+              each['channel'] = map2.get(each.sid);
           })
           setNotif(parsedResponse);
       } catch (err) {
@@ -380,8 +380,7 @@ function Feedbox() {
                 app,
                 icon,
                 image,
-                blockchain,
-                url
+                blockchain
               } = oneNotification;
 
               // render the notification item
@@ -397,9 +396,6 @@ function Feedbox() {
                     image={image}
                     chainName={blockchain}
                     theme={themes.scheme}
-                    url={url}
-                    // NotificationItem throws an error if this variable is not passed
-                    isSpam={false}
                   />
                 </div>
               );
@@ -437,8 +433,6 @@ function Feedbox() {
                   decryptFn={() => onDecrypt({ secret, title, message, image, cta })}
                   chainName={blockchain}
                   theme={themes.scheme}
-                  // NotificationItem throws an error if this variable is not passed
-                  isSpam={false}
                 />
               </div>
             );
