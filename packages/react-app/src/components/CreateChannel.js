@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import Select from "react-select";
+// import Select from "react-select";
 import styled, { css, useTheme } from "styled-components";
 import {
   Section,
@@ -46,6 +46,7 @@ const ALIAS_CHAINS = [
   { value: "Ethereum", label: "Ethereum" },
   { value: "POLYGON_TEST_MUMBAI:80001", label: "Polygon" },
 ];
+
 
 const networkName = {
   42: "Ethereum Kovan",
@@ -403,6 +404,7 @@ function CreateChannel() {
     xhr.send();
   }
 
+
   return (
     <ThemeProvider theme={themes}>
       <Section>
@@ -713,7 +715,17 @@ function CreateChannel() {
                   >
                     {/* <ItemAlias> */}
 
-                    <Select
+
+                    <SelectItem defaultValue={{label: "Ethereum", value:"Ethereum"}} className='selectItem' onChange={(selectedOption) => {
+                        setChainDetails(selectedOption.target.value);
+                        // console.log(selectedOption)
+                      }}>
+                      {ALIAS_CHAINS?.map((x)=>(
+                        <option value={x?.value}>{x?.label}</option>
+                      ))}
+                    </SelectItem>
+
+                    {/* <Select
                       // className="basic-single"
                       // classNamePrefix="select"
                       placeholder="Choose the channels network"
@@ -740,7 +752,7 @@ function CreateChannel() {
                       onChange={(selectedOption) => {
                         setChainDetails(selectedOption.value);
                       }}
-                    />
+                    /> */}
 
                     <span
                       className="imgSpan"
@@ -1036,6 +1048,20 @@ const Channel = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+`;
+
+const SelectItem = styled.select`
+  flex: 1;
+  outline: none;
+  height: 59px;
+  color: #000;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url('./svg/arrowdown.svg');
+  background-repeat: no-repeat, repeat;
+  background-position: right .7em top 50%, 0 0;
+  background-size: .65em auto, 100%;
 `;
 
 const Notice = styled.div`
