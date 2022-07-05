@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 // import Select from "react-select";
 import styled, { css, useTheme } from "styled-components";
+import Dropdown from "react-dropdown";
+import "react-dropdown/style.css";
 import {
   Section,
   Content,
@@ -713,17 +715,21 @@ function CreateChannel() {
                     height="20px"
                     style={{ position: "relative" }}
                   >
-                    {/* <ItemAlias> */}
+                    
+                    {/* dropdown */}
+                    <DropdownStyledParent>
+                            <DropdownStyled
+                                  options={ALIAS_CHAINS}
+                                  onChange={(option) => {
+                                      setChainDetails(option.value);
+                                      console.log(option);
+                                  }}
+                                  value={chainDetails}
+                                  // value={{label: "Ethereum", value:"Ethereum"}}
+                                  // placeholder="Select Type of Notification to Send"
+                              />
+                          </DropdownStyledParent>
 
-
-                    <SelectItem defaultValue={{label: "Ethereum", value:"Ethereum"}} className='selectItem' onChange={(selectedOption) => {
-                        setChainDetails(selectedOption.target.value);
-                        // console.log(selectedOption)
-                      }}>
-                      {ALIAS_CHAINS?.map((x)=>(
-                        <option value={x?.value}>{x?.label}</option>
-                      ))}
-                    </SelectItem>
 
                     {/* <Select
                       // className="basic-single"
@@ -1280,5 +1286,46 @@ const Field = styled.div`
   text-transform: uppercase;
 `;
 
-// Export Default
+const DropdownStyledParent = styled.div`
+flex:1;
+.is-open {
+    margin-bottom: 130px;
+}
+`
+
+const DropdownStyled = styled(Dropdown)`
+  .Dropdown-control {
+      background-color: #fff;
+      color: #000;
+      // padding: 12px 52px 12px 10px;
+      border: 1px solid black;
+      width:100%;
+      outline: none;
+      height: 59px;
+      display: flex;
+      align-items: center;
+  }
+  .Dropdown-arrow {
+      top: 30px;
+      bottom: 0;
+      border-color: #f #000 #000;
+  }
+  .Dropdown-menu {
+      .is-selected {
+      background-color: #D00775;
+      color:#fff;
+    }
+  }
+
+    
+  .Dropdown-option {
+      background-color: #fff;
+      color: #000;
+  }
+  .Dropdown-option:hover {
+      background-color: #D00775;
+      color: #000;
+  }
+  `;
+
 export default CreateChannel;
