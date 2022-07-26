@@ -408,17 +408,6 @@ function Feedbox() {
               )}
             </Notifs>
           )}
-          { run && welcomeNotifs.map((oneNotification, index) => {
-              const {
-                cta,
-                title,
-                message,
-                url,
-                app,
-                icon,
-                image,
-                blockchain
-              } = oneNotification;
 
           {toast && (
             <NotificationToast notification={toast} clearToast={clearToast} />
@@ -446,17 +435,6 @@ const Container = styled.div`
 const Notifs = styled.div`
   align-self: stretch;
   flex: 1;
-`;
-
-const Toaster = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 0px 10px;
-`;
-
-const ToasterMsg = styled.div`
-  margin: 0px 10px;
 `;
 
 const Toaster = styled.div`

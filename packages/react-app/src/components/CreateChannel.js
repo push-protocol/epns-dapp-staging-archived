@@ -105,13 +105,6 @@ function CreateChannel() {
     console.log(channelFile);
   };
 
-  const proceed = () => {
-    setStepFlow(2);
-    setProcessing(0);
-    setUploadDone(true);
-    console.log(channelFile);
-  };
-
   const handleLogoSizeLimitation = (base64) => {
     // Setup Error on higher size of 128px
     var sizeOf = require("image-size");

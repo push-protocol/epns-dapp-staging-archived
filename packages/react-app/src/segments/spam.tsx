@@ -34,12 +34,6 @@ function SpamBox({ currentTab }) {
   const themes = useTheme();
 
   // toast related section
-  const [toast, showToast] = React.useState(null);
-  const clearToast = () => showToast(null);
-
-  const { run } = useSelector((state: any) => state.userJourney);
-
-  // toast related section
 	const [toast, showToast] = React.useState(null);
   const clearToast = () => showToast(null);
   
@@ -446,7 +440,6 @@ function SpamBox({ currentTab }) {
               const {
                 cta,
                 title,
-                url,
                 message,
                 app,
                 icon,
@@ -480,7 +473,6 @@ function SpamBox({ currentTab }) {
                     isSecret={secret != ''}
                     decryptFn={() => onDecrypt({ secret, title, message, image, cta })}
                     chainName={blockchain}
-                    url={url}
                   />
                 </div>
               );
