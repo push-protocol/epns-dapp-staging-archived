@@ -54,6 +54,35 @@ export default function ChannelDetails() {
       setCreationDate(date.format(DATE_FORMAT))
     })();
   }, [channelDetails]);
+  
+
+  React.useEffect(() => {
+    if (!onCoreNetwork) return;
+
+    (async function() {
+      await postReq("/channels/get_alias_details", {
+        channel : account,
+        op: "read",
+      }).then(async ({ data }) => {
+        const aliasAccount = data;
+        // console.log(aliasAccount);
+        if (aliasAccount.aliasAddress) {
+          const { aliasAddress } = aliasAccount;
+            await postReq("/channels/get_alias_verification_status", {
+              aliasAddress: aliasAddress,
+              op: "read",
+            }).then(({ data }) => {
+              if (!data) {
+                return;
+              }
+              const { status } = data;
+              setAliasVerified(status || false);
+              return data;
+            });
+        }
+      });
+    })();
+  }, [account , chainId]);
 
   React.useEffect(() => {
     if (!onCoreNetwork) return;

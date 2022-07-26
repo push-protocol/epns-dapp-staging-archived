@@ -45,6 +45,13 @@ function YieldFarmingPage() {
     }
   })
 
+  React.useEffect(() => {
+    if (!onCoreNetwork) {
+      const url = window.location.origin;
+      window.location.replace(`${url}/#/notavailable`);
+    }
+  })
+
   const getPoolStats = React.useCallback(async () => {
     const poolStats = await YieldFarmingDataStore.instance.getPoolStats();
 

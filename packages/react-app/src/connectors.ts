@@ -25,6 +25,8 @@ const RPC_URLS: { [chainId: number]: string } = {
 
 export const injected = new InjectedConnector({ supportedChainIds: SUPPORTED_CHAIN_IDS })
 
+// Only receive messages from platform.apps.ledger.com
+export const ledgerLiveConnector = new LedgerHQFrameConnector()
 
 // Only receive messages from platform.apps.ledger.com
 export const ledgerLiveConnector = new LedgerHQFrameConnector();
@@ -48,7 +50,7 @@ export const trezor = new TrezorConnector({
   url: CORE_RPC,
   pollingInterval: POLLING_INTERVAL,
   manifestEmail: 'support@epns.io',
-  manifestAppUrl: 'https://staging-app.epns.io'
+  manifestAppUrl: 'https://staging.epns.io'
 })
 
 //

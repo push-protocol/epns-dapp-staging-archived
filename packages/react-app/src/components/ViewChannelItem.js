@@ -69,6 +69,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
   const [canUnverify, setCanUnverify] = React.useState(false);
   const [verifierDetails, setVerifierDetails] = React.useState(null);
   const [copyText, setCopyText] = React.useState(null);
+  const [ethAliasAccount, setEthAliasAccount] = React.useState(null);
 
   // ------ toast related section
   const isChannelBlacklisted = CHANNEL_BLACKLIST.includes(channelObject.addr);
@@ -153,6 +154,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
       }
       if (!channelAddress) return;
 
+      if (run) subscribed = false;
       setIsPushAdmin(pushAdminAddress === account);
       setMemberCount(channelObject.memberCount);
       setSubscribed(channelObject.isSubscriber);

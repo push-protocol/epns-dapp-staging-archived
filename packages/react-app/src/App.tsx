@@ -32,6 +32,7 @@ import InitState from "components/InitState";
 
 dotenv.config();
 
+const CACHEPREFIX = "PUSH_TOKEN_";
 // define the different type of connectors which we use
 const web3Connectors = {
   Injected: {
@@ -48,7 +49,6 @@ const web3Connectors = {
   Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
-
 export default function App() {
 
   const dispatch = useDispatch();

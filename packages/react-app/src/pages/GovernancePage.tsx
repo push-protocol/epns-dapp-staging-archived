@@ -55,6 +55,7 @@ function GovernancePage() {
 
   const [showDelegateePrompt, setShowDelegateePrompt] = React.useState(false);
   const [delegatee, setDelegatee] = React.useState(null);
+  const [delegateTxLoading, setDelegateTxLoading] = React.useState(false);
 
   const [showAnswers, setShowAnswers] = React.useState([]);
   const [selfVotingPower, setSelfVotingPower] = React.useState(null);
@@ -77,6 +78,13 @@ function GovernancePage() {
     }
   })
 
+  React.useEffect(()=>{
+      toolingPostReq('/gov/prev_delegation',{"walletAddress": account}).then(res=>{
+        console.log("result",res.data.user)
+        setGaslessInfo(res.data.user);
+      }
+      )
+  },[]);
   React.useEffect(() => {
     toolingPostReq('/gov/prev_delegation', { "walletAddress": account }).then(res => {
       console.log("result", res.data.user)
@@ -218,7 +226,6 @@ function GovernancePage() {
   const checkForDelegateError = async (gasEstimate) => {
     // return false if no error
     // otherwise return error message
-
     // get gas price
     const gasPrice = await EPNSCoreHelper.getGasPriceInDollars(library);
     const totalCost = gasPrice * gasEstimate;
@@ -230,7 +237,6 @@ function GovernancePage() {
 
 
   //execute delegate tx wth gas when tokenbalance < PUSH_BALANCE_TRESHOLD
-
 
   const delegateAction = async (newDelegatee) => {
     setTxInProgress(true);

@@ -39,6 +39,12 @@ function SpamBox({ currentTab }) {
 
   const { run } = useSelector((state: any) => state.userJourney);
 
+  // toast related section
+	const [toast, showToast] = React.useState(null);
+  const clearToast = () => showToast(null);
+  
+  const { run } = useSelector((state: any) => state.userJourney);
+
   const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
@@ -183,7 +189,6 @@ function SpamBox({ currentTab }) {
         const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
           let address = results[i].channel;
-
           const {
             data: { subscribers },
           } = await postReq("/channels/get_subscribers", {
@@ -297,7 +302,6 @@ function SpamBox({ currentTab }) {
       }
       return ethAccount;
     });
-
     return aliasEth;
   }
 
@@ -366,7 +370,6 @@ function SpamBox({ currentTab }) {
     let txToast;
     try {
       let decryptedSecret = await CryptoHelper.decryptWithWalletRPCMethod(library.provider, secret, account);
-
       // decrypt notification message
       const decryptedBody = await CryptoHelper.decryptWithAES(message, decryptedSecret);
 
@@ -446,6 +449,7 @@ function SpamBox({ currentTab }) {
               const {
                 cta,
                 title,
+                url,
                 message,
                 app,
                 icon,
@@ -468,6 +472,7 @@ function SpamBox({ currentTab }) {
                     notificationTitle={notification.title}
                     notificationBody={notification.body}
                     cta={cta}
+                    url={url}
                     app={app}
                     icon={icon}
                     image={image}

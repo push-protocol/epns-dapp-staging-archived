@@ -13,6 +13,8 @@ import NotificationToast from "../primaries/NotificationToast";
 
 import Loader from "react-loader-spinner";
 
+import Loader from "react-loader-spinner";
+
 import Feedbox from "segments/Feedbox";
 
 import ChannelsDataStore from "singletons/ChannelsDataStore";

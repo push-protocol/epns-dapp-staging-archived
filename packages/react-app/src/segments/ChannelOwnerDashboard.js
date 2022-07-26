@@ -118,7 +118,6 @@ const ChannelOwnerDashboard = () => {
               aliasEthAccount={aliasEthAccount}
             />
           }
-
           {/* display the create channel page if there are no details */}
           {/* display the channel settings */}
           {channelDetails && ((!onCoreNetwork && aliasVerified) || onCoreNetwork) ? <ChannelSettings /> : ""}
