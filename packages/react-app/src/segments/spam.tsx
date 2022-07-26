@@ -132,7 +132,6 @@ function SpamBox({ currentTab }) {
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
         chainId,
-        dev: true,
       });
         let parsedResponse = EpnsAPI.parseApiResponse(results);
           parsedResponse.forEach( (each,i) => {
@@ -176,7 +175,6 @@ function SpamBox({ currentTab }) {
         pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
         chainId,
-        dev: true,
       });
       if (!notifications.length) {
         dispatch(incrementPage());
@@ -225,7 +223,6 @@ function SpamBox({ currentTab }) {
         pageSize: 100000,
         page: 1,
         chainId,
-        dev: true,
       });
       if (!notifications.length) {
         dispatch(incrementPage());

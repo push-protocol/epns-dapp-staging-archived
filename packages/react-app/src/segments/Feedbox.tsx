@@ -112,7 +112,6 @@ function Feedbox() {
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
         chainId,
-        dev: true,
       });
       const parsedResponse = EpnsAPI.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
@@ -135,7 +134,6 @@ function Feedbox() {
         pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
         chainId,
-        dev: true,
       });
       if (!notifications.length) {
         dispatch(incrementPage());
@@ -177,7 +175,6 @@ function Feedbox() {
         pageSize: 100000,
         page: 1,
         chainId,
-        dev: true,
       });
       if (!notifications.length) {
         dispatch(incrementPage());
