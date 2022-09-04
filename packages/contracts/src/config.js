@@ -1,7 +1,7 @@
 // environmental configurations for the dapp for different environments
 const config = {
-    apiUrl: "https://backend-dev.epns.io/apis",
-    env: 'dev',
+    apiUrl: "https://backend-staging.epns.io/apis",
+    env: 'staging',
     toolingApiUrl: "https://tooling.epns.io/apis",
     allowedNetworks: [
         42, //for kovan
