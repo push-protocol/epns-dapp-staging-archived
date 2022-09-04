@@ -385,7 +385,7 @@ export default class ChannelsDataStore {
               is_alias_verified,
             }) => {
               return {
-                aliasAddress: alias_address,
+                aliasAddress: alias_address === "NULL" ? null: alias_address,
                 isAliasVerified: is_alias_verified,
               };
             }
