@@ -6,7 +6,7 @@ import Dropdown from "react-dropdown";
 import { Oval } from "react-loader-spinner";
 import "./createChannel.css";
 import { envConfig } from "@project/contracts";
-import { aliasChainIdsMapping, networkName, isValidUrl } from "helpers/UtilityHelper";
+import { aliasChainIdsMapping, networkName, isValidUrl, isValidAddress } from "helpers/UtilityHelper";
 
 const coreChainId = envConfig.coreContractChain;
 const aliasChainId = aliasChainIdsMapping[coreChainId];
@@ -59,6 +59,11 @@ const ChannelInfo = ({
       //   setProcessingInfo("");
       // }, 5000);
 
+      return false;
+    }
+
+    if(chainDetails !== coreChainId && !isValidAddress(channelAlias)) {
+      setInfo("Channel Alias Address is invalid! Please retry!");
       return false;
     }
 
